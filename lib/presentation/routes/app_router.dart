@@ -10,6 +10,7 @@ import 'package:artisanarc/features/business/presentation/daily_sales_screen.dar
 import 'package:artisanarc/features/business/presentation/new_sale_entry_screen.dart'; // Added
 import 'package:artisanarc/features/project/presentation/project_list_screen.dart'; // Added ProjectListScreen
 import 'package:artisanarc/features/project/presentation/project_planner_screen.dart'; // Added ProjectPlannerScreen
+import 'package:artisanarc/features/qr/presentation/qr_scanner_page.dart'; // Added QRScannerPage
 
 class AppRouter {
   // TODO: Implement logic to check onboarding completion status
@@ -85,6 +86,11 @@ class AppRouter {
           ),
           // TODO: Add route for project details view if different from edit view
         ],
+      ),
+      GoRoute(
+        path: '/scan-qr', // Top-level route for QR scanner
+        name: 'scanQrCode',
+        builder: (context, state) => const QRScannerPage(),
       ),
     ],
   );

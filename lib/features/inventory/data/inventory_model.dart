@@ -20,7 +20,13 @@ class InventoryItem extends HiveObject {
   final double? price;
 
   @HiveField(5)
-  final String? storageLocation;
+  String? storageLocation; // Made mutable for consistency if needed for editing
+
+  @HiveField(6)
+  List<String>? imagePaths; // New field for image paths
+
+  @HiveField(7)
+  DateTime lastUpdated; // Added lastUpdated
 
   InventoryItem({
     required this.id,
@@ -29,5 +35,30 @@ class InventoryItem extends HiveObject {
     required this.quantity,
     this.price,
     this.storageLocation,
+    this.imagePaths, // Added to constructor
+    required this.lastUpdated, // Added to constructor
   });
+
+  // copyWith method for easy updates
+  InventoryItem copyWith({
+    String? id,
+    String? name,
+    String? category,
+    int? quantity,
+    double? price,
+    String? storageLocation,
+    List<String>? imagePaths,
+    DateTime? lastUpdated,
+  }) {
+    return InventoryItem(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      category: category ?? this.category,
+      quantity: quantity ?? this.quantity,
+      price: price ?? this.price,
+      storageLocation: storageLocation ?? this.storageLocation,
+      imagePaths: imagePaths ?? this.imagePaths,
+      lastUpdated: lastUpdated ?? this.lastUpdated,
+    );
+  }
 }

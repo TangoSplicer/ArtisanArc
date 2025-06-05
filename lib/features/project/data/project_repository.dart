@@ -3,6 +3,7 @@ import 'project_model.dart';
 
 abstract class ProjectRepository {
   Future<void> saveProject(Project project);
+  Future<Project?> getProjectById(String id); // Added
   Future<List<Project>> getAllProjects();
   Future<void> deleteProject(String id);
 }
@@ -15,6 +16,12 @@ class ProjectRepositoryImpl implements ProjectRepository {
       await Hive.openBox<Project>(_boxName);
     }
     return Hive.box<Project>(_boxName);
+  }
+
+  @override
+  Future<Project?> getProjectById(String id) async {
+    final box = await _getBox();
+    return box.get(id);
   }
 
   @override

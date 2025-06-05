@@ -11,7 +11,7 @@ import '../../features/project/domain/entities/supply_need.dart'; // Added impor
 void registerHiveAdapters() {
   // Ensure typeIds are unique and match class annotations
   // ProjectAdapter() is for typeId 3
-  // MilestoneAdapter() is for typeId 2
+  // MilestoneAdapter() is for typeId 5 // Updated comment
   // SupplyNeedAdapter() is for typeId 4 (as defined in supply_need.dart)
 
   // Check if adapters are already registered to prevent errors during hot reload/restart

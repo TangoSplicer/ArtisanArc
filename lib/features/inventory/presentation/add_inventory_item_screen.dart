@@ -1,6 +1,10 @@
+import 'dart:io'; // For File operations
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // For FilteringTextInputFormatter
 import 'package:get_it/get_it.dart';
+import 'package:image_picker/image_picker.dart'; // Added image_picker
+import 'package:path_provider/path_provider.dart'; // Added path_provider
+import 'package:path/path.dart' as path; // For path manipulation
 import 'package:artisanarc/features/inventory/domain/entities/inventory_item.dart';
 import 'package:artisanarc/features/inventory/domain/usecases/add_inventory_item.dart';
 import 'package:uuid/uuid.dart'; // For generating unique IDs
@@ -19,6 +23,8 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
   final _quantityController = TextEditingController();
   final _priceController = TextEditingController();
   final _storageLocationController = TextEditingController();
+  List<String> _selectedImagePaths = []; // To store paths of copied images
+  final ImagePicker _picker = ImagePicker();
 
   final AddInventoryItem _addInventoryItemUseCase = GetIt.I<AddInventoryItem>();
   final Uuid _uuid = Uuid();
@@ -42,8 +48,8 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
         quantity: int.parse(_quantityController.text),
         price: _priceController.text.isNotEmpty ? double.parse(_priceController.text) : null,
         storageLocation: _storageLocationController.text.isNotEmpty ? _storageLocationController.text : null,
+        imagePaths: _selectedImagePaths, // Pass the stored image paths
         lastUpdated: DateTime.now(),
-        // supplier and notes can be added later if needed
       );
 
       try {
@@ -135,7 +141,9 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
                 controller: _storageLocationController,
                 decoration: const InputDecoration(labelText: 'Storage Location (Optional)', border: OutlineInputBorder()),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
+              _buildImagePickerSection(), // Added image picker section
+              const SizedBox(height: 24),
               ElevatedButton.icon(
                 icon: const Icon(Icons.add),
                 label: const Text('Add Item'),
@@ -150,5 +158,80 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
         ),
       ),
     );
+  }
+
+  Widget _buildImagePickerSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Images', style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: 8),
+        OutlinedButton.icon(
+          icon: const Icon(Icons.add_a_photo),
+          label: const Text('Add Images'),
+          onPressed: _pickImages,
+        ),
+        const SizedBox(height: 8),
+        _selectedImagePaths.isEmpty
+            ? const Text('No images selected.')
+            : Wrap(
+                spacing: 8.0,
+                runSpacing: 8.0,
+                children: _selectedImagePaths.map((imagePath) {
+                  // Since we are storing relative paths to files in app docs,
+                  // we need to reconstruct the full path to display them using Image.file
+                  // However, during selection, we only have the filename part here.
+                  // For simplicity, just show filename. Thumbnails would need full path reconstruction.
+                  return Chip(
+                    label: Text(path.basename(imagePath)), // Display only the filename
+                    onDeleted: () {
+                      setState(() {
+                        _selectedImagePaths.remove(imagePath);
+                        // TODO: Optionally delete the file from app documents directory if needed
+                      });
+                    },
+                  );
+                }).toList(),
+              ),
+      ],
+    );
+  }
+
+  Future<void> _pickImages() async {
+    try {
+      final List<XFile> pickedFiles = await _picker.pickMultiImage(
+        imageQuality: 80, // Compress images slightly
+      );
+
+      if (pickedFiles.isNotEmpty) {
+        final appDocDir = await getApplicationDocumentsDirectory();
+        final imagesDir = Directory(path.join(appDocDir.path, 'inventory_images'));
+
+        if (!await imagesDir.exists()) {
+          await imagesDir.create(recursive: true);
+        }
+
+        List<String> newImagePaths = [];
+        for (XFile pickedFile in pickedFiles) {
+          final fileName = '${_uuid.v4()}${path.extension(pickedFile.path)}'; // Create a unique filename
+          final localImagePath = path.join(imagesDir.path, fileName);
+
+          final File imageFile = File(pickedFile.path);
+          await imageFile.copy(localImagePath);
+
+          // Store the relative path (filename) for Hive, assuming all images are in 'inventory_images'
+          newImagePaths.add(fileName);
+        }
+        setState(() {
+          _selectedImagePaths.addAll(newImagePaths);
+        });
+      }
+    } catch (e) {
+      if(mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error picking images: $e')),
+        );
+      }
+    }
   }
 }

@@ -82,7 +82,7 @@ class Project extends HiveObject {
   }
 }
 
-@HiveType(typeId: 2) // Changed from 4 to 2 to match assumed typeId in ProjectPlannerScreen. This needs careful management.
+@HiveType(typeId: 5) // Changed from 2 to 5 to resolve collision
 class Milestone extends HiveObject { // Extended HiveObject
   @HiveField(0)
   String id; // Added ID
