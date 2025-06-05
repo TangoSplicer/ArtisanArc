@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart'; // Added go_router
 import '../../domain/business_service.dart';
 import '../../data/sale_model.dart';
-import 'daily_sales_screen.dart';
-import 'new_sale_entry_screen.dart';
+// Screen imports are still needed if you pass arguments or for type safety,
+// but not strictly for navigation if using named routes only.
+// import 'daily_sales_screen.dart';
+// import 'new_sale_entry_screen.dart';
 
 class BusinessDashboardScreen extends StatefulWidget {
   const BusinessDashboardScreen({super.key});
@@ -40,10 +43,8 @@ class _BusinessDashboardScreenState extends State<BusinessDashboardScreen> {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const NewSaleEntryScreen()),
-              );
+              // Navigate using go_router's named route
+              context.pushNamed('newSale');
             },
             icon: const Icon(Icons.add),
             tooltip: 'New Sale',
@@ -67,10 +68,8 @@ class _BusinessDashboardScreenState extends State<BusinessDashboardScreen> {
             title: const Text('View Daily Sales'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const DailySalesScreen()),
-              );
+              // Navigate using go_router's named route
+              context.pushNamed('dailySales');
             },
           ),
         ],

@@ -39,13 +39,21 @@ flutter_icons:
   image_path: assets/icon/app_icon.png
   remove_alpha_ios: true
 
-# Uncomment to enable splash screen
 flutter_native_splash:
-  color: "#F5F2FF"
+  color: "#F5F2FF" # A light lavender, assuming it fits the app's branding
   image: assets/icon/app_icon.png
+  # branding: assets/icon/branding.png # If you have a separate branding image
+  # color_dark: "#042a49" # Dark mode splash color
+  # image_dark: assets/icon/app_icon_dark.png # Dark mode splash image
+  # branding_dark: assets/icon/branding_dark.png # Dark mode branding image
   android_gravity: center
   ios_content_mode: center
   fullscreen: true
+  # android_12:
+  #   image: assets/icon/app_icon_android12.png
+  #   icon_background_color: "#F5F2FF"
+  #   image_dark: assets/icon/app_icon_android12_dark.png
+  #   icon_background_color_dark: "#042a49"
 
 flutter:
   uses-material-design: true

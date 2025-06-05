@@ -33,30 +33,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _loadSettings() async {
     final locale = await _service.getCurrentLocale();
     final vat = await _service.isVATRegistered();
-    final theme = await _themeService.getThemeMode();
-
-    setState(() {
-      _selectedLocale = locale ?? 'en_GB';
-      _isVATRegistered = vat;
-      _themeMode = theme;
-    });
+    // Theme is now managed by ThemeService and Provider, initial load happens in main.dart
+    // We can still get the current theme for initial UI state if needed, but updates are reactive.
+    if (mounted) { // Check if the widget is still in the tree
+      setState(() {
+        _selectedLocale = locale ?? 'en_GB';
+        _isVATRegistered = vat;
+        // _themeMode is now directly from the provider in the build method
+      });
+    }
   }
 
-  void _updateTheme(ThemeMode mode) async {
-    await _themeService.setThemeMode(mode);
-    setState(() => _themeMode = mode);
-    // Trigger rebuild by restarting app tree
-    runApp(await _reloadAppWithTheme(mode));
+  void _updateTheme(ThemeMode? mode) { // Changed to accept ThemeMode? for RadioListTile
+    if (mode != null) {
+      // Use Provider to access ThemeService and update the theme
+      Provider.of<ThemeService>(context, listen: false).setThemeMode(mode);
+      // No need to call setState here for _themeMode as the widget will rebuild
+      // when the ThemeService notifies listeners and ArtisanArcApp rebuilds.
+      // However, if _themeMode is used to control the RadioListTile's groupValue directly,
+      // then it might need to be updated via a listener or Consumer.
+      // For simplicity, we'll rely on the build method to get the current theme.
+    }
   }
 
-  Future<Widget> _reloadAppWithTheme(ThemeMode mode) async {
-    final seenOnboarding = await _storage.read(key: StorageKeys.onboardingComplete) == 'true';
-    return ArtisanArcApp(seenOnboarding: seenOnboarding, themeMode: mode);
-  }
+  // _reloadAppWithTheme and the runApp call are no longer needed.
 
   @override
   Widget build(BuildContext context) {
     final color = Theme.of(context).colorScheme;
+    // Get the current theme mode from the provider for the RadioListTile groupValue
+    final currentThemeMode = Provider.of<ThemeService>(context).currentThemeMode;
 
     return Scaffold(
       appBar: AppBar(
@@ -129,7 +135,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   RadioListTile<ThemeMode>(
                     title: const Text('System Default'),
                     value: ThemeMode.system,
-                    groupValue: _themeMode,
+                    groupValue: currentThemeMode, // Use theme from provider
                     onChanged: _updateTheme,
                   ),
                   RadioListTile<ThemeMode>(
