@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart'; // Added url_launcher
 
 import '../../../core/services/theme_service.dart';
 import '../../../core/utils/storage_keys.dart';
@@ -141,16 +142,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   RadioListTile<ThemeMode>(
                     title: const Text('Light'),
                     value: ThemeMode.light,
-                    groupValue: _themeMode,
+                    groupValue: currentThemeMode, // Corrected to use currentThemeMode
                     onChanged: _updateTheme,
                   ),
                   RadioListTile<ThemeMode>(
                     title: const Text('Dark'),
                     value: ThemeMode.dark,
-                    groupValue: _themeMode,
+                    groupValue: currentThemeMode, // Corrected to use currentThemeMode
                     onChanged: _updateTheme,
                   ),
                 ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Card( // Added Feedback Card
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              elevation: 5,
+              child: ListTile(
+                leading: const Icon(Icons.email_outlined),
+                title: const Text('Send Feedback'),
+                subtitle: const Text('Report issues or suggest features'),
+                onTap: _sendFeedbackEmail,
               ),
             ),
             const SizedBox(height: 16),
@@ -176,5 +188,40 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _sendFeedbackEmail() async {
+    const String recipientEmail = 'feedback@artisanarc.app'; // Replace with your actual feedback email
+    const String emailSubject = 'ArtisanArc App Feedback';
+
+    final Uri mailtoUri = Uri(
+      scheme: 'mailto',
+      path: recipientEmail,
+      queryParameters: {
+        'subject': emailSubject,
+        // 'body': 'Device Info:\nOS: ${Platform.operatingSystem}\nVersion: ${Platform.operatingSystemVersion}\n\nFeedback:\n', // Example prefilled body
+      },
+    );
+
+    try {
+      // Attempt to launch the mailto URI
+      if (await canLaunchUrl(mailtoUri)) {
+        await launchUrl(mailtoUri);
+      } else {
+        // If mailto scheme is not supported, try to launch a generic URL to a feedback page or show error
+        // For this example, we'll just show a snackbar if mailto fails.
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Could not open email app. Please send feedback manually to $recipientEmail')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('An error occurred: $e')),
+        );
+      }
+    }
   }
 }

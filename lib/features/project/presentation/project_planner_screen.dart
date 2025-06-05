@@ -7,9 +7,10 @@ import 'package:intl/intl.dart'; // For date formatting
 import 'package:artisanarc/features/project/domain/usecases/create_project.dart';
 import 'package:artisanarc/features/project/domain/usecases/get_project_by_id.dart';
 import 'package:artisanarc/features/project/domain/usecases/update_project.dart';
-// import 'package:artisanarc/features/project/domain/entities/project.dart'; // Already imported effectively via project_model.dart
-// import 'package:artisanarc/features/project/domain/entities/milestone.dart'; // Already imported effectively via project_model.dart
+import 'package:artisanarc/features/project/domain/entities/project.dart'; // Explicit import for Project entity
+import 'package:artisanarc/features/project/domain/entities/milestone.dart'; // Explicit import for Milestone entity
 import 'package:artisanarc/features/project/domain/entities/supply_need.dart'; // Import SupplyNeed
+import 'package:go_router/go_router.dart'; // For navigation
 
 class ProjectPlannerScreen extends StatefulWidget {
   final String? projectId; // Nullable for add mode
@@ -254,6 +255,15 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
         backgroundColor: colorScheme.primary,
         foregroundColor: colorScheme.onPrimary,
         actions: [
+          if (_craftController.text.isNotEmpty) // Show AI button only if craftType is set
+            IconButton(
+              icon: const Icon(Icons.lightbulb_outline),
+              tooltip: 'Get AI Crafting Hints',
+              onPressed: () {
+                // Ensure craftType is URL safe or handle encoding if needed by router
+                context.push('/ai-assistant/${Uri.encodeComponent(_craftController.text)}');
+              },
+            ),
           IconButton(
             icon: const Icon(Icons.save),
             onPressed: _isLoading ? null : _saveProject,
@@ -281,9 +291,26 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
                       maxLines: 3,
                     ),
                     const SizedBox(height: 16),
-                     TextFormField( // This should be improved (e.g. dropdown or selection)
+                     TextFormField(
                       controller: _craftController,
-                      decoration: const InputDecoration(labelText: 'Craft Type (e.g., Knitting, Woodwork)', border: OutlineInputBorder()),
+                      decoration: const InputDecoration(
+                        labelText: 'Craft Type (e.g., Knitting, Woodwork)',
+                        border: OutlineInputBorder(),
+                        // Suffix icon could also work for AI assistant, but AppBar is cleaner
+                      ),
+                      onChanged: (value) {
+                        // Rebuild actions in AppBar if craft type becomes empty/non-empty
+                        // This is a bit heavy, a dedicated ValueListenableBuilder for the button might be better
+                        // For simplicity, we'll rely on next field interaction or save attempt to update AppBar if needed,
+                        // or accept that the button might not appear/disappear instantly on typing.
+                        // A more reactive way: make _craftController a ValueNotifier or use a Form field's onChanged
+                        // to call setState for just the button's visibility if it were part of the body.
+                        // For AppBar, it's trickier without a full rebuild or a custom AppBar.
+                        // For now, let's ensure it appears if text is present on build/rebuild.
+                        if((value.isNotEmpty && !_isCraftTypeNotEmptyForAI()) || (value.isEmpty && _isCraftTypeNotEmptyForAI())) {
+                           setState(() {}); // Trigger rebuild to show/hide AI button
+                        }
+                      },
                     ),
                     const SizedBox(height: 16),
                     Row(

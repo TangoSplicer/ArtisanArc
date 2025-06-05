@@ -27,6 +27,7 @@ dependencies:
   qr_code_scanner: ^1.0.1 # For QR code scanning
   image_picker: ^1.0.0 # For picking images
   path_provider: ^2.1.0 # For accessing file system paths
+  url_launcher: ^6.1.14 # For launching URLs, including mailto links
 
 dev_dependencies:
   flutter_test:

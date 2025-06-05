@@ -44,4 +44,5 @@ final Map<String, CraftAIProfile> offlineCraftProfiles = {
     ],
   ),
   // Add more crafts as needed
+  // TODO: Expand with more craft profiles for a richer user experience.
 };

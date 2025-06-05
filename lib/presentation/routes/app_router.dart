@@ -11,6 +11,10 @@ import 'package:artisanarc/features/business/presentation/new_sale_entry_screen.
 import 'package:artisanarc/features/project/presentation/project_list_screen.dart'; // Added ProjectListScreen
 import 'package:artisanarc/features/project/presentation/project_planner_screen.dart'; // Added ProjectPlannerScreen
 import 'package:artisanarc/features/qr/presentation/qr_scanner_page.dart'; // Added QRScannerPage
+import 'package:artisanarc/features/compliance/presentation/compliance_screen.dart'; // Added ComplianceScreen
+import 'package:artisanarc/features/shopping/presentation/shopping_list_overview_screen.dart'; // Added ShoppingListOverviewScreen
+import 'package:artisanarc/features/shopping/presentation/shopping_list_detail_screen.dart'; // Added ShoppingListDetailScreen
+import 'package:artisanarc/features/ai/presentation/craft_ai_widget.dart'; // Added CraftAIWidget
 
 class AppRouter {
   // TODO: Implement logic to check onboarding completion status
@@ -91,6 +95,39 @@ class AppRouter {
         path: '/scan-qr', // Top-level route for QR scanner
         name: 'scanQrCode',
         builder: (context, state) => const QRScannerPage(),
+      ),
+      GoRoute(
+        path: '/compliance',
+        name: 'compliance',
+        builder: (context, state) => const ComplianceScreen(),
+      ),
+      GoRoute(
+        path: '/shopping-lists',
+        name: 'shoppingLists',
+        builder: (context, state) => const ShoppingListOverviewScreen(),
+        routes: [
+          GoRoute(
+            path: ':listId', // Accessible via /shopping-lists/some-id
+            name: 'shoppingListDetail',
+            builder: (context, state) {
+              final listId = state.pathParameters['listId'];
+              if (listId == null) {
+                // Handle error or redirect, though go_router should prevent this if path is matched
+                return const Scaffold(body: Center(child: Text('Error: List ID missing')));
+              }
+              return ShoppingListDetailScreen(shoppingListId: listId);
+            },
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/ai-assistant/:craftType',
+        name: 'aiAssistant',
+        builder: (context, state) {
+          final craftType = state.pathParameters['craftType'] ?? 'Unknown Craft';
+          // URL decoding is handled automatically by go_router for path parameters
+          return CraftAIWidget(craft: craftType);
+        },
       ),
     ],
   );

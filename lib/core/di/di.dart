@@ -33,6 +33,10 @@ import '../../features/project/domain/usecases/get_projects.dart';
 import '../../features/project/domain/usecases/update_project.dart';
 import '../../features/project/domain/usecases/delete_project.dart';
 
+// Shopping Feature
+import '../../features/shopping/data/shopping_repository.dart';
+import '../../features/shopping/domain/shopping_service.dart';
+
 final getIt = GetIt.instance;
 
 @injectableInit
@@ -79,4 +83,12 @@ Future<void> configureDependencies() async {
 
   // AI service: direct manual registration (if needed later)
   getIt.registerLazySingleton<CraftHintService>(() => CraftHintService());
+
+  // Shopping Feature Dependencies
+  if (!getIt.isRegistered<ShoppingRepository>()) {
+    getIt.registerLazySingleton<ShoppingRepository>(() => ShoppingRepositoryImpl());
+  }
+  if (!getIt.isRegistered<ShoppingService>()) {
+    getIt.registerLazySingleton<ShoppingService>(() => ShoppingServiceImpl(getIt<ShoppingRepository>()));
+  }
 }
