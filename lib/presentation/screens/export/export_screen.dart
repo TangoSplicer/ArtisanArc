@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
 
+import 'package:get_it/get_it.dart';
+import 'package:printing/printing.dart';
+import '../../../features/export/utils/export_helper.dart';
+import '../../../features/business/domain/business_service.dart';
+import '../../../features/inventory/domain/inventory_service.dart';
+ main
+
 class ExportScreen extends StatelessWidget {
   const ExportScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
 
+    final BusinessService businessService = GetIt.I<BusinessService>();
+    final InventoryService inventoryService = GetIt.I<InventoryService>();
+main
     final color = Theme.of(context).colorScheme;
 
     return Scaffold(
@@ -19,32 +29,63 @@ class ExportScreen extends StatelessWidget {
         children: [
           _buildExportOption(
             context,
+
+            title: 'Export Inventory as CSV',
+            subtitle: 'Export your inventory data to a CSV file',
+            icon: Icons.inventory_2,
+            color: color.primary,
+            onTap: () async {
+              final items = await inventoryService.fetchItems();
+              final csv = ExportHelper.generateCsvFromInventory(items);
+              await Printing.sharePdf(bytes: csv.codeUnits, filename: 'inventory.csv');
+
             title: 'Export Inventory',
             subtitle: 'Export your inventory data to a CSV file',
             icon: Icons.inventory_2,
             color: color.primary,
             onTap: () {
               // TODO: Implement export inventory functionality
+main
             },
           ),
           _buildExportOption(
             context,
+
+            title: 'Export Sales Data as CSV',
+            subtitle: 'Export your sales data to a CSV file',
+            icon: Icons.business_center,
+            color: color.secondary,
+            onTap: () async {
+              final sales = await businessService.fetchSales();
+              final csv = ExportHelper.generateCsvFromSales(sales);
+              await Printing.sharePdf(bytes: csv.codeUnits, filename: 'sales.csv');
+
             title: 'Export Sales Data',
             subtitle: 'Export your sales data to a CSV file',
             icon: Icons.business_center,
             color: color.secondary,
             onTap: () {
               // TODO: Implement export sales data functionality
+main
             },
           ),
           _buildExportOption(
             context,
+
+            title: 'Print Project Report as PDF',
+            subtitle: 'Print a detailed report of your projects',
+            icon: Icons.timeline,
+            color: color.tertiary,
+            onTap: () async {
+              // TODO: Implement project report generation
+
             title: 'Print Project Report',
             subtitle: 'Print a detailed report of your projects',
             icon: Icons.timeline,
             color: color.tertiary,
             onTap: () {
               // TODO: Implement print project report functionality
+main
             },
           ),
         ],
@@ -101,13 +142,15 @@ class ExportScreen extends StatelessWidget {
           ),
         ),
 
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Reports & Export'),
       ),
       body: const Center(
         child: Text('Reports & Export Screen'),
- main
+
+
       ),
     );
   }
