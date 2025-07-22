@@ -5,6 +5,8 @@ import 'package:craft_supply_organiser/presentation/screens/splash_screen.dart';
 import 'package:craft_supply_organiser/presentation/screens/inventory/inventory_screen.dart';
 import 'package:craft_supply_organiser/presentation/screens/settings/settings_screen.dart';
 import 'package:craft_supply_organiser/presentation/screens/business/business_dashboard_screen.dart';
+import 'package:craft_supply_organiser/presentation/screens/export/export_screen.dart';
+import 'package:craft_supply_organiser/presentation/screens/projects/project_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -34,6 +36,16 @@ class AppRouter {
         path: '/business',
         name: 'business',
         builder: (context, state) => const BusinessDashboardScreen(),
+      ),
+      GoRoute(
+        path: '/projects',
+        name: 'projects',
+        builder: (context, state) => const ProjectScreen(),
+      ),
+      GoRoute(
+        path: '/export',
+        name: 'export',
+        builder: (context, state) => const ExportScreen(),
       ),
     ],
   );
