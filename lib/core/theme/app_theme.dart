@@ -7,14 +7,12 @@ class AppTheme {
       primary: Color(0xFF6A5ACD), // SlateBlue
       secondary: Color(0xFF4682B4), // SteelBlue
       tertiary: Color(0xFFB0C4DE), // LightSteelBlue
-      surface: Color(0xFFF0F8FF),   // AliceBlue
-      background: Color(0xFFFFFFFF), // White
+      surface: Color(0xFFFFFFFF), // White
       error: Colors.redAccent,
       onPrimary: Colors.white,
       onSecondary: Colors.white,
       onTertiary: Colors.black,
       onSurface: Colors.black87,
-      onBackground: Colors.black87,
       onError: Colors.white,
     ),
     scaffoldBackgroundColor: const Color(0xFFF0F8FF),
@@ -30,7 +28,7 @@ class AppTheme {
       foregroundColor: Colors.white,
       elevation: 0,
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 4,
     ),
@@ -42,14 +40,12 @@ class AppTheme {
       primary: Color(0xFF6A5ACD), // SlateBlue
       secondary: Color(0xFF4682B4), // SteelBlue
       tertiary: Color(0xFFB0C4DE), // LightSteelBlue
-      surface: Color(0xFF121212),   // Dark Surface
-      background: Color(0xFF121212), // Dark Background
+      surface: Color(0xFF121212), // Dark Background
       error: Colors.redAccent,
       onPrimary: Colors.white,
       onSecondary: Colors.white,
       onTertiary: Colors.black,
       onSurface: Colors.white,
-      onBackground: Colors.white,
       onError: Colors.black,
     ),
     scaffoldBackgroundColor: const Color(0xFF121212),
@@ -65,7 +61,7 @@ class AppTheme {
       foregroundColor: Colors.white,
       elevation: 0,
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 4,
     ),
