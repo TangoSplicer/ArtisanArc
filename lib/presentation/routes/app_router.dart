@@ -1,21 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:craft_supply_organiser/presentation/screens/home_screen.dart';
-import 'package:craft_supply_organiser/presentation/screens/splash_screen.dart';
-import 'package:craft_supply_organiser/presentation/screens/inventory/inventory_screen.dart';
-import 'package:craft_supply_organiser/presentation/screens/settings/settings_screen.dart';
-import 'package:craft_supply_organiser/presentation/screens/business/business_dashboard_screen.dart';
-import 'package:craft_supply_organiser/presentation/screens/export/export_screen.dart';
-import 'package:craft_supply_organiser/presentation/screens/projects/project_screen.dart';
+import 'package:artisanarc/presentation/onboarding/onboarding_screen.dart';
+import 'package:artisanarc/presentation/screens/export/export_screen.dart';
+import 'package:artisanarc/presentation/screens/home_screen.dart';
+import 'package:artisanarc/presentation/screens/inventory/inventory_screen.dart';
+import 'package:artisanarc/presentation/screens/projects/project_screen.dart';
+import 'package:artisanarc/presentation/screens/settings/settings_screen.dart';
+import 'package:artisanarc/presentation/screens/splash_screen.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter/material.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: '/',
+    errorBuilder: (context, state) => Scaffold(
+      body: Center(
+        child: Text('Route not found: ${state.error}'),
+      ),
+    ),
     routes: [
       GoRoute(
         path: '/',
         name: 'splash',
         builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: '/onboarding',
+        name: 'onboarding',
+        builder: (context, state) => const OnboardingScreen(),
       ),
       GoRoute(
         path: '/home',
@@ -33,11 +45,6 @@ class AppRouter {
         builder: (context, state) => const SettingsScreen(),
       ),
       GoRoute(
-        path: '/business',
-        name: 'business',
-        builder: (context, state) => const BusinessDashboardScreen(),
-      ),
-      GoRoute(
         path: '/projects',
         name: 'projects',
         builder: (context, state) => const ProjectScreen(),
@@ -49,4 +56,16 @@ class AppRouter {
       ),
     ],
   );
+
+  static GoRouter createFallbackRouter(Widget initialScreen) {
+    return GoRouter(
+      initialLocation: '/',
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (context, state) => initialScreen,
+        ),
+      ],
+    );
+  }
 }
