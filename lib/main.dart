@@ -1,27 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:provider/provider.dart'; // Added Provider
+import 'package:provider/provider.dart';
 import 'core/di/di.dart';
 import 'core/utils/hive_adapters.dart';
 import 'core/utils/storage_keys.dart';
 import 'core/theme/app_theme.dart';
 import 'core/services/theme_service.dart';
 import 'presentation/routes/app_router.dart';
-// import 'presentation/screens/splash_screen.dart'; // Removed splash screen
-import 'presentation/onboarding/onboarding_screen.dart'; // Corrected import path
+import 'presentation/screens/splash_screen.dart';
+import 'presentation/onboarding/onboarding_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  runApp(const SplashScreen()); // Show splash screen initially
+
   await configureDependencies();
   registerHiveAdapters();
 
-  final storage = getIt<FlutterSecureStorage>(); // Using GetIt for storage
+  final storage = getIt<FlutterSecureStorage>();
   final seenOnboarding = await storage.read(key: StorageKeys.onboardingComplete) == 'true';
 
-  // ThemeService will be initialized and its theme loaded via ChangeNotifierProvider
   final themeService = ThemeService();
-  await themeService.loadThemeMode(); // Load initial theme
+  await themeService.loadThemeMode();
 
   runApp(
     ChangeNotifierProvider(
@@ -33,7 +34,7 @@ void main() async {
   );
 }
 
-class ArtisanArcApp extends StatefulWidget { // Changed to StatefulWidget
+class ArtisanArcApp extends StatefulWidget {
   final bool seenOnboarding;
 
   const ArtisanArcApp({
@@ -45,10 +46,9 @@ class ArtisanArcApp extends StatefulWidget { // Changed to StatefulWidget
   State<ArtisanArcApp> createState() => _ArtisanArcAppState();
 }
 
-class _ArtisanArcAppState extends State<ArtisanArcApp> { // State class for ArtisanArcApp
+class _ArtisanArcAppState extends State<ArtisanArcApp> {
   @override
   Widget build(BuildContext context) {
-    // Listen to ThemeService changes
     final themeService = Provider.of<ThemeService>(context);
 
     return MaterialApp.router(
@@ -56,7 +56,7 @@ class _ArtisanArcAppState extends State<ArtisanArcApp> { // State class for Arti
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: themeService.currentThemeMode, // Consuming themeMode from ThemeService
+      themeMode: themeService.currentThemeMode,
       routerConfig: widget.seenOnboarding ? AppRouter.router : _onboardingFallbackRouter,
       supportedLocales: const [
         Locale('en', 'GB'),
@@ -71,8 +71,6 @@ class _ArtisanArcAppState extends State<ArtisanArcApp> { // State class for Arti
     );
   }
 
-  // Assuming AppRouter.createFallbackRouter is a static method you might have
-  // If not, this part needs to be adjusted based on your actual AppRouter implementation
   static final GoRouter _onboardingFallbackRouter = GoRouter(
     routes: [
       GoRoute(
