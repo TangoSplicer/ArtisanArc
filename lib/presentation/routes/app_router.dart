@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
 import 'package:artisanarc/presentation/screens/home_screen.dart';
 import 'package:artisanarc/presentation/onboarding/onboarding_screen.dart'; // Added onboarding
 import 'package:artisanarc/features/inventory/presentation/inventory_screen.dart';
@@ -15,6 +16,17 @@ import 'package:artisanarc/features/compliance/presentation/compliance_screen.da
 import 'package:artisanarc/features/shopping/presentation/shopping_list_overview_screen.dart'; // Added ShoppingListOverviewScreen
 import 'package:artisanarc/features/shopping/presentation/shopping_list_detail_screen.dart'; // Added ShoppingListDetailScreen
 import 'package:artisanarc/features/ai/presentation/craft_ai_widget.dart'; // Added CraftAIWidget
+=======
+import 'package:artisanarc/presentation/onboarding/onboarding_screen.dart';
+import 'package:artisanarc/presentation/screens/export/export_screen.dart';
+import 'package:artisanarc/presentation/screens/home_screen.dart';
+import 'package:artisanarc/presentation/screens/inventory/inventory_screen.dart';
+import 'package:artisanarc/presentation/screens/projects/project_screen.dart';
+import 'package:artisanarc/presentation/screens/settings/settings_screen.dart';
+import 'package:artisanarc/presentation/screens/splash_screen.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter/material.dart';
+
 
 class AppRouter {
   // TODO: Implement logic to check onboarding completion status
@@ -22,8 +34,22 @@ class AppRouter {
   static const String initialRoute = '/home';
 
   static final GoRouter router = GoRouter(
+
     initialLocation: initialRoute,
+
+    initialLocation: '/',
+    errorBuilder: (context, state) => Scaffold(
+      body: Center(
+        child: Text('Route not found: ${state.error}'),
+      ),
+    ),
+
     routes: [
+      GoRoute(
+        path: '/onboarding',
+        name: 'onboarding',
+        builder: (context, state) => const OnboardingScreen(),
+      ),
       GoRoute(
         path: '/onboarding',
         name: 'onboarding',
@@ -54,6 +80,7 @@ class AppRouter {
         builder: (context, state) => const SettingsScreen(),
       ),
       GoRoute(
+
         path: '/business',
         name: 'business',
         builder: (context, state) => const BusinessDashboardScreen(),
@@ -128,7 +155,29 @@ class AppRouter {
           // URL decoding is handled automatically by go_router for path parameters
           return CraftAIWidget(craft: craftType);
         },
+
+        path: '/projects',
+        name: 'projects',
+        builder: (context, state) => const ProjectScreen(),
+      ),
+      GoRoute(
+        path: '/export',
+        name: 'export',
+        builder: (context, state) => const ExportScreen(),
+
       ),
     ],
   );
+
+  static GoRouter createFallbackRouter(Widget initialScreen) {
+    return GoRouter(
+      initialLocation: '/',
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (context, state) => initialScreen,
+        ),
+      ],
+    );
+  }
 }
