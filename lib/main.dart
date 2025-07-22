@@ -13,15 +13,28 @@ import 'presentation/onboarding/onboarding_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+
   runApp(const ArtisanArcAppLoader());
 }
 
 class ArtisanArcAppLoader extends StatefulWidget {
   const ArtisanArcAppLoader({super.key});
+  runApp(const SplashScreen()); // Show splash screen initially
+
+  await configureDependencies();
+  registerHiveAdapters();
+
+  final storage = getIt<FlutterSecureStorage>();
+  final seenOnboarding = await storage.read(key: StorageKeys.onboardingComplete) == 'true';
+
+  final themeService = ThemeService();
+  await themeService.loadThemeMode();
+
 
   @override
   State<ArtisanArcAppLoader> createState() => _ArtisanArcAppLoaderState();
 }
+
 
 class _ArtisanArcAppLoaderState extends State<ArtisanArcAppLoader> {
   late Future<void> _initialization;
@@ -31,6 +44,9 @@ class _ArtisanArcAppLoaderState extends State<ArtisanArcAppLoader> {
     super.initState();
     _initialization = _initializeApp();
   }
+class ArtisanArcApp extends StatefulWidget {
+  final bool seenOnboarding;
+
 
   Future<void> _initializeApp() async {
     await configureDependencies();
@@ -85,6 +101,30 @@ class ArtisanArcApp extends StatelessWidget {
           );
         },
       ),
+
+class _ArtisanArcAppState extends State<ArtisanArcApp> {
+  @override
+  Widget build(BuildContext context) {
+    final themeService = Provider.of<ThemeService>(context);
+
+    return MaterialApp.router(
+      title: 'ArtisanArc',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeService.currentThemeMode,
+      routerConfig: widget.seenOnboarding ? AppRouter.router : _onboardingFallbackRouter,
+      supportedLocales: const [
+        Locale('en', 'GB'),
+        Locale('en', 'US'),
+      ],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      locale: const Locale('en', 'GB'),
+
     );
   }
 
