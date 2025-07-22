@@ -5,6 +5,7 @@ class ExportScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     final color = Theme.of(context).colorScheme;
 
     return Scaffold(
@@ -99,6 +100,14 @@ class ExportScreen extends StatelessWidget {
             ],
           ),
         ),
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Reports & Export'),
+      ),
+      body: const Center(
+        child: Text('Reports & Export Screen'),
+ main
       ),
     );
   }
