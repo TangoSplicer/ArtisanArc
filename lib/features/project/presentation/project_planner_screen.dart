@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 import '../domain/project_service.dart';
 import '../data/project_model.dart';
+
 
 class ProjectPlannerScreen extends StatelessWidget {
   const ProjectPlannerScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+ 
     return ChangeNotifierProvider(
       create: (_) => ProjectViewModel(),
       child: const ProjectPlannerView(),
@@ -48,6 +51,7 @@ class ProjectPlannerView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<ProjectViewModel>(context);
+
     final color = Theme.of(context).colorScheme;
 
     return Scaffold(
@@ -56,6 +60,7 @@ class ProjectPlannerView extends StatelessWidget {
         backgroundColor: color.primary,
         foregroundColor: color.onPrimary,
       ),
+
       body: viewModel.isLoading
           ? const Center(child: CircularProgressIndicator())
           : viewModel.projects.isEmpty
@@ -76,11 +81,37 @@ class ProjectPlannerView extends StatelessWidget {
                 ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showCreateProjectDialog(context, viewModel),
+
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          _buildProjectCard(
+            context,
+            title: 'Summer Collection',
+            subtitle: 'A collection of summer-themed crafts',
+            icon: Icons.wb_sunny,
+            color: color.primary,
+          ),
+          _buildProjectCard(
+            context,
+            title: 'Winter Wonderland',
+            subtitle: 'A collection of winter-themed crafts',
+            icon: Icons.ac_unit,
+            color: color.secondary,
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // TODO: Implement create new project functionality
+        },
+
         backgroundColor: color.primary,
         child: const Icon(Icons.add),
       ),
     );
   }
+
 
   void _showCreateProjectDialog(BuildContext context, ProjectViewModel viewModel) {
     final TextEditingController nameController = TextEditingController();
@@ -129,6 +160,8 @@ class ProjectPlannerView extends StatelessWidget {
       },
     );
   }
+
+
 
   Widget _buildProjectCard(
     BuildContext context, {
