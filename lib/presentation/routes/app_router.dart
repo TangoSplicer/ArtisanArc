@@ -16,24 +16,13 @@ import 'package:artisanarc/features/shopping/presentation/shopping_list_overview
 import 'package:artisanarc/features/shopping/presentation/shopping_list_detail_screen.dart';
 import 'package:artisanarc/features/ai/presentation/craft_ai_widget.dart';
 import 'package:artisanarc/presentation/screens/export/export_screen.dart';
-
 import 'package:artisanarc/presentation/screens/error_screen.dart';
-
-import 'package:artisanarc/presentation/screens/projects/project_screen.dart';
-
 
 
 class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: '/',
-
     errorBuilder: (context, state) => ErrorScreen(error: state.error?.message),
-
-    errorBuilder: (context, state) => Scaffold(
-      body: Center(
-        child: Text('Route not found: ${state.error}'),
-      ),
-    ),
     routes: [
       GoRoute(
         path: '/onboarding',
@@ -94,12 +83,9 @@ class AppRouter {
             name: 'editProject',
             builder: (context, state) {
               final projectId = state.pathParameters['id'];
-
               if (projectId == null) {
                 return const ErrorScreen(error: 'Project ID is missing');
               }
-
-
               return ProjectPlannerScreen(projectId: projectId);
             },
           ),
@@ -126,10 +112,7 @@ class AppRouter {
             builder: (context, state) {
               final listId = state.pathParameters['listId'];
               if (listId == null) {
-
                 return const ErrorScreen(error: 'List ID is missing');
-                return const Scaffold(body: Center(child: Text('Error: List ID missing')));
-
               }
               return ShoppingListDetailScreen(shoppingListId: listId);
             },
@@ -140,13 +123,10 @@ class AppRouter {
         path: '/ai-assistant/:craftType',
         name: 'aiAssistant',
         builder: (context, state) {
-
           final craftType = state.pathParameters['craftType'];
           if (craftType == null) {
             return const ErrorScreen(error: 'Craft type is missing');
           }
-
-          final craftType = state.pathParameters['craftType'] ?? 'Unknown Craft';
           return CraftAIWidget(craft: craftType);
         },
       ),
@@ -154,14 +134,6 @@ class AppRouter {
         path: '/export',
         name: 'export',
         builder: (context, state) => const ExportScreen(),
-
-
-      ),
-       GoRoute(
-        path: '/project_screen',
-        name: 'project_screen',
-        builder: (context, state) => const ProjectScreen(),
-
       ),
     ],
   );
