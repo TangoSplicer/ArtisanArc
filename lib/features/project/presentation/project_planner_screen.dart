@@ -1,87 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
-import 'package:uuid/uuid.dart';
-import '../../domain/project_service.dart';
-import '../../data/project_model.dart';
 
-class ProjectPlannerScreen extends StatefulWidget {
+class ProjectPlannerScreen extends StatelessWidget {
   const ProjectPlannerScreen({super.key});
-
-  @override
-  State<ProjectPlannerScreen> createState() => _ProjectPlannerScreenState();
-}
-
-class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
-  final ProjectService _service = GetIt.I<ProjectService>();
-  final _nameController = TextEditingController();
-  final _craftController = TextEditingController();
-  final List<Milestone> _milestones = [];
-
-  void _addMilestone() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        final nameController = TextEditingController();
-        DateTime due = DateTime.now().add(const Duration(days: 7));
-
-        return AlertDialog(
-          title: const Text('Add Milestone'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(labelText: 'Milestone Name'),
-              ),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () async {
-                  final picked = await showDatePicker(
-                    context: context,
-                    initialDate: due,
-                    firstDate: DateTime.now(),
-                    lastDate: DateTime.now().add(const Duration(days: 365)),
-                  );
-                  if (picked != null) {
-                    due = picked;
-                  }
-                },
-                child: const Text('Select Due Date'),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                if (nameController.text.isNotEmpty) {
-                  setState(() {
-                    _milestones.add(Milestone(name: nameController.text, dueDate: due));
-                  });
-                }
-                Navigator.pop(context);
-              },
-              child: const Text('Add'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> _saveProject() async {
-    final project = Project(
-      id: const Uuid().v4(),
-      name: _nameController.text,
-      craftType: _craftController.text,
-      milestones: _milestones,
-      createdAt: DateTime.now(),
-    );
-    await _service.createProject(project);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Project saved')),
-    );
-    Navigator.pop(context);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,49 +13,76 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
         backgroundColor: color.primary,
         foregroundColor: color.onPrimary,
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: RadialGradient(
-            colors: [color.surface, color.background, color.primary.withOpacity(0.05)],
-            center: Alignment.bottomRight,
-            radius: 1.3,
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          _buildProjectCard(
+            context,
+            title: 'Summer Collection',
+            subtitle: 'A collection of summer-themed crafts',
+            icon: Icons.wb_sunny,
+            color: color.primary,
           ),
+          _buildProjectCard(
+            context,
+            title: 'Winter Wonderland',
+            subtitle: 'A collection of winter-themed crafts',
+            icon: Icons.ac_unit,
+            color: color.secondary,
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // TODO: Implement create new project functionality
+        },
+        backgroundColor: color.primary,
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  Widget _buildProjectCard(
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+  }) {
+    return Card(
+      elevation: 6,
+      margin: const EdgeInsets.only(bottom: 20),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shadowColor: color.withOpacity(0.4),
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: color.withOpacity(0.08),
         ),
-        child: ListView(
-          padding: const EdgeInsets.all(20),
+        child: Row(
           children: [
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Project Name'),
+            CircleAvatar(
+              backgroundColor: color.withOpacity(0.2),
+              child: Icon(icon, color: color),
             ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _craftController,
-              decoration: const InputDecoration(labelText: 'Craft Type'),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title,
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleLarge
+                          ?.copyWith(fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 4),
+                  Text(subtitle,
+                      style: Theme.of(context).textTheme.bodyMedium),
+                ],
+              ),
             ),
-            const SizedBox(height: 20),
-            ElevatedButton.icon(
-              onPressed: _addMilestone,
-              icon: const Icon(Icons.flag),
-              label: const Text('Add Milestone'),
-            ),
-            const SizedBox(height: 20),
-            ..._milestones.map((m) => Card(
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  margin: const EdgeInsets.only(bottom: 12),
-                  child: ListTile(
-                    title: Text(m.name),
-                    subtitle: Text('Due: ${m.dueDate.toLocal().toString().split(' ')[0]}'),
-                    trailing: const Icon(Icons.check_circle_outline),
-                  ),
-                )),
-            const SizedBox(height: 30),
-            ElevatedButton.icon(
-              onPressed: _saveProject,
-              icon: const Icon(Icons.save),
-              label: const Text('Save Project'),
-            ),
+            const Icon(Icons.chevron_right),
           ],
         ),
       ),
