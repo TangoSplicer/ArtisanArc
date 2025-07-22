@@ -26,13 +26,54 @@ import '../../features/project/domain/project_service.dart';
 // AI
 import '../../features/ai/domain/craft_hint_service.dart';
 
+// Project Use Cases
+import '../../features/project/domain/usecases/create_project.dart';
+import '../../features/project/domain/usecases/get_project_by_id.dart';
+import '../../features/project/domain/usecases/get_projects.dart';
+import '../../features/project/domain/usecases/update_project.dart';
+import '../../features/project/domain/usecases/delete_project.dart';
+
+// Shopping Feature
+import '../../features/shopping/data/shopping_repository.dart';
+import '../../features/shopping/domain/shopping_service.dart';
+
 final getIt = GetIt.instance;
 
 @injectableInit
 Future<void> configureDependencies() async {
-  await $initGetIt(getIt);
+  await $initGetIt(getIt); // Generated registrations
 
   // Custom service bindings (non-generated)
+
+  // Assuming ProjectRepositoryImpl and ProjectServiceImpl might not be annotated
+  // for injectable, or to ensure they are registered as specified.
+  // If they ARE annotated, these manual ones might conflict or be redundant if build_runner runs.
+
+  // Project Feature
+  if (!getIt.isRegistered<ProjectRepository>()) {
+    getIt.registerLazySingleton<ProjectRepository>(() => ProjectRepositoryImpl());
+  }
+
+  if (!getIt.isRegistered<ProjectService>()) {
+    getIt.registerLazySingleton<ProjectService>(() => ProjectServiceImpl(getIt<ProjectRepository>()));
+  }
+
+  // Register Project Use Cases
+  if (!getIt.isRegistered<CreateProject>()) {
+    getIt.registerLazySingleton<CreateProject>(() => CreateProject(getIt<ProjectService>()));
+  }
+  if (!getIt.isRegistered<GetProjectById>()) {
+    getIt.registerLazySingleton<GetProjectById>(() => GetProjectById(getIt<ProjectService>()));
+  }
+  if (!getIt.isRegistered<GetProjects>()) {
+    getIt.registerLazySingleton<GetProjects>(() => GetProjects(getIt<ProjectService>()));
+  }
+  if (!getIt.isRegistered<UpdateProject>()) {
+    getIt.registerLazySingleton<UpdateProject>(() => UpdateProject(getIt<ProjectService>()));
+  }
+  if (!getIt.isRegistered<DeleteProject>()) {
+    getIt.registerLazySingleton<DeleteProject>(() => DeleteProject(getIt<ProjectService>()));
+  }
 
   // Daily Sales Service: links Business & Inventory
   getIt.registerLazySingleton<DailySalesService>(() => DailySalesService(
@@ -42,4 +83,12 @@ Future<void> configureDependencies() async {
 
   // AI service: direct manual registration (if needed later)
   getIt.registerLazySingleton<CraftHintService>(() => CraftHintService());
+
+  // Shopping Feature Dependencies
+  if (!getIt.isRegistered<ShoppingRepository>()) {
+    getIt.registerLazySingleton<ShoppingRepository>(() => ShoppingRepositoryImpl());
+  }
+  if (!getIt.isRegistered<ShoppingService>()) {
+    getIt.registerLazySingleton<ShoppingService>(() => ShoppingServiceImpl(getIt<ShoppingRepository>()));
+  }
 }

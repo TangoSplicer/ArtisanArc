@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart'; // Added url_launcher
 
 import '../../../core/services/theme_service.dart';
 import '../../../core/utils/storage_keys.dart';
@@ -33,30 +34,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _loadSettings() async {
     final locale = await _service.getCurrentLocale();
     final vat = await _service.isVATRegistered();
-    final theme = await _themeService.getThemeMode();
-
-    setState(() {
-      _selectedLocale = locale ?? 'en_GB';
-      _isVATRegistered = vat;
-      _themeMode = theme;
-    });
+    // Theme is now managed by ThemeService and Provider, initial load happens in main.dart
+    // We can still get the current theme for initial UI state if needed, but updates are reactive.
+    if (mounted) { // Check if the widget is still in the tree
+      setState(() {
+        _selectedLocale = locale ?? 'en_GB';
+        _isVATRegistered = vat;
+        // _themeMode is now directly from the provider in the build method
+      });
+    }
   }
 
-  void _updateTheme(ThemeMode mode) async {
-    await _themeService.setThemeMode(mode);
-    setState(() => _themeMode = mode);
-    // Trigger rebuild by restarting app tree
-    runApp(await _reloadAppWithTheme(mode));
+  void _updateTheme(ThemeMode? mode) { // Changed to accept ThemeMode? for RadioListTile
+    if (mode != null) {
+      // Use Provider to access ThemeService and update the theme
+      Provider.of<ThemeService>(context, listen: false).setThemeMode(mode);
+      // No need to call setState here for _themeMode as the widget will rebuild
+      // when the ThemeService notifies listeners and ArtisanArcApp rebuilds.
+      // However, if _themeMode is used to control the RadioListTile's groupValue directly,
+      // then it might need to be updated via a listener or Consumer.
+      // For simplicity, we'll rely on the build method to get the current theme.
+    }
   }
 
-  Future<Widget> _reloadAppWithTheme(ThemeMode mode) async {
-    final seenOnboarding = await _storage.read(key: StorageKeys.onboardingComplete) == 'true';
-    return ArtisanArcApp(seenOnboarding: seenOnboarding, themeMode: mode);
-  }
+  // _reloadAppWithTheme and the runApp call are no longer needed.
 
   @override
   Widget build(BuildContext context) {
     final color = Theme.of(context).colorScheme;
+    // Get the current theme mode from the provider for the RadioListTile groupValue
+    final currentThemeMode = Provider.of<ThemeService>(context).currentThemeMode;
 
     return Scaffold(
       appBar: AppBar(
@@ -129,22 +136,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   RadioListTile<ThemeMode>(
                     title: const Text('System Default'),
                     value: ThemeMode.system,
-                    groupValue: _themeMode,
+                    groupValue: currentThemeMode, // Use theme from provider
                     onChanged: _updateTheme,
                   ),
                   RadioListTile<ThemeMode>(
                     title: const Text('Light'),
                     value: ThemeMode.light,
-                    groupValue: _themeMode,
+                    groupValue: currentThemeMode, // Corrected to use currentThemeMode
                     onChanged: _updateTheme,
                   ),
                   RadioListTile<ThemeMode>(
                     title: const Text('Dark'),
                     value: ThemeMode.dark,
-                    groupValue: _themeMode,
+                    groupValue: currentThemeMode, // Corrected to use currentThemeMode
                     onChanged: _updateTheme,
                   ),
                 ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Card( // Added Feedback Card
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              elevation: 5,
+              child: ListTile(
+                leading: const Icon(Icons.email_outlined),
+                title: const Text('Send Feedback'),
+                subtitle: const Text('Report issues or suggest features'),
+                onTap: _sendFeedbackEmail,
               ),
             ),
             const SizedBox(height: 16),
@@ -170,5 +188,40 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _sendFeedbackEmail() async {
+    const String recipientEmail = 'feedback@artisanarc.app'; // Replace with your actual feedback email
+    const String emailSubject = 'ArtisanArc App Feedback';
+
+    final Uri mailtoUri = Uri(
+      scheme: 'mailto',
+      path: recipientEmail,
+      queryParameters: {
+        'subject': emailSubject,
+        // 'body': 'Device Info:\nOS: ${Platform.operatingSystem}\nVersion: ${Platform.operatingSystemVersion}\n\nFeedback:\n', // Example prefilled body
+      },
+    );
+
+    try {
+      // Attempt to launch the mailto URI
+      if (await canLaunchUrl(mailtoUri)) {
+        await launchUrl(mailtoUri);
+      } else {
+        // If mailto scheme is not supported, try to launch a generic URL to a feedback page or show error
+        // For this example, we'll just show a snackbar if mailto fails.
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Could not open email app. Please send feedback manually to $recipientEmail')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('An error occurred: $e')),
+        );
+      }
+    }
   }
 }

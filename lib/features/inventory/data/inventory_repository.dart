@@ -3,6 +3,7 @@ import 'inventory_model.dart';
 
 abstract class InventoryRepository {
   Future<void> addItem(InventoryItem item);
+  Future<InventoryItem?> getItemById(String id); // Added
   Future<List<InventoryItem>> getAllItems();
   Future<void> updateItem(InventoryItem item);
   Future<void> deleteItem(String id);
@@ -16,6 +17,12 @@ class InventoryRepositoryImpl implements InventoryRepository {
       await Hive.openBox<InventoryItem>(_boxName);
     }
     return Hive.box<InventoryItem>(_boxName);
+  }
+
+  @override
+  Future<InventoryItem?> getItemById(String id) async {
+    final box = await _getBox();
+    return box.get(id);
   }
 
   @override

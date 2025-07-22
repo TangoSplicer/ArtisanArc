@@ -53,6 +53,22 @@ class HomeScreen extends StatelessWidget {
               route: '/projects',
               color: color.tertiary,
             ),
+            _buildNavCard( // Added Compliance Tracker card
+              context,
+              title: 'Compliance Tracker',
+              subtitle: 'Manage safety certs, track standards',
+              icon: Icons.shield_check_outlined, // Example Icon
+              route: '/compliance',
+              color: Colors.teal, // Example Color
+            ),
+             _buildNavCard( // Added Smart Shopping card
+              context,
+              title: 'Smart Shopping',
+              subtitle: 'Create lists, track needs, (future: compare prices)',
+              icon: Icons.shopping_cart_checkout,
+              route: '/shopping-lists', // Route to overview
+              color: Colors.orangeAccent,
+            ),
             _buildNavCard(
               context,
               title: 'Reports & Export',
