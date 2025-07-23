@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'core/di/di.dart';
 import 'core/utils/hive_adapters.dart';
@@ -11,74 +12,35 @@ import 'presentation/routes/app_router.dart';
 import 'presentation/screens/splash_screen.dart';
 import 'presentation/onboarding/onboarding_screen.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  runApp(const ArtisanArcAppLoader());
-}
-
-class ArtisanArcAppLoader extends StatefulWidget {
-  const ArtisanArcAppLoader({super.key});
-  runApp(const SplashScreen()); // Show splash screen initially
-
   await configureDependencies();
   registerHiveAdapters();
-
+  final themeService = getIt<ThemeService>();
+  await themeService.loadThemeMode();
   final storage = getIt<FlutterSecureStorage>();
   final seenOnboarding = await storage.read(key: StorageKeys.onboardingComplete) == 'true';
 
-  final themeService = ThemeService();
-  await themeService.loadThemeMode();
-
-
-  @override
-  State<ArtisanArcAppLoader> createState() => _ArtisanArcAppLoaderState();
-}
-
-
-class _ArtisanArcAppLoaderState extends State<ArtisanArcAppLoader> {
-  late Future<void> _initialization;
-
-  @override
-  void initState() {
-    super.initState();
-    _initialization = _initializeApp();
-  }
-class ArtisanArcApp extends StatefulWidget {
-  final bool seenOnboarding;
-
-
-  Future<void> _initializeApp() async {
-    await configureDependencies();
-    registerHiveAdapters();
-    final themeService = getIt<ThemeService>();
-    await themeService.loadThemeMode();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _initialization,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          return const ArtisanArcApp();
-        }
-        return const SplashScreen();
-      },
-    );
-  }
+  runApp(ArtisanArcApp(
+    themeService: themeService,
+    seenOnboarding: seenOnboarding,
+  ));
 }
 
 class ArtisanArcApp extends StatelessWidget {
-  const ArtisanArcApp({super.key});
+  final ThemeService themeService;
+  final bool seenOnboarding;
+
+  const ArtisanArcApp({
+    super.key,
+    required this.themeService,
+    required this.seenOnboarding,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final storage = getIt<FlutterSecureStorage>();
-    final seenOnboarding = storage.read(key: StorageKeys.onboardingComplete) == 'true';
-
-    return ChangeNotifierProvider(
-      create: (_) => getIt<ThemeService>(),
+    return ChangeNotifierProvider.value(
+      value: themeService,
       child: Consumer<ThemeService>(
         builder: (context, themeService, child) {
           return MaterialApp.router(
@@ -101,40 +63,16 @@ class ArtisanArcApp extends StatelessWidget {
           );
         },
       ),
-
-class _ArtisanArcAppState extends State<ArtisanArcApp> {
-  @override
-  Widget build(BuildContext context) {
-    final themeService = Provider.of<ThemeService>(context);
-
-    return MaterialApp.router(
-      title: 'ArtisanArc',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: themeService.currentThemeMode,
-      routerConfig: widget.seenOnboarding ? AppRouter.router : _onboardingFallbackRouter,
-      supportedLocales: const [
-        Locale('en', 'GB'),
-        Locale('en', 'US'),
-      ],
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      locale: const Locale('en', 'GB'),
-
     );
   }
-
-  static final GoRouter _onboardingFallbackRouter = GoRouter(
-    routes: [
-      GoRoute(
-        path: '/',
-        builder: (context, state) => const OnboardingScreen(),
-      ),
-    ],
-    initialLocation: '/',
-  );
 }
+
+final GoRouter _onboardingFallbackRouter = GoRouter(
+  routes: [
+    GoRoute(
+      path: '/',
+      builder: (context, state) => const OnboardingScreen(),
+    ),
+  ],
+  initialLocation: '/',
+);
