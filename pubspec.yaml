@@ -28,6 +28,7 @@ dependencies:
   image_picker: ^1.0.0 # For picking images
   path_provider: ^2.1.0 # For accessing file system paths
   url_launcher: ^6.1.14 # For launching URLs, including mailto links
+  uuid: ^4.0.0
 
 dev_dependencies:
   flutter_test:
