@@ -2,6 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import '../../domain/daily_sales_service.dart';
+import '../../data/sale_model.dart';
+
+class _LinkedSale {
+  final SaleRecord sale;
+  final String? itemName;
+
+  _LinkedSale({required this.sale, this.itemName});
+}
 
 class DailySalesScreen extends StatefulWidget {
   const DailySalesScreen({super.key});
@@ -22,7 +30,15 @@ class _DailySalesScreenState extends State<DailySalesScreen> {
   }
 
   Future<void> _loadSales() async {
-    final grouped = await _service.getGroupedSales();
+    final sales = await _service.getSalesWithItemNames();
+    final Map<String, List<_LinkedSale>> grouped = {};
+    for (var sale in sales) {
+      final dateKey = DateFormat('yyyy-MM-dd').format(sale.key.date);
+      if (!grouped.containsKey(dateKey)) {
+        grouped[dateKey] = [];
+      }
+      grouped[dateKey]!.add(_LinkedSale(sale: sale.key, itemName: sale.value));
+    }
     setState(() => _grouped = grouped);
   }
 
@@ -76,7 +92,7 @@ class _DailySalesScreenState extends State<DailySalesScreen> {
               itemBuilder: (context, index) {
                 final date = filteredDates[index];
                 final sales = _grouped[date]!;
-                final dailyTotal = sales.fold<double>(0, (sum, s) => sum + s.sale.total);
+                final dailyTotal = sales.fold<double>(0, (sum, s) => sum + (s.sale.total ?? 0.0));
 
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,9 +107,9 @@ class _DailySalesScreenState extends State<DailySalesScreen> {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                           elevation: 2,
                           child: ListTile(
-                            title: Text(s.itemName),
+                            title: Text(s.itemName ?? 'Unknown Item'),
                             subtitle: Text('${s.sale.quantity} × £${s.sale.pricePerUnit.toStringAsFixed(2)}'),
-                            trailing: Text('£${s.sale.total.toStringAsFixed(2)}'),
+                            trailing: Text('£${s.sale.total?.toStringAsFixed(2) ?? '0.00'}'),
                           ),
                         )),
                     Padding(

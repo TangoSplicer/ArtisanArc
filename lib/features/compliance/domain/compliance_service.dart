@@ -17,7 +17,7 @@ class ComplianceServiceImpl implements ComplianceService {
   Future<void> recordCertification(ComplianceEntry entry) => _repo.addEntry(entry); // Hive's put handles create
 
   @override
-  Future<List<ComplianceEntry>> fetchCertifications() => _repo.getEntries();
+  Future<List<ComplianceEntry>> fetchCertifications() => _repo.getAllEntries();
 
   @override
   Future<void> updateCertification(ComplianceEntry entry) => _repo.addEntry(entry); // Hive's put handles update
