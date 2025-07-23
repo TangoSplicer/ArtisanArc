@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:artisan_arc/features/business/domain/daily_sales_service.dart';
-import 'package:artisan_arc/features/business/data/sale_model.dart';
-import 'package:artisan_arc/features/business/data/business_repository.dart';
-import 'package:artisan_arc/features/inventory/data/inventory_model.dart';
-import 'package:artisan_arc/features/inventory/data/inventory_repository.dart';
+import 'package:artisanarc/features/business/domain/daily_sales_service.dart';
+import 'package:artisanarc/features/business/data/sale_model.dart';
+import 'package:artisanarc/features/business/data/business_repository.dart';
+import 'package:artisanarc/features/inventory/data/inventory_model.dart';
+import 'package:artisanarc/features/inventory/data/inventory_repository.dart';
 
 class MockBusinessRepo extends Mock implements BusinessRepository {}
 

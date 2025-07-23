@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:textile_management/features/qr_integration/domain/entities/item.dart'; // Assuming Item entity exists
-import 'package:textile_management/features/qr_integration/application/services/qr_code_service.dart'; // Assuming QrCodeService exists
+import 'package:artisanarc/features/qr_integration/domain/entities/item.dart'; // Assuming Item entity exists
+import 'package:artisanarc/features/qr_integration/application/services/qr_code_service.dart'; // Assuming QrCodeService exists
 
 // Create a mock class for QrCodeService
 class MockQrCodeService extends Mock implements QrCodeService {}

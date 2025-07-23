@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:textile_management/features/compliance_tracker/domain/entities/item.dart';
-import 'package:textile_management/features/compliance_tracker/domain/entities/safety_certification.dart';
+import 'package:artisanarc/features/compliance_tracker/domain/entities/item.dart';
+import 'package:artisanarc/features/compliance_tracker/domain/entities/safety_certification.dart';
 
 void main() {
   group('ComplianceTracker', () {

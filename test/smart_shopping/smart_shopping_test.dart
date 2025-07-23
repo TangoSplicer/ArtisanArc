@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:textile_management/features/smart_shopping/domain/entities/shopping_list.dart';
-import 'package:textile_management/features/smart_shopping/domain/entities/shopping_list_item.dart';
+import 'package:artisanarc/features/smart_shopping/domain/entities/shopping_list.dart';
+import 'package:artisanarc/features/smart_shopping/domain/entities/shopping_list_item.dart';
 
 void main() {
   group('SmartShopping', () {
