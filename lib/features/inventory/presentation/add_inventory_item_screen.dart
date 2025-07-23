@@ -6,7 +6,7 @@ import 'package:image_picker/image_picker.dart'; // Added image_picker
 import 'package:path_provider/path_provider.dart'; // Added path_provider
 import 'package:path/path.dart' as path; // For path manipulation
 import 'package:artisanarc/features/inventory/data/inventory_model.dart';
-import 'package:artisanarc/features/inventory/domain/usecases/add_inventory_item_usecase.dart';
+import 'package:artisanarc/features/inventory/domain/inventory_service.dart';
 import 'package:uuid/uuid.dart'; // For generating unique IDs
 
 class AddInventoryItemScreen extends StatefulWidget {
@@ -26,7 +26,7 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
   List<String> _selectedImagePaths = []; // To store paths of copied images
   final ImagePicker _picker = ImagePicker();
 
-  final AddInventoryItemUseCase _addInventoryItemUseCase = GetIt.I<AddInventoryItemUseCase>();
+  final InventoryService _inventoryService = GetIt.I<InventoryService>();
   final Uuid _uuid = Uuid();
 
   @override
@@ -41,7 +41,7 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
 
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      final newItem = InventoryModel(
+      final newItem = InventoryItem(
         id: _uuid.v4(), // Generate a unique ID
         name: _nameController.text,
         category: _categoryController.text,
@@ -53,7 +53,7 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
       );
 
       try {
-        await _addInventoryItemUseCase(newItem);
+        await _inventoryService.createItem(newItem);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('${newItem.name} added to inventory')),

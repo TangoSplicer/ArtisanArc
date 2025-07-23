@@ -4,13 +4,6 @@ import 'package:intl/intl.dart';
 import '../../domain/daily_sales_service.dart';
 import '../../data/sale_model.dart';
 
-class _LinkedSale {
-  final SaleRecord sale;
-  final String? itemName;
-
-  _LinkedSale({required this.sale, this.itemName});
-}
-
 class DailySalesScreen extends StatefulWidget {
   const DailySalesScreen({super.key});
 
@@ -30,16 +23,8 @@ class _DailySalesScreenState extends State<DailySalesScreen> {
   }
 
   Future<void> _loadSales() async {
-    final sales = await _service.getSalesWithItemNames();
-    final Map<String, List<_LinkedSale>> grouped = {};
-    for (var sale in sales) {
-      final dateKey = DateFormat('yyyy-MM-dd').format(sale.key.date);
-      if (!grouped.containsKey(dateKey)) {
-        grouped[dateKey] = [];
-      }
-      grouped[dateKey]!.add(_LinkedSale(sale: sale.key, itemName: sale.value));
-    }
-    setState(() => _grouped = grouped);
+    final groupedSales = await _service.getGroupedSales();
+    setState(() => _grouped = groupedSales);
   }
 
   void _pickDate() async {

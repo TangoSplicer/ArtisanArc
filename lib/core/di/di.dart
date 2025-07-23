@@ -41,7 +41,7 @@ final getIt = GetIt.instance;
 
 @injectableInit
 Future<void> configureDependencies() async {
-  await $initGetIt(getIt); // Generated registrations
+  // await $initGetIt(getIt); // Generated registrations - Temporarily commented out
 
   // Custom service bindings (non-generated)
 
