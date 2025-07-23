@@ -1,0 +1,52 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+
+# IntelliJ
+.idea/
+*.iml
+*.ipr
+
+# Visual Studio Code
+.vscode/
+
+# Android
+.gradle/
+build/
+app/build/
+android/app/build/
+android/build/
+android/.gradle/
+*.apk
+*.aab
+*.jar
+
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+
+# Other
+*.keystore
+*.jks
+*.properties
+secrets.json
+google-services.json
+fastlane/
+coverage/
+lcov.info
+*.psd
+*.zip
+*.tar.gz
+*.7z
