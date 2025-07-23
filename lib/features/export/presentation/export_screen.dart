@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:printing/printing.dart';
-import '../../utils/export_helper.dart';
-import '../../../business/domain/business_service.dart';
-import '../../../inventory/domain/inventory_service.dart';
+import '../utils/export_helper.dart';
+import '../../business/domain/business_service.dart';
+import '../../inventory/domain/inventory_service.dart';
 
 class ExportScreen extends StatelessWidget {
   const ExportScreen({super.key});
@@ -23,7 +23,7 @@ class ExportScreen extends StatelessWidget {
       body: Container(
         decoration: BoxDecoration(
           gradient: RadialGradient(
-            colors: [color.surface, color.background, color.primary.withOpacity(0.05)],
+            colors: [color.surface, color.surface, color.primary.withValues()],
             radius: 1.2,
             center: Alignment.centerRight,
           ),
@@ -86,17 +86,11 @@ class ExportScreen extends StatelessWidget {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       elevation: 5,
-      shadowColor: color.withOpacity(0.3),
+      shadowColor: color.withValues(),
       margin: const EdgeInsets.only(bottom: 20),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: color.withOpacity(0.2),
-          child: Icon(icon, color: color),
-        ),
-        title: Text(title),
-        onTap: onTap,
-        trailing: const Icon(Icons.chevron_right),
-      ),
-    );
+          backgroundColor: color.withValues()),
+    ));
   }
 }

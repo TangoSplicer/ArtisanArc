@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:uuid/uuid.dart';
-import '../../../inventory/domain/inventory_service.dart';
-import '../../../inventory/data/inventory_model.dart';
-import '../../domain/business_service.dart';
-import '../../data/sale_model.dart';
+import '../../inventory/domain/inventory_service.dart';
+import '../../inventory/data/inventory_model.dart';
+import '../domain/business_service.dart';
+import '../data/sale_model.dart';
 
 class NewSaleEntryScreen extends StatefulWidget {
   const NewSaleEntryScreen({super.key});

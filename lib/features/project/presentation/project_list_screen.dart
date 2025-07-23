@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:artisanarc/features/project/domain/entities/project.dart';
+import 'package:artisanarc/features/project/domain/project_service.dart';
 import 'package:artisanarc/features/project/domain/usecases/get_projects.dart';
 import 'package:artisanarc/features/project/domain/usecases/delete_project.dart';
-// import 'package:artisanarc/features/project/presentation/project_planner_screen.dart'; // For navigation if needed directly
+import 'package:artisanarc/features/project/presentation/project_planner_screen.dart'; // For navigation if needed directly
 
 class ProjectListScreen extends StatefulWidget {
   const ProjectListScreen({super.key});

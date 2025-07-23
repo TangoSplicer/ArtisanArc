@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart'; // Added go_router
-import '../../domain/business_service.dart';
-import '../../data/sale_model.dart';
+import '../domain/business_service.dart';
+import '../data/sale_model.dart';
 // Screen imports are still needed if you pass arguments or for type safety,
 // but not strictly for navigation if using named routes only.
 // import 'daily_sales_screen.dart';

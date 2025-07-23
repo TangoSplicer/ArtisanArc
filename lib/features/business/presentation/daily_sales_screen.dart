@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
-import '../../domain/daily_sales_service.dart';
-import '../../data/sale_model.dart';
+import '../domain/daily_sales_service.dart';
+import '../data/sale_model.dart';
 
 class DailySalesScreen extends StatefulWidget {
   const DailySalesScreen({super.key});
