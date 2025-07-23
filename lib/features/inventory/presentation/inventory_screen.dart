@@ -5,9 +5,9 @@ import 'package:go_router/go_router.dart'; // Added go_router
 import 'package:path_provider/path_provider.dart'; // For getApplicationDocumentsDirectory
 import 'package:path/path.dart' as p; // For path.join
 import '../../../core/utils/premium_checker.dart';
-import '../../domain/inventory_service.dart';
-import '../../domain/entities/inventory_item.dart'; // Corrected to use entity
-import '../../../presentation/widgets/premium_prompt.dart';
+import 'package:artisanarc/features/inventory/domain/inventory_service.dart';
+import 'package:artisanarc/features/inventory/data/inventory_model.dart'; // Corrected to use entity
+import 'package:artisanarc/core/widgets/premium_prompt.dart';
 import 'package:artisanarc/features/qr/presentation/qr_generator_widget.dart'; // Added QR Generator Widget
 // AddInventoryItemScreen is not directly used here, but routing to it.
 
@@ -20,7 +20,7 @@ class InventoryScreen extends StatefulWidget {
 
 class _InventoryScreenState extends State<InventoryScreen> {
   final InventoryService _service = GetIt.I<InventoryService>();
-  List<InventoryItem> _items = [];
+  List<InventoryModel> _items = [];
   bool _isPremium = false;
 
   @override
@@ -70,7 +70,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
             onPressed: () async { // Make onPressed async to await the result
               final result = await context.pushNamed('scanQrCode');
 
-              if (result is InventoryItem && mounted) {
+              if (result is InventoryModel && mounted) {
                 // Display the item's details in a dialog
                 showDialog(
                   context: context,
@@ -173,7 +173,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
     );
   }
 
-  Widget _buildItemLeadingWidget(InventoryItem item, ColorScheme colorScheme) {
+  Widget _buildItemLeadingWidget(InventoryModel item, ColorScheme colorScheme) {
     if (item.imagePaths != null && item.imagePaths!.isNotEmpty) {
       // Attempt to display the first image
       return FutureBuilder<String>(

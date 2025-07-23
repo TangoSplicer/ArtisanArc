@@ -2,11 +2,11 @@ import 'dart:io';
 import 'package:csv/csv.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:craft_supply_organiser/features/business/data/sale_model.dart';
-import 'package:craft_supply_organiser/features/inventory/data/inventory_model.dart';
+import 'package:artisanarc/features/business/data/sale_model.dart';
+import 'package:artisanarc/features/inventory/data/inventory_model.dart';
 
 class ExportHelper {
-  static String generateCsvFromSales(List<SaleRecord> sales) {
+  static String generateCsvFromSales(List<SaleModel> sales) {
     final List<List<dynamic>> rows = [
       ['Item Name', 'Quantity', 'Price Per Unit', 'Date', 'Buyer'],
       ...sales.map((sale) => [
@@ -20,21 +20,21 @@ class ExportHelper {
     return const ListToCsvConverter().convert(rows);
   }
 
-  static String generateCsvFromInventory(List<InventoryItem> items) {
+  static String generateCsvFromInventory(List<InventoryModel> items) {
     final List<List<dynamic>> rows = [
       ['Name', 'Category', 'Quantity', 'Price', 'Location'],
       ...items.map((item) => [
             item.name,
             item.category,
             item.quantity,
-            item.price?.toStringAsFixed(2) ?? '',
+            item.price.toStringAsFixed(2),
             item.storageLocation ?? '',
           ]),
     ];
     return const ListToCsvConverter().convert(rows);
   }
 
-  static pw.Document generateSalesPdf(List<SaleRecord> sales) {
+  static pw.Document generateSalesPdf(List<SaleModel> sales) {
     final doc = pw.Document();
     doc.addPage(
       pw.MultiPage(
@@ -58,7 +58,7 @@ class ExportHelper {
     return doc;
   }
 
-  static pw.Document generateInventoryPdf(List<InventoryItem> items) {
+  static pw.Document generateInventoryPdf(List<InventoryModel> items) {
     final doc = pw.Document();
     doc.addPage(
       pw.MultiPage(
@@ -71,7 +71,7 @@ class ExportHelper {
                 i.name,
                 i.category,
                 i.quantity,
-                i.price?.toStringAsFixed(2) ?? '',
+                i.price.toStringAsFixed(2),
                 i.storageLocation ?? '',
               ];
             }).toList(),
