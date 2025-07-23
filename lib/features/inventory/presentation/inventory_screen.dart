@@ -20,7 +20,7 @@ class InventoryScreen extends StatefulWidget {
 
 class _InventoryScreenState extends State<InventoryScreen> {
   final InventoryService _service = GetIt.I<InventoryService>();
-  List<InventoryModel> _items = [];
+  List<InventoryItem> _items = [];
   bool _isPremium = false;
 
   @override
@@ -70,7 +70,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
             onPressed: () async { // Make onPressed async to await the result
               final result = await context.pushNamed('scanQrCode');
 
-              if (result is InventoryModel && mounted) {
+              if (result is InventoryItem && mounted) {
                 // Display the item's details in a dialog
                 showDialog(
                   context: context,
@@ -173,7 +173,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
     );
   }
 
-  Widget _buildItemLeadingWidget(InventoryModel item, ColorScheme colorScheme) {
+  Widget _buildItemLeadingWidget(InventoryItem item, ColorScheme colorScheme) {
     if (item.imagePaths != null && item.imagePaths!.isNotEmpty) {
       // Attempt to display the first image
       return FutureBuilder<String>(

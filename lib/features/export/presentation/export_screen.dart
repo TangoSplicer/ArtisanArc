@@ -39,7 +39,7 @@ class ExportScreen extends StatelessWidget {
               onTap: () async {
                 final sales = await business.fetchSales();
                 final csv = ExportHelper.generateCsvFromSales(sales);
-                await Printing.sharePdf(bytes: csv.codeUnits, filename: 'sales.csv');
+                await Printing.sharePdf(bytes: Uint8List.fromList(csv.codeUnits), filename: 'sales.csv');
               },
             ),
             _buildExportCard(
@@ -50,7 +50,7 @@ class ExportScreen extends StatelessWidget {
               onTap: () async {
                 final items = await inventory.fetchItems();
                 final csv = ExportHelper.generateCsvFromInventory(items);
-                await Printing.sharePdf(bytes: csv.codeUnits, filename: 'inventory.csv');
+                await Printing.sharePdf(bytes: Uint8List.fromList(csv.codeUnits), filename: 'inventory.csv');
               },
             ),
             _buildExportCard(
