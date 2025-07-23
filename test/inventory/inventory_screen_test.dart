@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:craft_supply_organiser/features/inventory/presentation/inventory_screen.dart';
+import 'package:artisanarc/features/inventory/presentation/inventory_screen.dart';
 
 void main() {
   testWidgets('InventoryScreen shows empty message and FAB', (tester) async {

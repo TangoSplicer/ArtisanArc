@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:craft_supply_organiser/features/inventory/domain/inventory_service.dart';
-import 'package:craft_supply_organiser/features/inventory/data/inventory_model.dart';
-import 'package:craft_supply_organiser/features/inventory/data/inventory_repository.dart';
+import 'package:artisanarc/features/inventory/domain/inventory_service.dart';
+import 'package:artisanarc/features/inventory/data/inventory_model.dart';
+import 'package:artisanarc/features/inventory/data/inventory_repository.dart';
 
 class MockInventoryRepository extends Mock implements InventoryRepository {}
 

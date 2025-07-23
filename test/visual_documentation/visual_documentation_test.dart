@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:textile_management/features/visual_documentation/domain/entities/item.dart'; // Assuming Item entity
-import 'package:textile_management/features/visual_documentation/application/services/image_service.dart'; // Assuming ImageService
-import 'package:textile_management/features/visual_documentation/application/services/color_extraction_service.dart'; // Assuming ColorExtractionService
+import 'package:artisanarc/features/visual_documentation/domain/entities/item.dart'; // Assuming Item entity
+import 'package:artisanarc/features/visual_documentation/application/services/image_service.dart'; // Assuming ImageService
+import 'package:artisanarc/features/visual_documentation/application/services/color_extraction_service.dart'; // Assuming ColorExtractionService
 import 'dart:typed_data'; // For Uint8List
 
 // Mock classes

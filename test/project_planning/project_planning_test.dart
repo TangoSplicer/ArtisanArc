@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:textile_management/features/project_planning/domain/entities/project.dart';
-import 'package:textile_management/features/project_planning/domain/entities/milestone.dart';
-import 'package:textile_management/features/project_planning/domain/entities/supply_need.dart';
+import 'package:artisanarc/features/project_planning/domain/entities/project.dart';
+import 'package:artisanarc/features/project_planning/domain/entities/milestone.dart';
+import 'package:artisanarc/features/project_planning/domain/entities/supply_need.dart';
 
 void main() {
   group('ProjectPlanning', () {
