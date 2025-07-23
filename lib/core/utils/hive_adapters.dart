@@ -21,14 +21,14 @@ void registerHiveAdapters() {
   // ShoppingListItemAdapter() is for typeId 7
 
   // Check if adapters are already registered to prevent errors during hot reload/restart
-  _registerAdapterIfNotRegistered(ProjectAdapter());
-  _registerAdapterIfNotRegistered(MilestoneAdapter());
-  _registerAdapterIfNotRegistered(SupplyNeedAdapter());
-  _registerAdapterIfNotRegistered(ShoppingListAdapter());
-  _registerAdapterIfNotRegistered(ShoppingListItemAdapter());
+  // _registerAdapterIfNotRegistered(ProjectAdapter());
+  // _registerAdapterIfNotRegistered(MilestoneAdapter());
+  // _registerAdapterIfNotRegistered(SupplyNeedAdapter());
+  // _registerAdapterIfNotRegistered(ShoppingListAdapter());
+  // _registerAdapterIfNotRegistered(ShoppingListItemAdapter());
 
   // Pre-existing adapters (ensure their typeIds are known and don't clash)
-  _registerAdapterIfNotRegistered(InventoryItemAdapter());
+  // _registerAdapterIfNotRegistered(InventoryItemAdapter());
   // _registerAdapterIfNotRegistered(SaleRecordAdapter()); // Uncomment if SaleRecordAdapter exists and needs registration
   // _registerAdapterIfNotRegistered(ComplianceEntryAdapter()); // Uncomment if ComplianceEntryAdapter exists
 }

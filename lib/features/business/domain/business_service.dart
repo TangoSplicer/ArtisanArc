@@ -13,7 +13,7 @@ class BusinessServiceImpl implements BusinessService {
   BusinessServiceImpl(this._repository);
 
   @override
-  Future<void> createSale(SaleRecord record) => _repository.logSale(record);
+  Future<void> createSale(SaleRecord record) => _repository.createSale(record);
 
   @override
   Future<List<SaleRecord>> fetchSales() => _repository.getSales();
