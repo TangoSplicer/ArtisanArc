@@ -49,7 +49,7 @@ class ArtisanArcApp extends StatelessWidget {
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: themeService.currentThemeMode,
-            routerConfig: seenOnboarding ? AppRouter.router : _onboardingFallbackRouter,
+            routerConfig: AppRouter.router,
             supportedLocales: const [
               Locale('en', 'GB'),
               Locale('en', 'US'),
@@ -66,13 +66,3 @@ class ArtisanArcApp extends StatelessWidget {
     );
   }
 }
-
-final GoRouter _onboardingFallbackRouter = GoRouter(
-  routes: [
-    GoRoute(
-      path: '/',
-      builder: (context, state) => const OnboardingScreen(),
-    ),
-  ],
-  initialLocation: '/',
-);
