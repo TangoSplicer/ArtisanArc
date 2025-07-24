@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:artisanarc/features/project/domain/project_service.dart';
 import 'package:artisanarc/features/project/domain/usecases/get_projects.dart';
 import 'package:artisanarc/features/project/domain/usecases/delete_project.dart';
@@ -127,8 +128,17 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                       margin: const EdgeInsets.symmetric(vertical: 8.0),
                       child: ListTile(
                         title: Text(project.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                        subtitle: Text(project.description ?? 'No description'),
-                        // TODO: Display more details like start/end dates, milestone count
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(project.description ?? 'No description'),
+                            const SizedBox(height: 4),
+                            Text(
+                              '${project.startDate != null ? DateFormat.yMMMd().format(project.startDate!) : 'No start date'} - ${project.endDate != null ? DateFormat.yMMMd().format(project.endDate!) : 'No end date'}',
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                          ],
+                        ),
                         trailing: PopupMenuButton<String>(
                           onSelected: (value) {
                             if (value == 'edit') {

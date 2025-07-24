@@ -43,6 +43,58 @@ final Map<String, CraftAIProfile> offlineCraftProfiles = {
       '5mm needles',
     ],
   ),
-  // Add more crafts as needed
-  // TODO: Expand with more craft profiles for a richer user experience.
+  'Sewing': CraftAIProfile(
+    craft: 'Sewing',
+    tips: [
+      'Always press your seams.',
+      'Change your needle every 8-10 hours of sewing.',
+      'Test your stitch on a scrap piece of fabric first.',
+    ],
+    commonMistakes: [
+      'Not backstitching at the beginning and end of seams.',
+      'Stretching the fabric while sewing.',
+      'Using the wrong type of needle for the fabric.',
+    ],
+    recommendedMaterials: [
+      'Cotton fabric',
+      'Universal needle',
+      'Polyester thread',
+    ],
+  ),
+  'Embroidery': CraftAIProfile(
+    craft: 'Embroidery',
+    tips: [
+      'Use a hoop to keep your fabric taut.',
+      'Separate your embroidery floss for a neater look.',
+      'Start with simple stitches like the backstitch and satin stitch.',
+    ],
+    commonMistakes: [
+      'Pulling your stitches too tight.',
+      'Making large knots on the back of your work.',
+      'Using a single strand of floss for all stitches.',
+    ],
+    recommendedMaterials: [
+      'Embroidery floss',
+      'Linen or cotton fabric',
+      'Embroidery hoop',
+    ],
+  ),
+  'Pottery': CraftAIProfile(
+    craft: 'Pottery',
+    tips: [
+      'Wedge your clay properly to remove air bubbles.',
+      'Keep your hands wet while throwing on the wheel.',
+      'Compress the rim of your pots to prevent cracking.',
+    ],
+    commonMistakes: [
+      'Using too much water.',
+      'Not centering the clay on the wheel.',
+      'Making the walls of the pot too thin.',
+    ],
+    recommendedMaterials: [
+      'Stoneware clay',
+      'Pottery wheel',
+      'Basic pottery tools (needle tool, wire cutter, sponge)',
+    ],
+  ),
 };
