@@ -24,6 +24,11 @@ class AppRouter {
     initialLocation: '/',
     errorBuilder: (context, state) => ErrorScreen(error: state.error?.message),
     routes: [
+       GoRoute(
+        path: '/',
+        name: 'root',
+        builder: (context, state) => const HomeScreen(),
+      ),
       GoRoute(
         path: '/onboarding',
         name: 'onboarding',
