@@ -1,4 +1,4 @@
-import 'package:flutter/material3.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:artisanarc/presentation/screens/home_screen.dart';
 import 'package:artisanarc/presentation/onboarding/onboarding_screen.dart';
