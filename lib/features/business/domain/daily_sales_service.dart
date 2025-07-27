@@ -1,8 +1,9 @@
-import 'package:intl/intl.dart';
+import 'package.intl/intl.dart';
 import '../../inventory/data/inventory_repository.dart';
 import '../../inventory/data/inventory_model.dart';
 import '../../business/data/sale_model.dart';
 import '../../business/data/business_repository.dart';
+import 'linked_sale_model.dart';
 
 class DailySalesService {
   final BusinessRepository salesRepo;
@@ -10,7 +11,7 @@ class DailySalesService {
 
   DailySalesService(this.salesRepo, this.inventoryRepo);
 
-  Future<Map<String, List<_LinkedSale>>> getGroupedSales() async {
+  Future<Map<String, List<LinkedSaleModel>>> getGroupedSales() async {
     final sales = await salesRepo.getSales();
     final inventory = await inventoryRepo.getAllItems();
 
@@ -18,7 +19,7 @@ class DailySalesService {
       for (var item in inventory) item.id: item.name,
     };
 
-    final Map<String, List<_LinkedSale>> grouped = {};
+    final Map<String, List<LinkedSaleModel>> grouped = {};
 
     for (final sale in sales) {
       final dateKey = DateFormat('yyyy-MM-dd').format(sale.date);
@@ -26,17 +27,10 @@ class DailySalesService {
 
       grouped.putIfAbsent(dateKey, () => []);
       grouped[dateKey]!.add(
-        _LinkedSale(sale: sale, itemName: itemName),
+        LinkedSaleModel(sale: sale, itemName: itemName),
       );
     }
 
     return grouped;
   }
-}
-
-class _LinkedSale {
-  final SaleRecord sale;
-  final String itemName;
-
-  _LinkedSale({required this.sale, required this.itemName});
 }

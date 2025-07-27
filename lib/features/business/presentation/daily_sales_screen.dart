@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import '../domain/daily_sales_service.dart';
-import '../data/sale_model.dart';
+import '../domain/linked_sale_model.dart';
 
 class DailySalesScreen extends StatefulWidget {
   const DailySalesScreen({super.key});
@@ -13,7 +13,7 @@ class DailySalesScreen extends StatefulWidget {
 
 class _DailySalesScreenState extends State<DailySalesScreen> {
   final DailySalesService _service = GetIt.I<DailySalesService>();
-  Map<String, List<_LinkedSale>> _grouped = {};
+  Map<String, List<LinkedSaleModel>> _grouped = {};
   DateTime? _selectedDate;
 
   @override
