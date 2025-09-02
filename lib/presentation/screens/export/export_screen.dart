@@ -55,7 +55,19 @@ class ExportScreen extends StatelessWidget {
             icon: Icons.timeline,
             color: color.tertiary,
             onTap: () async {
-              // TODO: Implement project report generation
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Project reports coming soon!')),
+              );
+            },
+          ),
+          _buildExportOption(
+            context,
+            title: 'Label Generator',
+            subtitle: 'Create printable labels for inventory items',
+            icon: Icons.label,
+            color: Colors.green,
+            onTap: () {
+              context.pushNamed('labelEditor');
             },
           ),
         ],

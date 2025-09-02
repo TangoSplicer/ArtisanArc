@@ -5,8 +5,10 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart'; // Added url_launcher
 
 import '../../../core/services/theme_service.dart';
+import '../../../core/services/backup_service.dart';
+import '../../../core/services/analytics_service.dart';
 import '../../../core/utils/storage_keys.dart';
-import '../../domain/settings_service.dart';
+import '../domain/settings_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -155,6 +157,50 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
             const SizedBox(height: 16),
+            Card( // Added Backup & Restore Card
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              elevation: 5,
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.backup),
+                    title: const Text('Backup Data'),
+                    subtitle: const Text('Export all your data to a file'),
+                    onTap: _exportBackup,
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.restore),
+                    title: const Text('Restore Data'),
+                    subtitle: const Text('Import data from a backup file'),
+                    onTap: _importBackup,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Card( // Added Analytics Card
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              elevation: 5,
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.analytics),
+                    title: const Text('Usage Analytics'),
+                    subtitle: const Text('View your app usage patterns'),
+                    onTap: _showAnalytics,
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.delete_sweep),
+                    title: const Text('Clear Analytics'),
+                    subtitle: const Text('Remove all usage data'),
+                    onTap: _clearAnalytics,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
             Card( // Added Feedback Card
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               elevation: 5,
@@ -220,6 +266,129 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('An error occurred: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _exportBackup() async {
+    try {
+      await BackupService.exportBackup();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Backup exported successfully!')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error exporting backup: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _importBackup() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Import Backup'),
+        content: const Text('This will replace all current data. Are you sure?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Import'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      try {
+        final success = await BackupService.importBackup();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(success ? 'Backup imported successfully!' : 'Import cancelled'),
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error importing backup: $e')),
+          );
+        }
+      }
+    }
+  }
+
+  Future<void> _showAnalytics() async {
+    final analytics = await AnalyticsService.getUsageAnalytics();
+    
+    if (mounted) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Usage Analytics'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: analytics.isEmpty
+                ? const Text('No usage data available yet.')
+                : ListView(
+                    shrinkWrap: true,
+                    children: analytics.entries.map((entry) {
+                      final feature = entry.key;
+                      final usage = entry.value as Map<String, dynamic>;
+                      final totalUsage = usage.values.fold<int>(0, (sum, count) => sum + (count as int));
+                      
+                      return ListTile(
+                        title: Text(feature),
+                        trailing: Text('$totalUsage uses'),
+                      );
+                    }).toList(),
+                  ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  Future<void> _clearAnalytics() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Clear Analytics'),
+        content: const Text('Are you sure you want to clear all usage analytics?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Clear'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      await AnalyticsService.clearAnalytics();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Analytics cleared')),
         );
       }
     }

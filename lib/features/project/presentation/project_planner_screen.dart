@@ -9,8 +9,7 @@ import 'package:go_router/go_router.dart'; // For navigation
 import 'package:artisanarc/features/project/domain/usecases/create_project.dart';
 import 'package:artisanarc/features/project/domain/usecases/get_project_by_id.dart';
 import 'package:artisanarc/features/project/domain/usecases/update_project.dart';
-import 'package:artisanarc/features/project/domain/entities/project.dart'; // Explicit import for Project entity
-import 'package:artisanarc/features/project/domain/entities/milestone.dart'; // Explicit import for Milestone entity
+import 'package:artisanarc/features/project/data/project_model.dart'; // Use data model instead
 import 'package:artisanarc/features/project/domain/entities/supply_need.dart'; // Import SupplyNeed
 
 

@@ -94,7 +94,7 @@ class _DailySalesScreenState extends State<DailySalesScreen> {
                           child: ListTile(
                             title: Text(s.itemName ?? 'Unknown Item'),
                             subtitle: Text('${s.sale.quantity} × £${s.sale.pricePerUnit.toStringAsFixed(2)}'),
-                            trailing: Text('£${s.sale.total?.toStringAsFixed(2) ?? '0.00'}'),
+                            trailing: Text('£${s.sale.total.toStringAsFixed(2)}'),
                           ),
                         )),
                     Padding(

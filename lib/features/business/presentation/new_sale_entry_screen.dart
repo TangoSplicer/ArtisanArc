@@ -77,7 +77,7 @@ class _NewSaleEntryScreenState extends State<NewSaleEntryScreen> {
             const SizedBox(height: 10),
             TextField(
               controller: _priceController,
-              decoration: const InputDecoration(labelText: 'Price Per Unit'),
+              decoration: const InputDecoration(labelText: 'Price Per Unit (£)'),
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
             ),
             const SizedBox(height: 20),

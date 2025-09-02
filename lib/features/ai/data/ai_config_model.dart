@@ -97,4 +97,58 @@ final Map<String, CraftAIProfile> offlineCraftProfiles = {
       'Basic pottery tools (needle tool, wire cutter, sponge)',
     ],
   ),
+  'Quilting': CraftAIProfile(
+    craft: 'Quilting',
+    tips: [
+      'Use a rotary cutter for precise fabric cutting.',
+      'Press seams consistently in one direction.',
+      'Pin generously to prevent fabric shifting.',
+    ],
+    commonMistakes: [
+      'Not pre-washing fabrics.',
+      'Inconsistent seam allowances.',
+      'Skipping the basting step.',
+    ],
+    recommendedMaterials: [
+      'Cotton quilting fabric',
+      'Rotary cutter and mat',
+      'Quilting ruler',
+    ],
+  ),
+  'Paper Craft': CraftAIProfile(
+    craft: 'Paper Craft',
+    tips: [
+      'Use bone folder for crisp creases.',
+      'Score before folding thick paper.',
+      'Work in good lighting to avoid eye strain.',
+    ],
+    commonMistakes: [
+      'Using too much adhesive.',
+      'Not measuring twice before cutting.',
+      'Rushing the drying process.',
+    ],
+    recommendedMaterials: [
+      'Cardstock paper',
+      'Craft knife',
+      'Cutting mat',
+    ],
+  ),
+  'Macramé': CraftAIProfile(
+    craft: 'Macramé',
+    tips: [
+      'Keep consistent tension throughout.',
+      'Use a macramé board for complex patterns.',
+      'Comb out cords for a neat finish.',
+    ],
+    commonMistakes: [
+      'Starting with cords too short.',
+      'Inconsistent knot spacing.',
+      'Not securing the mounting cord properly.',
+    ],
+    recommendedMaterials: [
+      'Macramé cord (3-4mm)',
+      'Wooden dowel or ring',
+      'Macramé comb',
+    ],
+  ),
 };

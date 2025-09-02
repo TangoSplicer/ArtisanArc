@@ -2,23 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'core/di/di.dart';
 import 'core/utils/hive_adapters.dart';
 import 'core/utils/storage_keys.dart';
 import 'core/theme/app_theme.dart';
 import 'core/services/theme_service.dart';
+import 'core/services/notification_service.dart';
 import 'presentation/routes/app_router.dart';
 import 'presentation/screens/splash_screen.dart';
 import 'presentation/onboarding/onboarding_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await configureDependencies();
+  
+  // Initialize Hive
+  await Hive.initFlutter();
   registerHiveAdapters();
-  final themeService = getIt<ThemeService>();
+  
+  // Configure dependencies
+  await configureDependencies();
+  
+  // Initialize notifications
+  await NotificationService.initialize();
+  
+  final themeService = getIt.get<ThemeService>();
   await themeService.loadThemeMode();
-  final storage = getIt<FlutterSecureStorage>();
+  final storage = getIt.get<FlutterSecureStorage>();
   final seenOnboarding = await storage.read(key: StorageKeys.onboardingComplete) == 'true';
 
   runApp(ArtisanArcApp(

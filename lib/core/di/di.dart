@@ -1,6 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
-import 'di.config.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 // Inventory
 import '../../features/inventory/data/inventory_repository.dart';
@@ -37,43 +37,42 @@ import '../../features/project/domain/usecases/delete_project.dart';
 import '../../features/shopping/data/shopping_repository.dart';
 import '../../features/shopping/domain/shopping_service.dart';
 
+// Theme Service
+import '../../core/services/theme_service.dart';
+
 final getIt = GetIt.instance;
 
-@injectableInit
 Future<void> configureDependencies() async {
-  // await $initGetIt(getIt); // Generated registrations - Temporarily commented out
+  // Core Services
+  getIt.registerLazySingleton<FlutterSecureStorage>(() => const FlutterSecureStorage());
+  getIt.registerLazySingleton<ThemeService>(() => ThemeService());
 
-  // Custom service bindings (non-generated)
+  // Inventory Feature
+  getIt.registerLazySingleton<InventoryRepository>(() => InventoryRepositoryImpl());
+  getIt.registerLazySingleton<InventoryService>(() => InventoryServiceImpl(getIt<InventoryRepository>()));
 
-  // Assuming ProjectRepositoryImpl and ProjectServiceImpl might not be annotated
-  // for injectable, or to ensure they are registered as specified.
-  // If they ARE annotated, these manual ones might conflict or be redundant if build_runner runs.
+  // Business Feature
+  getIt.registerLazySingleton<BusinessRepository>(() => BusinessRepositoryImpl());
+  getIt.registerLazySingleton<BusinessService>(() => BusinessServiceImpl(getIt<BusinessRepository>()));
+
+  // Compliance Feature
+  getIt.registerLazySingleton<ComplianceRepository>(() => ComplianceRepositoryImpl());
+  getIt.registerLazySingleton<ComplianceService>(() => ComplianceServiceImpl(getIt<ComplianceRepository>()));
+
+  // Settings Feature
+  getIt.registerLazySingleton<SettingsRepository>(() => SettingsRepositoryImpl());
+  getIt.registerLazySingleton<SettingsService>(() => SettingsServiceImpl(getIt<SettingsRepository>()));
 
   // Project Feature
-  if (!getIt.isRegistered<ProjectRepository>()) {
-    getIt.registerLazySingleton<ProjectRepository>(() => ProjectRepositoryImpl());
-  }
-
-  if (!getIt.isRegistered<ProjectService>()) {
-    getIt.registerLazySingleton<ProjectService>(() => ProjectServiceImpl(getIt<ProjectRepository>()));
-  }
+  getIt.registerLazySingleton<ProjectRepository>(() => ProjectRepositoryImpl());
+  getIt.registerLazySingleton<ProjectService>(() => ProjectServiceImpl(getIt<ProjectRepository>()));
 
   // Register Project Use Cases
-  if (!getIt.isRegistered<CreateProject>()) {
-    getIt.registerLazySingleton<CreateProject>(() => CreateProject(getIt<ProjectService>()));
-  }
-  if (!getIt.isRegistered<GetProjectById>()) {
-    getIt.registerLazySingleton<GetProjectById>(() => GetProjectById(getIt<ProjectService>()));
-  }
-  if (!getIt.isRegistered<GetProjects>()) {
-    getIt.registerLazySingleton<GetProjects>(() => GetProjects(getIt<ProjectService>()));
-  }
-  if (!getIt.isRegistered<UpdateProject>()) {
-    getIt.registerLazySingleton<UpdateProject>(() => UpdateProject(getIt<ProjectService>()));
-  }
-  if (!getIt.isRegistered<DeleteProject>()) {
-    getIt.registerLazySingleton<DeleteProject>(() => DeleteProject(getIt<ProjectService>()));
-  }
+  getIt.registerLazySingleton<CreateProject>(() => CreateProject(getIt<ProjectService>()));
+  getIt.registerLazySingleton<GetProjectById>(() => GetProjectById(getIt<ProjectService>()));
+  getIt.registerLazySingleton<GetProjects>(() => GetProjects(getIt<ProjectService>()));
+  getIt.registerLazySingleton<UpdateProject>(() => UpdateProject(getIt<ProjectService>()));
+  getIt.registerLazySingleton<DeleteProject>(() => DeleteProject(getIt<ProjectService>()));
 
   // Daily Sales Service: links Business & Inventory
   getIt.registerLazySingleton<DailySalesService>(() => DailySalesService(
@@ -85,10 +84,6 @@ Future<void> configureDependencies() async {
   getIt.registerLazySingleton<CraftHintService>(() => CraftHintService());
 
   // Shopping Feature Dependencies
-  if (!getIt.isRegistered<ShoppingRepository>()) {
-    getIt.registerLazySingleton<ShoppingRepository>(() => ShoppingRepositoryImpl());
-  }
-  if (!getIt.isRegistered<ShoppingService>()) {
-    getIt.registerLazySingleton<ShoppingService>(() => ShoppingServiceImpl(getIt<ShoppingRepository>()));
-  }
+  getIt.registerLazySingleton<ShoppingRepository>(() => ShoppingRepositoryImpl());
+  getIt.registerLazySingleton<ShoppingService>(() => ShoppingServiceImpl(getIt<ShoppingRepository>()));
 }

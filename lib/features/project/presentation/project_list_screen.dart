@@ -5,7 +5,9 @@ import 'package:intl/intl.dart';
 import 'package:artisanarc/features/project/domain/project_service.dart';
 import 'package:artisanarc/features/project/domain/usecases/get_projects.dart';
 import 'package:artisanarc/features/project/domain/usecases/delete_project.dart';
-import 'package:artisanarc/features/project/presentation/project_planner_screen.dart'; // For navigation if needed directly
+import 'package:artisanarc/features/project/data/project_model.dart';
+import 'package:artisanarc/core/widgets/empty_state_widget.dart';
+import 'package:artisanarc/core/utils/date_helpers.dart';
 
 class ProjectListScreen extends StatefulWidget {
   const ProjectListScreen({super.key});
@@ -112,18 +114,22 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _projects.isEmpty
-              ? Center(
-                  child: Text(
-                    'No projects yet. Tap the + button to create one!',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
+              ? EmptyStateWidget(
+                  icon: Icons.timeline,
+                  title: 'No Projects Yet',
+                  subtitle: 'Create your first project to start organizing your craft work',
+                  actionText: 'Create Project',
+                  onAction: _navigateToAddProject,
                 )
               : ListView.builder(
                   padding: const EdgeInsets.all(8.0),
                   itemCount: _projects.length,
                   itemBuilder: (context, index) {
                     final project = _projects[index];
+                    final completedMilestones = project.milestones.where((m) => m.isCompleted).length;
+                    final totalMilestones = project.milestones.length;
+                    final progress = totalMilestones > 0 ? completedMilestones / totalMilestones : 0.0;
+                    
                     return Card(
                       margin: const EdgeInsets.symmetric(vertical: 8.0),
                       child: ListTile(
@@ -134,7 +140,18 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                             Text(project.description ?? 'No description'),
                             const SizedBox(height: 4),
                             Text(
-                              '${project.startDate != null ? DateFormat.yMMMd().format(project.startDate!) : 'No start date'} - ${project.endDate != null ? DateFormat.yMMMd().format(project.endDate!) : 'No end date'}',
+                              '${project.startDate != null ? DateHelpers.formatForDisplay(project.startDate!) : 'No start date'} - ${project.endDate != null ? DateHelpers.formatForDisplay(project.endDate!) : 'No end date'}',
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                            const SizedBox(height: 8),
+                            LinearProgressIndicator(
+                              value: progress,
+                              backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+                              valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '$completedMilestones of $totalMilestones milestones completed',
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                           ],
@@ -159,7 +176,7 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                           ],
                         ),
                         onTap: () {
-                           _navigateToEditProject(project); // Or navigate to a dedicated detail view
+                          context.push('/projects/detail/${project.id}').then((_) => _loadProjects());
                         },
                       ),
                     );

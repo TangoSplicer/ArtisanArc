@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:../features/inventory/domain/inventory_service.dart';
 import 'package:artisanarc/features/inventory/domain/inventory_service.dart';
+import 'package:artisanarc/features/inventory/data/inventory_model.dart';
 import 'package:artisanarc/features/qr/presentation/qr_scanner_widget.dart'; // Assuming this is the correct path
 
 class QRScannerPage extends StatefulWidget {

@@ -9,7 +9,8 @@ import 'package:artisanarc/features/inventory/domain/inventory_service.dart';
 import 'package:artisanarc/features/inventory/data/inventory_model.dart'; // Corrected to use entity
 import 'package:artisanarc/core/widgets/premium_prompt.dart';
 import 'package:artisanarc/features/qr/presentation/qr_generator_widget.dart'; // Added QR Generator Widget
-// AddInventoryItemScreen is not directly used here, but routing to it.
+import 'package:artisanarc/core/widgets/empty_state_widget.dart';
+import 'package:artisanarc/core/services/analytics_service.dart';
 
 class InventoryScreen extends StatefulWidget {
   const InventoryScreen({super.key});
@@ -28,6 +29,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
     super.initState();
     _loadItems();
     _checkPremium();
+    AnalyticsService.trackFeatureUsage('inventory_view');
   }
 
   Future<void> _checkPremium() async {
@@ -119,7 +121,13 @@ class _InventoryScreenState extends State<InventoryScreen> {
           ),
         ),
         child: _items.isEmpty
-            ? const Center(child: Text('No items found. Tap + to add.'))
+            ? EmptyStateWidget(
+                icon: Icons.inventory_2,
+                title: 'No Items Yet',
+                subtitle: 'Start building your craft inventory by adding your first item',
+                actionText: 'Add First Item',
+                onAction: _navigateToAddItemForm,
+              )
             : ListView.builder(
                 padding: const EdgeInsets.all(16),
                 itemCount: _items.length,
@@ -134,7 +142,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                       title: Text(item.name, style: const TextStyle(fontWeight: FontWeight.bold)),
                       subtitle: Text(
                           'Qty: ${item.quantity} • Category: ${item.category}\n'
-                          'Price: ${item.price != null ? '\$${item.price!.toStringAsFixed(2)}' : 'N/A'}\n'
+                          'Price: ${item.price != null ? '£${item.price!.toStringAsFixed(2)}' : 'N/A'}\n'
                           'Location: ${item.storageLocation ?? 'N/A'}',
                           ),
                       trailing: IconButton( // Removed _isPremium check
@@ -164,7 +172,10 @@ class _InventoryScreenState extends State<InventoryScreen> {
                           );
                         },
                       ),
-                      isThreeLine: true, // To accommodate more details
+                      isThreeLine: true,
+                      onTap: () {
+                        context.push('/inventory/detail/${item.id}').then((_) => _loadItems());
+                      },
                     ),
                   );
                 },

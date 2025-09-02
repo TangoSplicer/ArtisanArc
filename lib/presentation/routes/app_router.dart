@@ -17,13 +17,34 @@ import 'package:artisanarc/features/shopping/presentation/shopping_list_detail_s
 import 'package:artisanarc/features/ai/presentation/craft_ai_widget.dart';
 import 'package:artisanarc/presentation/screens/export/export_screen.dart';
 import 'package:artisanarc/presentation/screens/error_screen.dart';
+import 'package:artisanarc/features/labels/presentation/label_editor_screen.dart';
+import 'package:artisanarc/presentation/screens/premium/premium_screen.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:artisanarc/core/utils/storage_keys.dart';
+import 'package:artisanarc/features/inventory/presentation/inventory_detail_screen.dart';
+import 'package:artisanarc/features/business/presentation/revenue_analytics_screen.dart';
+import 'package:artisanarc/features/project/presentation/project_detail_screen.dart';
 
 
 class AppRouter {
   static final GoRouter router = GoRouter(
-    initialLocation: '/',
+    initialLocation: '/splash',
     errorBuilder: (context, state) => ErrorScreen(error: state.error?.message),
+    redirect: (context, state) async {
+      const storage = FlutterSecureStorage();
+      final seenOnboarding = await storage.read(key: StorageKeys.onboardingComplete) == 'true';
+      
+      if (state.matchedLocation == '/splash') {
+        return seenOnboarding ? '/home' : '/onboarding';
+      }
+      return null;
+    },
     routes: [
+      GoRoute(
+        path: '/splash',
+        name: 'splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
        GoRoute(
         path: '/',
         name: 'root',
@@ -49,6 +70,17 @@ class AppRouter {
             name: 'addInventoryItem',
             builder: (context, state) => const AddInventoryItemScreen(),
           ),
+          GoRoute(
+            path: 'detail/:itemId',
+            name: 'inventoryDetail',
+            builder: (context, state) {
+              final itemId = state.pathParameters['itemId'];
+              if (itemId == null) {
+                return const ErrorScreen(error: 'Item ID is missing');
+              }
+              return InventoryDetailScreen(itemId: itemId);
+            },
+          ),
         ],
       ),
       GoRoute(
@@ -71,6 +103,11 @@ class AppRouter {
             name: 'newSale',
             builder: (context, state) => const NewSaleEntryScreen(),
           ),
+          GoRoute(
+            path: 'analytics',
+            name: 'revenueAnalytics',
+            builder: (context, state) => const RevenueAnalyticsScreen(),
+          ),
         ],
       ),
       GoRoute(
@@ -92,6 +129,17 @@ class AppRouter {
                 return const ErrorScreen(error: 'Project ID is missing');
               }
               return ProjectPlannerScreen(projectId: projectId);
+            },
+          ),
+          GoRoute(
+            path: 'detail/:id',
+            name: 'projectDetail',
+            builder: (context, state) {
+              final projectId = state.pathParameters['id'];
+              if (projectId == null) {
+                return const ErrorScreen(error: 'Project ID is missing');
+              }
+              return ProjectDetailScreen(projectId: projectId);
             },
           ),
         ],
@@ -139,6 +187,18 @@ class AppRouter {
         path: '/export',
         name: 'export',
         builder: (context, state) => const ExportScreen(),
+        routes: [
+          GoRoute(
+            path: 'labels',
+            name: 'labelEditor',
+            builder: (context, state) => const LabelEditorScreen(),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/premium',
+        name: 'premium',
+        builder: (context, state) => const PremiumScreen(),
       ),
     ],
   );

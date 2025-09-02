@@ -1,4 +1,4 @@
-import 'package.intl/intl.dart';
+import 'package:intl/intl.dart';
 import '../../inventory/data/inventory_repository.dart';
 import '../../inventory/data/inventory_model.dart';
 import '../../business/data/sale_model.dart';
@@ -32,5 +32,24 @@ class DailySalesService {
     }
 
     return grouped;
+  }
+
+  Future<double> getTotalRevenueForPeriod(DateTime start, DateTime end) async {
+    final sales = await salesRepo.getSales();
+    return sales
+        .where((sale) => sale.date.isAfter(start) && sale.date.isBefore(end))
+        .fold(0.0, (sum, sale) => sum + sale.total);
+  }
+
+  Future<Map<String, double>> getRevenueByMonth() async {
+    final sales = await salesRepo.getSales();
+    final Map<String, double> monthlyRevenue = {};
+
+    for (final sale in sales) {
+      final monthKey = DateFormat('yyyy-MM').format(sale.date);
+      monthlyRevenue[monthKey] = (monthlyRevenue[monthKey] ?? 0.0) + sale.total;
+    }
+
+    return monthlyRevenue;
   }
 }

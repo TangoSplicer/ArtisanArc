@@ -8,6 +8,8 @@ import 'package:path/path.dart' as path; // For path manipulation
 import 'package:artisanarc/features/inventory/data/inventory_model.dart';
 import 'package:artisanarc/features/inventory/domain/inventory_service.dart';
 import 'package:uuid/uuid.dart'; // For generating unique IDs
+import 'package:artisanarc/core/utils/validators.dart';
+import 'package:artisanarc/core/services/permission_service.dart';
 
 class AddInventoryItemScreen extends StatefulWidget {
   const AddInventoryItemScreen({super.key});
@@ -85,23 +87,13 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
               TextFormField(
                 controller: _nameController,
                 decoration: const InputDecoration(labelText: 'Name*', border: OutlineInputBorder()),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter the item name';
-                  }
-                  return null;
-                },
+                validator: Validators.validateItemName,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _categoryController,
                 decoration: const InputDecoration(labelText: 'Category*', border: OutlineInputBorder()),
-                 validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a category';
-                  }
-                  return null;
-                },
+                validator: (value) => Validators.validateRequired(value, fieldName: 'Category'),
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -111,30 +103,17 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
                 inputFormatters: <TextInputFormatter>[
                   FilteringTextInputFormatter.digitsOnly
                 ],
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter the quantity';
-                  }
-                  if (int.tryParse(value) == null || int.parse(value) <= 0) {
-                    return 'Please enter a valid positive quantity';
-                  }
-                  return null;
-                },
+                validator: Validators.validateQuantity,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _priceController,
-                decoration: const InputDecoration(labelText: 'Price (Optional)', border: OutlineInputBorder(), prefixText: '\$ '),
+                decoration: const InputDecoration(labelText: 'Price (Optional)', border: OutlineInputBorder(), prefixText: '£ '),
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 inputFormatters: <TextInputFormatter>[
                   FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
                 ],
-                 validator: (value) {
-                  if (value != null && value.isNotEmpty && double.tryParse(value) == null) {
-                    return 'Please enter a valid price';
-                  }
-                  return null;
-                },
+                validator: Validators.validatePrice,
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -199,6 +178,17 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
 
   Future<void> _pickImages() async {
     try {
+      // Check camera permission
+      final hasPermission = await PermissionService.requestCameraPermission();
+      if (!hasPermission) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Camera permission is required to add images')),
+          );
+        }
+        return;
+      }
+
       final List<XFile> pickedFiles = await _picker.pickMultiImage(
         imageQuality: 80, // Compress images slightly
       );
