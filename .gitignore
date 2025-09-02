@@ -50,3 +50,4 @@ lcov.info
 *.zip
 *.tar.gz
 *.7z
+.env
