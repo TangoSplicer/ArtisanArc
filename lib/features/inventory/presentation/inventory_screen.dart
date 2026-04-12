@@ -4,10 +4,8 @@ import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart'; // Added go_router
 import 'package:path_provider/path_provider.dart'; // For getApplicationDocumentsDirectory
 import 'package:path/path.dart' as p; // For path.join
-import '../../../core/utils/premium_checker.dart';
 import 'package:artisanarc/features/inventory/domain/inventory_service.dart';
 import 'package:artisanarc/features/inventory/data/inventory_model.dart'; // Corrected to use entity
-import 'package:artisanarc/core/widgets/premium_prompt.dart';
 import 'package:artisanarc/features/qr/presentation/qr_generator_widget.dart'; // Added QR Generator Widget
 import 'package:artisanarc/core/widgets/empty_state_widget.dart';
 import 'package:artisanarc/core/services/analytics_service.dart';
@@ -22,19 +20,12 @@ class InventoryScreen extends StatefulWidget {
 class _InventoryScreenState extends State<InventoryScreen> {
   final InventoryService _service = GetIt.I<InventoryService>();
   List<InventoryItem> _items = [];
-  bool _isPremium = false;
 
   @override
   void initState() {
     super.initState();
     _loadItems();
-    _checkPremium();
     AnalyticsService.trackFeatureUsage('inventory_view');
-  }
-
-  Future<void> _checkPremium() async {
-    final unlocked = await PremiumChecker.isPremiumUnlocked();
-    setState(() => _isPremium = unlocked);
   }
 
   Future<void> _loadItems() async {
@@ -43,10 +34,6 @@ class _InventoryScreenState extends State<InventoryScreen> {
   }
 
   Future<void> _navigateToAddItemForm() async {
-    if (!_isPremium && _items.length >= _service.getFreeTierLimit()) { // Using service method for limit
-      showDialog(context: context, builder: (_) => const PremiumPrompt());
-      return;
-    }
     // Navigate to the add item screen and wait for a result.
     final result = await context.pushNamed('addInventoryItem');
 
@@ -145,7 +132,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                           'Price: ${item.price != null ? '£${item.price!.toStringAsFixed(2)}' : 'N/A'}\n'
                           'Location: ${item.storageLocation ?? 'N/A'}',
                           ),
-                      trailing: IconButton( // Removed _isPremium check
+                      trailing: IconButton( 
                         icon: const Icon(Icons.qr_code_2),
                         tooltip: 'Show QR Code',
                         onPressed: () {

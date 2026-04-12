@@ -93,12 +93,12 @@ class HomeScreen extends StatelessWidget {
             ),
             _buildNavCard(
               context,
-              title: 'Premium Features',
-              subtitle: 'Unlock advanced tools and unlimited access',
-              icon: Icons.star,
+              title: 'App Status',
+              subtitle: 'Personal Edition - All features unlocked',
+              icon: Icons.verified_user,
               route: '/premium',
               color: Colors.amber,
-              onTap: () => _trackNavigation('premium'),
+              onTap: () => _trackNavigation('status'),
             ),
             _buildNavCard(
               context,

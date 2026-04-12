@@ -1,8 +1,8 @@
 class AppConstants {
   // App Information
   static const String appName = 'ArtisanArc';
-  static const String appVersion = '1.0.0';
-  static const String appDescription = 'Elegant craft supply organiser and business toolkit';
+  static const String appVersion = '1.1.0';
+  static const String appDescription = 'Elegant craft supply organiser and personal toolkit';
   
   // Business Constants
   static const double defaultVATRate = 0.20; // 20% VAT for UK
@@ -10,13 +10,13 @@ class AppConstants {
   static const double usVATThreshold = 100000.0; // Example US threshold
   
   // Inventory Constants
-  static const int freeTierInventoryLimit = 50;
-  static const int premiumInventoryLimit = 1000;
+  static const int freeTierInventoryLimit = 10000; // Effectively unlimited
+  static const int premiumInventoryLimit = 10000;
   static const int lowStockThreshold = 5;
   
   // Project Constants
-  static const int freeTierProjectLimit = 3;
-  static const int premiumProjectLimit = 100;
+  static const int freeTierProjectLimit = 1000; // Effectively unlimited
+  static const int premiumProjectLimit = 1000;
   
   // File Storage
   static const String inventoryImagesFolder = 'inventory_images';
@@ -37,18 +37,18 @@ class AppConstants {
   static const String currencyCode = 'GBP';
   
   // Contact Information
-  static const String supportEmail = 'support@artisanarc.app';
-  static const String feedbackEmail = 'feedback@artisanarc.app';
+  static const String supportEmail = 'personal@artisanarc.app';
+  static const String feedbackEmail = 'personal@artisanarc.app';
   static const String websiteUrl = 'https://artisanarc.app';
   
-  // Premium Features
-  static const List<String> premiumFeatures = [
+  // App Features (All now available)
+  static const List<String> allFeatures = [
     'Unlimited inventory items',
     'Unlimited projects',
     'Advanced analytics',
-    'Priority support',
     'Custom export formats',
     'Bulk operations',
     'Advanced notifications',
+    'Offline AI Hints',
   ];
 }
