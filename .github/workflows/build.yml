@@ -23,7 +23,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.0' # Provides Dart SDK 3.3.0+, required by intl >=0.20.0
+          flutter-version: '3.13.0' # Aligned with intl 0.18.1 for dependency stability
           channel: 'stable'
 
       - name: Get dependencies
