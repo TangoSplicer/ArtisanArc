@@ -119,7 +119,6 @@ class _LabelEditorScreenState extends State<LabelEditorScreen> {
                 maxLines: 3,
               ),
             ],
-            ),
             const SizedBox(height: 16),
             ElevatedButton.icon(
               icon: const Icon(Icons.print),
