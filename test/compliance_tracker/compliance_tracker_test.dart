@@ -1,64 +1,39 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:artisanarc/features/compliance_tracker/domain/entities/item.dart';
-import 'package:artisanarc/features/compliance_tracker/domain/entities/safety_certification.dart';
+import 'package:artisanarc/features/compliance/data/compliance_model.dart';
 
 void main() {
   group('ComplianceTracker', () {
-    test('mark an item with a safety certification', () {
-      final item = Item(
-        id: 'item1',
-        name: 'Organic Cotton T-Shirt',
-        certifications: [],
+    test('create a new compliance entry', () {
+      final entry = ComplianceEntry(
+        id: 'c1',
+        certification: 'UKCA',
+        applicableCraft: 'Toys',
+        dateCertified: DateTime.now(),
+        notes: 'Initial certification',
       );
-      final certification = SafetyCertification(
-        id: 'cert1',
-        name: 'GOTS',
-        issuingBody: 'Global Organic Textile Standard',
-        validityDate: DateTime.now().add(Duration(days: 365)),
-      );
-      item.certifications.add(certification);
-      expect(item.certifications, isNotEmpty);
-      expect(item.certifications.first.name, 'GOTS');
+      expect(entry.certification, 'UKCA');
+      expect(entry.applicableCraft, 'Toys');
     });
 
-    test('filter items by safety certification', () {
-      final item1 = Item(
-        id: 'item1',
-        name: 'Organic Cotton T-Shirt',
-        certifications: [
-          SafetyCertification(
-            id: 'cert1',
-            name: 'GOTS',
-            issuingBody: 'Global Organic Textile Standard',
-            validityDate: DateTime.now().add(Duration(days: 365)),
-          ),
-        ],
+    test('filter compliance entries', () {
+      final entry1 = ComplianceEntry(
+        id: 'c1',
+        certification: 'UKCA',
+        applicableCraft: 'Toys',
+        dateCertified: DateTime.now(),
       );
-      final item2 = Item(
-        id: 'item2',
-        name: 'Recycled Polyester Jacket',
-        certifications: [
-          SafetyCertification(
-            id: 'cert2',
-            name: 'GRS',
-            issuingBody: 'Global Recycled Standard',
-            validityDate: DateTime.now().add(Duration(days: 365)),
-          ),
-        ],
+      final entry2 = ComplianceEntry(
+        id: 'c2',
+        certification: 'CE',
+        applicableCraft: 'Jewelry',
+        dateCertified: DateTime.now(),
       );
-      final item3 = Item(
-        id: 'item3',
-        name: 'Conventional Cotton Jeans',
-        certifications: [],
-      );
-
-      final allItems = [item1, item2, item3];
-      final gotsCertifiedItems = allItems
-          .where((item) => item.certifications.any((cert) => cert.name == 'GOTS'))
-          .toList();
-
-      expect(gotsCertifiedItems.length, 1);
-      expect(gotsCertifiedItems.first.name, 'Organic Cotton T-Shirt');
+      
+      final entries = [entry1, entry2];
+      final filtered = entries.where((e) => e.certification == 'UKCA').toList();
+      
+      expect(filtered.length, 1);
+      expect(filtered.first.id, 'c1');
     });
   });
 }

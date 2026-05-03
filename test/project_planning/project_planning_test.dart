@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:artisanarc/features/project_planning/domain/entities/project.dart';
-import 'package:artisanarc/features/project_planning/domain/entities/milestone.dart';
-import 'package:artisanarc/features/project_planning/domain/entities/supply_need.dart';
+import 'package:artisanarc/features/project/data/project_model.dart';
+import 'package:artisanarc/features/project/domain/entities/supply_need.dart';
 
 void main() {
   group('ProjectPlanning', () {
@@ -11,9 +10,10 @@ void main() {
         name: 'New Collection',
         description: 'A collection of summer wear.',
         startDate: DateTime.now(),
-        endDate: DateTime.now().add(Duration(days: 30)),
+        endDate: DateTime.now().add(const Duration(days: 30)),
         milestones: [],
         supplyNeeds: [],
+        createdAt: DateTime.now(),
       );
       expect(project.name, 'New Collection');
       expect(project.description, 'A collection of summer wear.');
@@ -27,15 +27,16 @@ void main() {
         name: 'New Collection',
         description: 'A collection of summer wear.',
         startDate: DateTime.now(),
-        endDate: DateTime.now().add(Duration(days: 30)),
+        endDate: DateTime.now().add(const Duration(days: 30)),
         milestones: [],
         supplyNeeds: [],
+        createdAt: DateTime.now(),
       );
       final milestone = Milestone(
         id: 'm1',
         name: 'Design Phase',
         description: 'Complete all design work.',
-        dueDate: DateTime.now().add(Duration(days: 7)),
+        dueDate: DateTime.now().add(const Duration(days: 7)),
         isCompleted: false,
       );
       project.milestones.add(milestone);
@@ -49,17 +50,17 @@ void main() {
         name: 'New Collection',
         description: 'A collection of summer wear.',
         startDate: DateTime.now(),
-        endDate: DateTime.now().add(Duration(days: 30)),
+        endDate: DateTime.now().add(const Duration(days: 30)),
         milestones: [],
         supplyNeeds: [],
+        createdAt: DateTime.now(),
       );
       final supplyNeed = SupplyNeed(
         id: 's1',
         itemName: 'Cotton Fabric',
-        quantity: 100,
+        quantityNeeded: 100,
         unit: 'meters',
-        supplier: 'Fabric Corp',
-        estimatedCost: 500.0,
+        isSourced: false,
       );
       project.supplyNeeds.add(supplyNeed);
       expect(project.supplyNeeds, isNotEmpty);

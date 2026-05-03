@@ -1,10 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:mockito/annotations.dart';
 import 'package:artisanarc/features/inventory/domain/inventory_service.dart';
 import 'package:artisanarc/features/inventory/data/inventory_model.dart';
 import 'package:artisanarc/features/inventory/data/inventory_repository.dart';
 
-class MockInventoryRepository extends Mock implements InventoryRepository {}
+@GenerateMocks([InventoryRepository])
+import 'inventory_service_test.mocks.dart';
 
 void main() {
   late InventoryService service;
@@ -23,7 +25,7 @@ void main() {
       quantity: 3,
     );
 
-    when(mockRepo.addItem(testItem)).thenAnswer((_) async => {});
+    when(mockRepo.addItem(any)).thenAnswer((_) async => {});
     when(mockRepo.getAllItems()).thenAnswer((_) async => [testItem]);
 
     await service.createItem(testItem);

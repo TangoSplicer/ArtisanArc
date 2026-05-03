@@ -1,23 +1,23 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:mockito/annotations.dart';
 import 'package:artisanarc/features/business/domain/daily_sales_service.dart';
 import 'package:artisanarc/features/business/data/sale_model.dart';
 import 'package:artisanarc/features/business/data/business_repository.dart';
 import 'package:artisanarc/features/inventory/data/inventory_model.dart';
 import 'package:artisanarc/features/inventory/data/inventory_repository.dart';
 
-class MockBusinessRepo extends Mock implements BusinessRepository {}
-
-class MockInventoryRepo extends Mock implements InventoryRepository {}
+@GenerateMocks([BusinessRepository, InventoryRepository])
+import 'daily_sales_service_test.mocks.dart';
 
 void main() {
-  late MockBusinessRepo salesRepo;
-  late MockInventoryRepo inventoryRepo;
+  late MockBusinessRepository salesRepo;
+  late MockInventoryRepository inventoryRepo;
   late DailySalesService service;
 
   setUp(() {
-    salesRepo = MockBusinessRepo();
-    inventoryRepo = MockInventoryRepo();
+    salesRepo = MockBusinessRepository();
+    inventoryRepo = MockInventoryRepository();
     service = DailySalesService(salesRepo, inventoryRepo);
   });
 

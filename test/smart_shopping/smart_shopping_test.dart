@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:artisanarc/features/smart_shopping/domain/entities/shopping_list.dart';
-import 'package:artisanarc/features/smart_shopping/domain/entities/shopping_list_item.dart';
+import 'package:artisanarc/features/shopping/data/shopping_list_model.dart';
 
 void main() {
   group('SmartShopping', () {
@@ -8,7 +7,7 @@ void main() {
       final shoppingList = ShoppingList(
         id: 'sl1',
         name: 'Spring Collection Supplies',
-        createdDate: DateTime.now(),
+        createdAt: DateTime.now(),
         items: [],
       );
       expect(shoppingList.name, 'Spring Collection Supplies');
@@ -19,14 +18,13 @@ void main() {
       final shoppingList = ShoppingList(
         id: 'sl1',
         name: 'Spring Collection Supplies',
-        createdDate: DateTime.now(),
+        createdAt: DateTime.now(),
         items: [],
       );
       final item = ShoppingListItem(
         id: 'item1',
         itemName: 'Blue Silk Fabric',
-        quantity: 10,
-        unit: 'yards',
+        quantity: '10 yards',
         isPurchased: false,
       );
       shoppingList.items.add(item);
@@ -38,8 +36,7 @@ void main() {
       final item = ShoppingListItem(
         id: 'item1',
         itemName: 'Blue Silk Fabric',
-        quantity: 10,
-        unit: 'yards',
+        quantity: '10 yards',
         isPurchased: false,
       );
       // Mark as purchased
@@ -51,21 +48,19 @@ void main() {
       final item1 = ShoppingListItem(
         id: 'item1',
         itemName: 'Blue Silk Fabric',
-        quantity: 10,
-        unit: 'yards',
+        quantity: '10 yards',
         isPurchased: false,
       );
       final item2 = ShoppingListItem(
         id: 'item2',
         itemName: 'Red Cotton Thread',
-        quantity: 5,
-        unit: 'spools',
+        quantity: '5 spools',
         isPurchased: false,
       );
       final shoppingList = ShoppingList(
         id: 'sl1',
         name: 'Spring Collection Supplies',
-        createdDate: DateTime.now(),
+        createdAt: DateTime.now(),
         items: [item1, item2],
       );
 
