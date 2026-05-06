@@ -23,6 +23,7 @@ void main() {
       name: 'Yarn Ball',
       category: 'Yarn',
       quantity: 3,
+      lastUpdated: DateTime.now(),
     );
 
     when(mockRepo.addItem(any)).thenAnswer((_) async => {});

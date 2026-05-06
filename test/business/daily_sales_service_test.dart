@@ -33,7 +33,13 @@ void main() {
 
     when(salesRepo.getSales()).thenAnswer((_) async => [sale]);
     when(inventoryRepo.getAllItems()).thenAnswer((_) async => [
-          InventoryItem(id: 'abc123', name: 'Test Yarn', category: 'Yarn', quantity: 10),
+          InventoryItem(
+            id: 'abc123',
+            name: 'Test Yarn',
+            category: 'Yarn',
+            quantity: 10,
+            lastUpdated: DateTime.now(),
+          ),
         ]);
 
     final result = await service.getGroupedSales();
