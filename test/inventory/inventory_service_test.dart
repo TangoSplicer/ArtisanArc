@@ -26,7 +26,7 @@ void main() {
       lastUpdated: DateTime.now(),
     );
 
-    when(mockRepo.addItem(any)).thenAnswer((_) async => {});
+    when(mockRepo.addItem(argThat(isA<InventoryItem>()))).thenAnswer((_) async => {});
     when(mockRepo.getAllItems()).thenAnswer((_) async => [testItem]);
 
     await service.createItem(testItem);

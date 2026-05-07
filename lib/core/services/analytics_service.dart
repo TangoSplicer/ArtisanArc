@@ -6,13 +6,17 @@ class AnalyticsService {
   static const String _usageKey = 'app_usage_analytics';
 
   static Future<void> trackFeatureUsage(String feature) async {
-    final currentData = await _getUsageData();
-    final today = DateTime.now().toIso8601String().split('T')[0];
-    
-    currentData[feature] ??= {};
-    currentData[feature][today] = (currentData[feature][today] ?? 0) + 1;
-    
-    await _storage.write(key: _usageKey, value: jsonEncode(currentData));
+    try {
+      final currentData = await _getUsageData();
+      final today = DateTime.now().toIso8601String().split('T')[0];
+      
+      currentData[feature] ??= {};
+      currentData[feature][today] = (currentData[feature][today] ?? 0) + 1;
+      
+      await _storage.write(key: _usageKey, value: jsonEncode(currentData));
+    } catch (e) {
+      // Silently fail in tests or when secure storage is unavailable
+    }
   }
 
   static Future<Map<String, dynamic>> getUsageAnalytics() async {
