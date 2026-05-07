@@ -38,7 +38,7 @@ class DailySalesService {
     final sales = await salesRepo.getSales();
     return sales
         .where((sale) => sale.date.isAfter(start) && sale.date.isBefore(end))
-        .fold(0.0, (sum, sale) => sum + sale.total);
+        .fold<double>(0.0, (double sum, sale) => sum + sale.total);
   }
 
   Future<Map<String, double>> getRevenueByMonth() async {
