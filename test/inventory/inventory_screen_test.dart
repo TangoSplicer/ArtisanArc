@@ -26,9 +26,10 @@ void main() {
   });
 
   testWidgets('InventoryScreen shows empty message and FAB', (tester) async {
-    // Provide a simple Material app with a Scaffold for the test
-    await tester.pumpWidget(const MaterialApp(
-      home: InventoryScreen(),
+    await tester.pumpWidget(MaterialApp(
+      onGenerateRoute: (settings) => MaterialPageRoute(
+        builder: (context) => const InventoryScreen(),
+      ),
     ));
 
     // Wait for the async loading of items in initState
@@ -36,6 +37,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('No Items Yet'), findsOneWidget);
-    expect(find.byIcon(Icons.add), findsWidgets);
+    // The screen has Icons.add in FAB and Icons.add in EmptyStateWidget's action button
+    expect(find.byIcon(Icons.add), findsAtLeastNWidgets(1));
   });
 }
