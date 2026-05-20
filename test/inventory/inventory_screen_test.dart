@@ -11,10 +11,11 @@ import 'inventory_screen_test.mocks.dart';
 @GenerateMocks([InventoryService])
 void main() {
   late MockInventoryService mockService;
-  final getIt = GetIt.instance;
 
   setUp(() {
     mockService = MockInventoryService();
+    // Reset GetIt to ensure a clean state for each test
+    final getIt = GetIt.instance;
     getIt.reset();
     getIt.registerSingleton<InventoryService>(mockService);
 
@@ -22,14 +23,13 @@ void main() {
   });
 
   tearDown(() {
-    getIt.reset();
+    GetIt.instance.reset();
   });
 
   testWidgets('InventoryScreen shows empty message and FAB', (tester) async {
-    await tester.pumpWidget(MaterialApp(
-      onGenerateRoute: (settings) => MaterialPageRoute(
-        builder: (context) => const InventoryScreen(),
-      ),
+    // Provide a simple Material app with a Scaffold for the test
+    await tester.pumpWidget(const MaterialApp(
+      home: InventoryScreen(),
     ));
 
     // Wait for the async loading of items in initState
@@ -37,7 +37,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('No Items Yet'), findsOneWidget);
-    // The screen has Icons.add in FAB and Icons.add in EmptyStateWidget's action button
+    // The screen has Icons.add in FAB and potentially in the empty state action button
     expect(find.byIcon(Icons.add), findsAtLeastNWidgets(1));
   });
 }
