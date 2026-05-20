@@ -14,17 +14,15 @@ void main() {
 
   setUp(() {
     mockService = MockInventoryService();
-    // Reset GetIt to ensure a clean state for each test
-    final getIt = GetIt.instance;
-    if (getIt.isRegistered<InventoryService>()) {
-      getIt.unregister<InventoryService>();
-    }
-    getIt.registerSingleton<InventoryService>(mockService);
+    // Ensure GetIt is reset before each test
+    GetIt.instance.reset();
+    GetIt.instance.registerSingleton<InventoryService>(mockService);
 
     when(mockService.fetchItems()).thenAnswer((_) async => []);
   });
 
   tearDown(() {
+    // Ensure GetIt is reset after each test
     GetIt.instance.reset();
   });
 
@@ -34,10 +32,7 @@ void main() {
       home: InventoryScreen(),
     ));
 
-    // Wait for the async loading of items in initState
-    // Using multiple pumps to ensure all microtasks and animations finish
-    await tester.pump(); 
-    await tester.pump(const Duration(milliseconds: 100));
+    // Wait for the async loading of items in initState and subsequent UI rebuilds
     await tester.pumpAndSettle();
 
     // Verify empty state title
