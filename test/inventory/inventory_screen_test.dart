@@ -16,7 +16,9 @@ void main() {
     mockService = MockInventoryService();
     // Reset GetIt to ensure a clean state for each test
     final getIt = GetIt.instance;
-    getIt.reset();
+    if (getIt.isRegistered<InventoryService>()) {
+      getIt.unregister<InventoryService>();
+    }
     getIt.registerSingleton<InventoryService>(mockService);
 
     when(mockService.fetchItems()).thenAnswer((_) async => []);
@@ -33,11 +35,16 @@ void main() {
     ));
 
     // Wait for the async loading of items in initState
+    // Using multiple pumps to ensure all microtasks and animations finish
     await tester.pump(); 
+    await tester.pump(const Duration(milliseconds: 100));
     await tester.pumpAndSettle();
 
+    // Verify empty state title
     expect(find.text('No Items Yet'), findsOneWidget);
-    // The screen has Icons.add in FAB and potentially in the empty state action button
+    
+    // Verify FAB or action button exists
+    // EmptyStateWidget has an action button with Icons.add, and Scaffold has a FAB with Icons.add
     expect(find.byIcon(Icons.add), findsAtLeastNWidgets(1));
   });
 }
