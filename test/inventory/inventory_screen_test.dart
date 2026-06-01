@@ -14,24 +14,22 @@ void main() {
 
   setUp(() {
     mockService = MockInventoryService();
-    final getIt = GetIt.instance;
-    
-    // Clear GetIt for a clean state
-    getIt.reset();
-    
-    // Register the mock service
-    getIt.registerSingleton<InventoryService>(mockService);
+    // Ensure GetIt is reset before each test
+    GetIt.instance.reset();
+    GetIt.instance.registerSingleton<InventoryService>(mockService);
 
-    // Default mock behavior
     when(mockService.fetchItems()).thenAnswer((_) async => []);
   });
 
   tearDown(() {
+    // Ensure GetIt is reset after each test
     GetIt.instance.reset();
   });
 
   testWidgets('InventoryScreen shows empty message and FAB', (tester) async {
     // Build our app and trigger a frame.
+    // The key is to register the service BEFORE the widget is created.
+    // Since setUp runs before each test, it's already registered.
     await tester.pumpWidget(const MaterialApp(
       home: InventoryScreen(),
     ));
