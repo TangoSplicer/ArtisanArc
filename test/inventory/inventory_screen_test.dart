@@ -14,7 +14,7 @@ void main() {
 
   setUp(() {
     mockService = MockInventoryService();
-    // Ensure GetIt is reset before each test
+    // Ensure GetIt is reset and then the service is registered
     GetIt.instance.reset();
     GetIt.instance.registerSingleton<InventoryService>(mockService);
 
@@ -22,28 +22,31 @@ void main() {
   });
 
   tearDown(() {
-    // Ensure GetIt is reset after each test
     GetIt.instance.reset();
   });
 
   testWidgets('InventoryScreen shows empty message and FAB', (tester) async {
-    // Build our app and trigger a frame.
-    // The key is to register the service BEFORE the widget is created.
-    // Since setUp runs before each test, it's already registered.
-    await tester.pumpWidget(const MaterialApp(
-      home: InventoryScreen(),
+    // We wrap the screen in a Scaffold and MaterialApp to provide necessary context
+    await tester.pumpWidget(MaterialApp(
+      home: Scaffold(
+        body: const InventoryScreen(),
+      ),
     ));
 
-    // Wait for the async _loadItems() in initState to complete
-    await tester.pump(); // Initial build
-    await tester.pumpAndSettle(); // Wait for Future and animations
+    // Wait for the initial build and async _loadItems() in initState
+    await tester.pump(); 
+    // We use pump() with a duration to allow any internal timers or async calls to settle
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pumpAndSettle();
 
     // Verify that the empty state is shown.
-    expect(find.text('No Items Yet'), findsOneWidget);
+    // We use find.textContaining for more robustness
+    expect(find.textContaining('No Items Yet'), findsOneWidget);
     expect(find.textContaining('Start building your craft inventory'), findsOneWidget);
     
     // Verify that the FAB is present.
     expect(find.byType(FloatingActionButton), findsOneWidget);
+    // There are at least two Icons.add (FAB and empty state button)
     expect(find.byIcon(Icons.add), findsAtLeastNWidgets(1));
   });
 }

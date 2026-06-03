@@ -5,11 +5,9 @@ class AppConstants {
   static const double defaultVATRate = 0.20;
   static const double ukVATThreshold = 85000.0;
   static const double usVATThreshold = 100000.0;
-  static const int freeTierInventoryLimit = 10000;
-  static const int premiumInventoryLimit = 10000;
+  static const int inventoryLimit = 10000;
   static const int lowStockThreshold = 5;
-  static const int freeTierProjectLimit = 1000;
-  static const int premiumProjectLimit = 1000;
+  static const int projectLimit = 1000;
   static const String inventoryImagesFolder = 'inventory_images';
   static const String projectImagesFolder = 'project_images';
   static const String backupFolder = 'backups';
