@@ -96,7 +96,7 @@ class HomeScreen extends StatelessWidget {
               title: 'App Status',
               subtitle: 'Personal Edition - All features unlocked',
               icon: Icons.verified_user,
-              route: '/premium',
+              route: '/status',
               color: Colors.amber,
               onTap: () => _trackNavigation('status'),
             ),

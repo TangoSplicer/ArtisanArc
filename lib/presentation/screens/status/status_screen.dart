@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import '../../../core/utils/premium_checker.dart';
 
-class PremiumScreen extends StatefulWidget {
-  const PremiumScreen({super.key});
+class StatusScreen extends StatefulWidget {
+  const StatusScreen({super.key});
 
   @override
-  State<PremiumScreen> createState() => _PremiumScreenState();
+  State<StatusScreen> createState() => _StatusScreenState();
 }
 
-class _PremiumScreenState extends State<PremiumScreen> {
+class _StatusScreenState extends State<StatusScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);

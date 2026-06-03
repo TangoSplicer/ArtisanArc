@@ -18,7 +18,7 @@ import 'package:artisanarc/features/ai/presentation/craft_ai_widget.dart';
 import 'package:artisanarc/presentation/screens/export/export_screen.dart';
 import 'package:artisanarc/presentation/screens/error_screen.dart';
 import 'package:artisanarc/features/labels/presentation/label_editor_screen.dart';
-import 'package:artisanarc/presentation/screens/premium/premium_screen.dart';
+import '../screens/status/status_screen.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:artisanarc/core/utils/storage_keys.dart';
 import 'package:artisanarc/features/inventory/presentation/inventory_detail_screen.dart';
@@ -196,9 +196,9 @@ class AppRouter {
         ],
       ),
       GoRoute(
-        path: '/premium',
-        name: 'premium',
-        builder: (context, state) => const PremiumScreen(),
+        path: '/status',
+        name: 'status',
+        builder: (context, state) => const StatusScreen(),
       ),
     ],
   );
