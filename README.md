@@ -26,9 +26,18 @@ ArtisanArc provides a complete suite of tools to manage your craft projects and 
 
 ## Getting Started
 
-### Requirements
--   Flutter 3.10+
--   Dart SDK 3.1+
+### Download the App
+Since this is a personal edition, you can build and download the Android APK directly from this repository using GitHub Actions:
+
+1.  Go to the **Actions** tab at the top of this repository.
+2.  Select the latest successful run of the **ArtisanArc Build** workflow.
+3.  Scroll down to the **Artifacts** section at the bottom of the page.
+4.  Click on **artisan-arc-apk** to download the zip file containing your APK.
+5.  Extract the APK and install it on your Android device.
+
+### Development Requirements
+-   Flutter 3.24.0+
+-   Dart SDK 3.5.0+
 -   Android Studio or VSCode (for development environment)
 
 ArtisanArc is designed to be a personal, offline-first application, ensuring your data remains private and accessible without an internet connection.
