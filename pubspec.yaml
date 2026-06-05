@@ -3,7 +3,7 @@ description: A self-contained, offline-first craft organisation app for personal
 version: 1.1.0+1
 
 environment:
-  sdk: ">=3.1.0 <4.0.0"
+  sdk: '>=3.1.0 <4.0.0'
 
 dependencies:
   flutter:
@@ -50,12 +50,12 @@ dev_dependencies:
 flutter_icons:
   android: true
   ios: true
-  image_path: assets/icon/app_icon.png
+  image_path: "assets/icon/app_icon.png"
   remove_alpha_ios: true
 
 flutter_native_splash:
   color: "#F5F2FF"
-  image: assets/icon/app_icon.png
+  image: "assets/icon/app_icon.png"
   android_gravity: center
   ios_content_mode: center
   fullscreen: true
