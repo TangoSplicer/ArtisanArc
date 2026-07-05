@@ -33,9 +33,17 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+    flavorDimensions "app"
+    productFlavors {
+        production {
+            dimension "app"
+        }
+    }
+
     buildTypes {
         release {
-            signingConfig signingConfigs.debug
+
         }
     }
 }
