@@ -1,5 +1,5 @@
-import 'package:artisan_arc/core/widgets/empty_state_widget.dart';
-import 'package:artisan_arc/features/inventory/presentation/inventory_screen.dart';
+import 'package:artisanarc/core/widgets/empty_state_widget.dart';
+import 'package:artisanarc/features/inventory/presentation/inventory_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
