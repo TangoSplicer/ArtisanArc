@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:artisanarc/presentation/screens/home_screen.dart';
+import 'package:artisanarc/presentation/screens/splash_screen.dart';
 import 'package:artisanarc/presentation/onboarding/onboarding_screen.dart';
 import 'package:artisanarc/features/inventory/presentation/inventory_screen.dart';
 import 'package:artisanarc/features/inventory/presentation/add_inventory_item_screen.dart';

@@ -68,7 +68,7 @@ class HomeScreen extends StatelessWidget {
               context,
               title: 'Compliance Tracker',
               subtitle: 'Manage safety certs, track standards',
-              icon: Icons.shield_check_outlined, // Example Icon
+              icon: Icons.verified_user, // Example Icon
               route: '/compliance',
               color: Colors.teal, // Example Color
               onTap: () => _trackNavigation('compliance'),

@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../domain/usecases/get_project_by_id.dart';
 import '../domain/usecases/update_project.dart';
 import '../data/project_model.dart';
+import '../domain/entities/supply_need.dart';
 import '../../ai/presentation/craft_ai_widget.dart';
 import '../../../core/utils/date_helpers.dart';
 
