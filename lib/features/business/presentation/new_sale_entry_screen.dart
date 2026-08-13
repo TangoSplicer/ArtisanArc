@@ -42,22 +42,38 @@ class _NewSaleEntryScreenState extends State<NewSaleEntryScreen> {
     final items = await _inventoryService.fetchItems();
     if (!mounted) return;
     setState(() {
-      _items = [...items]..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+      _items = items.where((item) => item.isFinishedItem).toList()
+        ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
     });
   }
 
   Future<void> _submitSale() async {
     if (!_formKey.currentState!.validate() || _selectedItem == null) return;
 
+    final quantity = int.parse(_quantityController.text);
+    if (quantity > _selectedItem!.quantity) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Only ${_selectedItem!.quantity} ${_selectedItem!.name} available in the created-item tally.')),
+      );
+      return;
+    }
+
+    final now = DateTime.now();
     final sale = SaleRecord(
       id: const Uuid().v4(),
       itemId: _selectedItem!.id,
-      quantity: int.parse(_quantityController.text),
+      quantity: quantity,
       pricePerUnit: double.parse(_priceController.text),
-      date: DateTime.now(),
+      date: now,
     );
 
     await _businessService.createSale(sale);
+    await _inventoryService.updateItem(
+      _selectedItem!.copyWith(
+        quantity: _selectedItem!.quantity - quantity,
+        lastUpdated: now,
+      ),
+    );
     if (mounted) Navigator.pop(context, true);
   }
 
@@ -74,11 +90,11 @@ class _NewSaleEntryScreenState extends State<NewSaleEntryScreen> {
               SearchableSelectionField<InventoryItem>(
                 options: _items,
                 value: _selectedItem,
-                labelText: 'Inventory item',
-                hintText: 'Search by item, category, or location',
-                emptyMessage: 'No matching inventory items',
+                labelText: 'Created item',
+                hintText: 'Search created items ready to sell',
+                emptyMessage: 'No created items available to sell',
                 itemLabel: (item) => item.name,
-                itemSubtitle: (item) => '${item.category} · ${item.quantity} in stock${item.storageLocation == null || item.storageLocation!.isEmpty ? '' : ' · ${item.storageLocation}'}',
+                itemSubtitle: (item) => '${item.category} · ${item.quantity} available${item.storageLocation == null || item.storageLocation!.isEmpty ? '' : ' · ${item.storageLocation}'}',
                 searchTerms: (item) => [item.name, item.category, item.storageLocation ?? ''],
                 onChanged: (item) => setState(() => _selectedItem = item),
                 validator: (item) => item == null ? 'Select an inventory item' : null,

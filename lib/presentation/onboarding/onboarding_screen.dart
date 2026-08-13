@@ -25,18 +25,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       icon: Icons.auto_awesome,
     ),
     _OnboardingContent(
-      title: '1. Add stock you can find',
-      description: 'Start in Inventory. Save yarn, hooks, needles, finished makes, prices, and where each item lives. Use the search buttons whenever a list gets long.',
+      title: '1. Tally what you have created',
+      description: 'Use Inventory for finished makes. Add each piece you have made, its sale price, and how many are ready. This is the tally used by sales.',
       icon: Icons.inventory_2,
     ),
     _OnboardingContent(
-      title: '2. Turn an idea into a project',
-      description: 'Use Projects to choose a craft, add milestones, and note the supplies you need. The planner can search your saved inventory when you add a supply.',
-      icon: Icons.timeline,
+      title: '2. Check materials before you make',
+      description: 'Use Materials Stock for yarn, hooks, needles, notions, and other supplies. It shows what is available to work with and highlights low materials.',
+      icon: Icons.yard_outlined,
     ),
     _OnboardingContent(
-      title: '3. Sell quickly at a table or stall',
-      description: 'Open Business Tools and choose On-the-day Sales. Tap + as an item sells, then save once. Stock reduces and the sale appears in daily totals, analytics, and exports.',
+      title: '3. Plan and sell with confidence',
+      description: 'Use Projects to plan a make with materials. At a table or stall, open Business Tools and choose On-the-day Sales. Tap + as each finished item sells; its tally reduces while materials stock stays visible for future work.',
       icon: Icons.storefront,
     ),
     _OnboardingContent(

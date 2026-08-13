@@ -39,15 +39,15 @@ class SampleDataService {
 
     final now = DateTime.now();
     final inventoryItems = <InventoryItem>[
-      InventoryItem(id: 'sample-finished-bee', name: 'Crochet Bee Keyring', category: 'Finished Crochet Makes', quantity: 9, price: 5.00, storageLocation: 'Display Shelf', lastUpdated: now),
-      InventoryItem(id: 'sample-finished-basket', name: 'Chunky Crochet Basket', category: 'Finished Crochet Makes', quantity: 3, price: 18.00, storageLocation: 'Display Shelf', lastUpdated: now),
-      InventoryItem(id: 'sample-finished-tote', name: 'Granny Square Tote Bag', category: 'Finished Crochet Makes', quantity: 3, price: 28.00, storageLocation: 'Display Shelf', lastUpdated: now),
-      InventoryItem(id: 'sample-finished-cozy', name: 'Knitted Mug Cozy', category: 'Finished Knitted Makes', quantity: 6, price: 9.00, storageLocation: 'Display Shelf', lastUpdated: now),
-      InventoryItem(id: 'sample-finished-headband', name: 'Ribbed Knit Headband', category: 'Finished Knitted Makes', quantity: 6, price: 14.00, storageLocation: 'Display Shelf', lastUpdated: now),
-      InventoryItem(id: 'sample-yarn-cotton', name: 'DK Cotton Yarn — Sage', category: 'Yarn & Fibre', quantity: 10, price: 3.75, storageLocation: 'Yarn Shelf', lastUpdated: now),
-      InventoryItem(id: 'sample-yarn-wool', name: 'Chunky Wool Yarn — Oatmeal', category: 'Yarn & Fibre', quantity: 6, price: 5.50, storageLocation: 'Yarn Basket', lastUpdated: now),
-      InventoryItem(id: 'sample-hook-4mm', name: '4 mm Ergonomic Crochet Hook', category: 'Crochet Hooks', quantity: 2, price: 4.50, storageLocation: 'Hook Case', lastUpdated: now),
-      InventoryItem(id: 'sample-marker-set', name: 'Locking Stitch Marker Set', category: 'Stitch Markers & Counters', quantity: 1, price: 3.25, storageLocation: 'Notions Tin', lastUpdated: now),
+      InventoryItem(id: 'sample-finished-bee', name: 'Crochet Bee Keyring', category: 'Finished Crochet Makes', quantity: 9, price: 5.00, storageLocation: 'Display Shelf', lastUpdated: now, itemType: 'finished'),
+      InventoryItem(id: 'sample-finished-basket', name: 'Chunky Crochet Basket', category: 'Finished Crochet Makes', quantity: 3, price: 18.00, storageLocation: 'Display Shelf', lastUpdated: now, itemType: 'finished'),
+      InventoryItem(id: 'sample-finished-tote', name: 'Granny Square Tote Bag', category: 'Finished Crochet Makes', quantity: 3, price: 28.00, storageLocation: 'Display Shelf', lastUpdated: now, itemType: 'finished'),
+      InventoryItem(id: 'sample-finished-cozy', name: 'Knitted Mug Cozy', category: 'Finished Knitted Makes', quantity: 6, price: 9.00, storageLocation: 'Display Shelf', lastUpdated: now, itemType: 'finished'),
+      InventoryItem(id: 'sample-finished-headband', name: 'Ribbed Knit Headband', category: 'Finished Knitted Makes', quantity: 6, price: 14.00, storageLocation: 'Display Shelf', lastUpdated: now, itemType: 'finished'),
+      InventoryItem(id: 'sample-yarn-cotton', name: 'DK Cotton Yarn — Sage', category: 'Yarn & Fibre', quantity: 10, price: 3.75, storageLocation: 'Yarn Shelf', lastUpdated: now, itemType: 'material'),
+      InventoryItem(id: 'sample-yarn-wool', name: 'Chunky Wool Yarn — Oatmeal', category: 'Yarn & Fibre', quantity: 6, price: 5.50, storageLocation: 'Yarn Basket', lastUpdated: now, itemType: 'material'),
+      InventoryItem(id: 'sample-hook-4mm', name: '4 mm Ergonomic Crochet Hook', category: 'Crochet Hooks', quantity: 2, price: 4.50, storageLocation: 'Hook Case', lastUpdated: now, itemType: 'material'),
+      InventoryItem(id: 'sample-marker-set', name: 'Locking Stitch Marker Set', category: 'Stitch Markers & Counters', quantity: 1, price: 3.25, storageLocation: 'Notions Tin', lastUpdated: now, itemType: 'material'),
     ];
 
     final sampleProject = Project(

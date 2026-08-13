@@ -1,6 +1,49 @@
 /// Curated offline suggestions for a yarn-craft-led maker workflow.
 /// Crochet and knitting appear first; users can still add their own values.
 class SelectionOptions {
+  static const List<String> finishedItemCategories = [
+    'Finished Crochet Makes',
+    'Finished Knitted Makes',
+    'Finished Woven Makes',
+    'Finished Sewn Makes',
+    'Finished Embroidered Makes',
+    'Finished Craft Kit',
+    'Other Finished Make',
+  ];
+
+  static const List<String> materialStockCategories = [
+    'Yarn & Fibre',
+    'Crochet Hooks',
+    'Knitting Needles',
+    'Stitch Markers & Counters',
+    'Yarn Tools & Accessories',
+    'Patterns & Project Notes',
+    'Blocking & Finishing',
+    'Amigurumi Components',
+    'Toy Stuffing & Safety Eyes',
+    'Buttons & Fastenings',
+    'Bag Hardware & Handles',
+    'Embroidery & Cross-stitch',
+    'Thread & Floss',
+    'Sewing Notions',
+    'Fabric & Textiles',
+    'Quilting Supplies',
+    'Weaving & Macramé',
+    'Dyes & Inks',
+    'Adhesives & Tapes',
+    'Paper & Card',
+    'Paint & Pigment',
+    'Beads & Jewellery Findings',
+    'Leather & Hide',
+    'Wood & Timber',
+    'Ceramics & Clay',
+    'Glass & Mosaic',
+    'Moulds & Resin',
+    'Tools & Equipment',
+    'Packaging & Labels',
+    'Safety Equipment',
+  ];
+
   static const List<String> inventoryCategories = [
     'Finished Crochet Makes',
     'Finished Knitted Makes',

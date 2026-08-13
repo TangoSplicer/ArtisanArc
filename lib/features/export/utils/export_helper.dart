@@ -27,9 +27,10 @@ class ExportHelper {
 
   static String generateCsvFromInventory(List<InventoryItem> items) {
     final List<List<dynamic>> rows = [
-      ['Name', 'Category', 'Quantity', 'Price', 'Location'],
+      ['Name', 'Type', 'Category', 'Quantity', 'Price', 'Location'],
       ...items.map((item) => [
             item.name,
+            item.isFinishedItem ? 'Created Item' : 'Material Stock',
             item.category,
             item.quantity,
             item.price.toString,
@@ -108,10 +109,11 @@ class ExportHelper {
         build: (context) => [
           pw.Text('Inventory Report', style: pw.TextStyle(fontSize: 24)),
           pw.TableHelper.fromTextArray(
-            headers: ['Name', 'Category', 'Qty', 'Price', 'Location'],
+            headers: ['Name', 'Type', 'Category', 'Qty', 'Price', 'Location'],
             data: items.map((i) {
               return [
                 i.name,
+                i.isFinishedItem ? 'Created Item' : 'Material Stock',
                 i.category,
                 i.quantity,
                 i.price.toString,

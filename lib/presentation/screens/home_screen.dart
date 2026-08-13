@@ -40,12 +40,21 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 20),
             _buildNavCard(
               context,
-              title: 'Inventory',
-              subtitle: 'Organise materials, assign QR, price & storage',
+              title: 'Inventory · Created Items',
+              subtitle: 'Keep a tally of finished makes that are ready to sell',
               icon: Icons.inventory_2,
               route: '/inventory',
               color: color.primary,
               onTap: () => _trackNavigation('inventory'),
+            ),
+            _buildNavCard(
+              context,
+              title: 'Materials Stock',
+              subtitle: 'See yarn, hooks, notions, and supplies available to work with',
+              icon: Icons.yard_outlined,
+              route: '/stock',
+              color: color.tertiary,
+              onTap: () => _trackNavigation('materials_stock'),
             ),
             _buildNavCard(
               context,

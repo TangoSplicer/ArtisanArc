@@ -26,7 +26,6 @@ class _EventSalesScreenState extends State<EventSalesScreen> {
   final Map<String, int> _soldQuantities = {};
 
   List<InventoryItem> _items = [];
-  bool _showAllInventory = false;
   bool _isLoading = true;
   bool _isSaving = false;
 
@@ -53,9 +52,8 @@ class _EventSalesScreenState extends State<EventSalesScreen> {
   }
 
   List<InventoryItem> get _visibleItems {
-    final saleable = _items.where((item) => item.quantity > 0 && item.price != null).toList();
-    if (_showAllInventory) return saleable;
-    return saleable.where((item) => item.category.startsWith('Finished')).toList();
+    final saleable = _items.where((item) => item.isFinishedItem && item.quantity > 0 && item.price != null).toList();
+    return saleable;
   }
 
   int get _totalItemsSold => _soldQuantities.values.fold(0, (sum, quantity) => sum + quantity);
@@ -161,14 +159,9 @@ class _EventSalesScreenState extends State<EventSalesScreen> {
                   children: [
                     Expanded(
                       child: Text(
-                        'Tap + as each item sells. Stock is updated when you save.',
+                        'Tap + as each created item sells. Your finished-item tally is updated when you save.',
                         style: theme.textTheme.bodySmall,
                       ),
-                    ),
-                    FilterChip(
-                      label: const Text('All priced stock'),
-                      selected: _showAllInventory,
-                      onSelected: (value) => setState(() => _showAllInventory = value),
                     ),
                   ],
                 ),
@@ -183,9 +176,7 @@ class _EventSalesScreenState extends State<EventSalesScreen> {
                         child: Padding(
                           padding: const EdgeInsets.all(32),
                           child: Text(
-                            _showAllInventory
-                                ? 'Add priced inventory before recording a sale.'
-                                : 'Add finished crochet or knitted makes with prices, or switch on “All priced stock”.',
+                            'Add finished created items with sale prices in Inventory before recording a sale.',
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -207,7 +198,7 @@ class _EventSalesScreenState extends State<EventSalesScreen> {
                                     child: ListTile(
                                       contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                                       title: Text(item.name),
-                                      subtitle: Text('${item.category} · £${item.price!.toStringAsFixed(2)} · $stockRemaining left'),
+                                      subtitle: Text('${item.category} · £${item.price!.toStringAsFixed(2)} · $stockRemaining available'),
                                     ),
                                   ),
                                   IconButton(

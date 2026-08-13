@@ -30,9 +30,17 @@ void main() {
       await tester.pump(); // Allow state to update after fetchItems
 
       expect(find.byType(EmptyStateWidget), findsOneWidget);
-      // Corrected strings based on lib/features/inventory/presentation/inventory_screen.dart
-      expect(find.text('No Items Yet'), findsOneWidget);
-      expect(find.text('Start building your craft inventory by adding your first item'), findsOneWidget);
+      expect(find.text('No Created Items Yet'), findsOneWidget);
+      expect(find.text('Add the pieces you have made to keep a clear tally of what is ready.'), findsOneWidget);
+    });
+
+    testWidgets('renders a dedicated materials-stock empty state', (tester) async {
+      await tester.pumpWidget(const MaterialApp(home: InventoryScreen(viewMode: InventoryViewMode.materialsStock)));
+      await tester.pump();
+
+      expect(find.byType(EmptyStateWidget), findsOneWidget);
+      expect(find.text('No Materials Stock Yet'), findsOneWidget);
+      expect(find.text('Add yarn, hooks, notions, and supplies so you can see what is available to work with.'), findsOneWidget);
     });
   });
 }

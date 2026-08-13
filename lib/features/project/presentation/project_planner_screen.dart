@@ -71,6 +71,7 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
     if (!mounted) return;
     setState(() {
       _inventoryItemNames = items
+          .where((item) => item.isMaterialStock)
           .map((item) => item.name.trim())
           .where((name) => name.isNotEmpty)
           .toSet()

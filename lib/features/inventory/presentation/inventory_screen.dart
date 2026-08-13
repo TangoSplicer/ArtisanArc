@@ -1,18 +1,27 @@
-import 'dart:io'; // For File
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:artisanarc/core/widgets/personal_app_bar.dart';
 import 'package:get_it/get_it.dart';
-import 'package:go_router/go_router.dart'; // Added go_router
-import 'package:path_provider/path_provider.dart'; // For getApplicationDocumentsDirectory
-import 'package:path/path.dart' as p; // For path.join
-import 'package:artisanarc/features/inventory/domain/inventory_service.dart';
-import 'package:artisanarc/features/inventory/data/inventory_model.dart'; // Corrected to use entity
-import 'package:artisanarc/features/qr/presentation/qr_generator_widget.dart'; // Added QR Generator Widget
-import 'package:artisanarc/core/widgets/empty_state_widget.dart';
+import 'package:go_router/go_router.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+
 import 'package:artisanarc/core/services/analytics_service.dart';
+import 'package:artisanarc/core/widgets/empty_state_widget.dart';
+import 'package:artisanarc/core/widgets/personal_app_bar.dart';
+import 'package:artisanarc/features/inventory/data/inventory_model.dart';
+import 'package:artisanarc/features/inventory/domain/inventory_service.dart';
+import 'package:artisanarc/features/qr/presentation/qr_generator_widget.dart';
+
+enum InventoryViewMode { finishedItems, materialsStock }
 
 class InventoryScreen extends StatefulWidget {
-  const InventoryScreen({super.key});
+  final InventoryViewMode viewMode;
+
+  const InventoryScreen({
+    super.key,
+    this.viewMode = InventoryViewMode.finishedItems,
+  });
 
   @override
   State<InventoryScreen> createState() => _InventoryScreenState();
@@ -22,83 +31,59 @@ class _InventoryScreenState extends State<InventoryScreen> {
   final InventoryService _service = GetIt.I<InventoryService>();
   List<InventoryItem> _items = [];
 
+  bool get _isFinishedView => widget.viewMode == InventoryViewMode.finishedItems;
+  String get _title => _isFinishedView ? 'Inventory · Created Items' : 'Materials Stock';
+  String get _emptyTitle => _isFinishedView ? 'No Created Items Yet' : 'No Materials Stock Yet';
+  String get _emptySubtitle => _isFinishedView
+      ? 'Add the pieces you have made to keep a clear tally of what is ready.'
+      : 'Add yarn, hooks, notions, and supplies so you can see what is available to work with.';
+
   @override
   void initState() {
     super.initState();
     _loadItems();
-    AnalyticsService.trackFeatureUsage('inventory_view');
+    AnalyticsService.trackFeatureUsage(_isFinishedView ? 'created_items_view' : 'materials_stock_view');
   }
 
   Future<void> _loadItems() async {
-    final items = await _service.fetchItems();
-    setState(() => _items = items);
+    final allItems = await _service.fetchItems();
+    final filtered = allItems.where((item) => _isFinishedView ? item.isFinishedItem : item.isMaterialStock).toList()
+      ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+    if (mounted) setState(() => _items = filtered);
   }
 
   Future<void> _navigateToAddItemForm() async {
-    // Navigate to the add item screen and wait for a result.
-    final result = await context.pushNamed('addInventoryItem');
-
-    // If the form was submitted successfully (returned true), reload the items.
-    if (result == true) {
-      _loadItems();
-    }
+    final result = await context.push(_isFinishedView ? '/inventory/add' : '/stock/add');
+    if (result == true) _loadItems();
   }
 
   @override
   Widget build(BuildContext context) {
     final color = Theme.of(context).colorScheme;
+    final totalQuantity = _items.fold<int>(0, (sum, item) => sum + item.quantity);
+    final finishedValue = _items.fold<double>(0, (sum, item) => sum + item.quantity * (item.price ?? 0));
 
     return Scaffold(
       appBar: PersonalAppBar(
-        title: const Text('Inventory'),
+        title: Text(_title),
         backgroundColor: color.primary,
         foregroundColor: color.onPrimary,
         actions: [
           IconButton(
             icon: const Icon(Icons.qr_code_scanner),
-            tooltip: 'Scan Item QR Code',
-            onPressed: () async { // Make onPressed async to await the result
+            tooltip: 'Scan item QR code',
+            onPressed: () async {
               final result = await context.pushNamed('scanQrCode');
-
-              if (result is InventoryItem && mounted) {
-                // Display the item's details in a dialog
-                showDialog(
-                  context: context,
-                  builder: (BuildContext dialogContext) {
-                    return AlertDialog(
-                      title: Text(result.name),
-                      content: SingleChildScrollView(
-                        child: ListBody(
-                          children: <Widget>[
-                            Text('ID: ${result.id}'), // Good to show ID for confirmation
-                            Text('Category: ${result.category}'),
-                            Text('Quantity: ${result.quantity}'),
-                            Text('Price: ${result.price != null ? '\$${result.price!.toStringAsFixed(2)}' : 'N/A'}'),
-                            Text('Storage Location: ${result.storageLocation ?? 'N/A'}'),
-                            Text('Last Updated: ${result.lastUpdated.toLocal().toString().split(' ')[0]}'),
-                          ],
-                        ),
-                      ),
-                      actions: <Widget>[
-                        TextButton(
-                          child: const Text('OK'),
-                          onPressed: () {
-                            Navigator.of(dialogContext).pop();
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                );
-              }
+              if (result is InventoryItem && mounted) _showScannedItem(result);
             },
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _navigateToAddItemForm, // Changed to new method
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _navigateToAddItemForm,
         backgroundColor: color.primary,
-        child: const Icon(Icons.add),
+        icon: const Icon(Icons.add),
+        label: Text(_isFinishedView ? 'Add created item' : 'Add material'),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -110,60 +95,56 @@ class _InventoryScreenState extends State<InventoryScreen> {
         ),
         child: _items.isEmpty
             ? EmptyStateWidget(
-                icon: Icons.inventory_2,
-                title: 'No Items Yet',
-                subtitle: 'Start building your craft inventory by adding your first item',
-                actionText: 'Add First Item',
+                icon: _isFinishedView ? Icons.inventory_2_outlined : Icons.yard_outlined,
+                title: _emptyTitle,
+                subtitle: _emptySubtitle,
+                actionText: _isFinishedView ? 'Add created item' : 'Add material',
                 onAction: _navigateToAddItemForm,
               )
             : ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: _items.length,
-                itemBuilder: (_, i) {
-                  final item = _items[i];
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
+                itemCount: _items.length + 1,
+                itemBuilder: (_, index) {
+                  if (index == 0) {
+                    return Card(
+                      color: color.primaryContainer,
+                      margin: const EdgeInsets.only(bottom: 16),
+                      child: ListTile(
+                        leading: Icon(_isFinishedView ? Icons.widgets_outlined : Icons.yard_outlined, color: color.onPrimaryContainer),
+                        title: Text(
+                          _isFinishedView ? '$totalQuantity item${totalQuantity == 1 ? '' : 's'} currently tallied' : '$totalQuantity units available to work with',
+                          style: TextStyle(color: color.onPrimaryContainer, fontWeight: FontWeight.w700),
+                        ),
+                        subtitle: Text(
+                          _isFinishedView
+                              ? '${_items.length} created-item line${_items.length == 1 ? '' : 's'} · £${finishedValue.toStringAsFixed(2)} potential sales value'
+                              : '${_items.length} material line${_items.length == 1 ? '' : 's'} · yarn, tools, and supplies',
+                          style: TextStyle(color: color.onPrimaryContainer),
+                        ),
+                      ),
+                    );
+                  }
+
+                  final item = _items[index - 1];
                   return Card(
                     elevation: 4,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                     margin: const EdgeInsets.only(bottom: 16),
                     child: ListTile(
-                      leading: _buildItemLeadingWidget(item, color), // Updated leading widget
+                      leading: _buildItemLeadingWidget(item, color),
                       title: Text(item.name, style: const TextStyle(fontWeight: FontWeight.bold)),
                       subtitle: Text(
-                          'Qty: ${item.quantity} • Category: ${item.category}\n'
-                          'Price: ${item.price != null ? '£${item.price!.toStringAsFixed(2)}' : 'N/A'}\n'
-                          'Location: ${item.storageLocation ?? 'N/A'}',
-                          ),
-                      trailing: IconButton( 
+                        _isFinishedView
+                            ? 'Tally: ${item.quantity} made / available · ${item.category}\nSale price: ${item.price != null ? '£${item.price!.toStringAsFixed(2)}' : 'Not set'} · Location: ${item.storageLocation ?? 'Not set'}'
+                            : 'Available: ${item.quantity} · ${item.category}\nLocation: ${item.storageLocation ?? 'Not set'}${item.price == null ? '' : ' · Replacement cost: £${item.price!.toStringAsFixed(2)}'}',
+                      ),
+                      trailing: IconButton(
                         icon: const Icon(Icons.qr_code_2),
-                        tooltip: 'Show QR Code',
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext dialogContext) {
-                              return AlertDialog(
-                                title: const Text('Item QR Code'),
-                                content: SizedBox( // Constrain the size of the QR code
-                                  width: 250,
-                                  height: 250,
-                                  child: QRGeneratorWidget(data: item.id),
-                                ),
-                                actions: <Widget>[
-                                  TextButton(
-                                    child: const Text('Close'),
-                                    onPressed: () {
-                                      Navigator.of(dialogContext).pop();
-                                    },
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        },
+                        tooltip: 'Show QR code',
+                        onPressed: () => _showQrCode(item),
                       ),
                       isThreeLine: true,
-                      onTap: () {
-                        context.push('/inventory/detail/${item.id}').then((_) => _loadItems());
-                      },
+                      onTap: () => context.push('/inventory/detail/${item.id}').then((_) => _loadItems()),
                     ),
                   );
                 },
@@ -172,56 +153,63 @@ class _InventoryScreenState extends State<InventoryScreen> {
     );
   }
 
+  void _showScannedItem(InventoryItem item) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(item.name),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: [
+              Text('Type: ${item.isFinishedItem ? 'Created item' : 'Material stock'}'),
+              Text('Category: ${item.category}'),
+              Text(item.isFinishedItem ? 'Tally: ${item.quantity}' : 'Available: ${item.quantity}'),
+              Text('Price: ${item.price != null ? '£${item.price!.toStringAsFixed(2)}' : 'Not set'}'),
+              Text('Location: ${item.storageLocation ?? 'Not set'}'),
+            ],
+          ),
+        ),
+        actions: [TextButton(onPressed: () => Navigator.of(dialogContext).pop(), child: const Text('OK'))],
+      ),
+    );
+  }
+
+  void _showQrCode(InventoryItem item) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text('${item.name} QR Code'),
+        content: SizedBox(width: 250, height: 250, child: QRGeneratorWidget(data: item.id)),
+        actions: [TextButton(onPressed: () => Navigator.of(dialogContext).pop(), child: const Text('Close'))],
+      ),
+    );
+  }
+
   Widget _buildItemLeadingWidget(InventoryItem item, ColorScheme colorScheme) {
     if (item.imagePaths != null && item.imagePaths!.isNotEmpty) {
-      // Attempt to display the first image
       return FutureBuilder<String>(
         future: getApplicationDocumentsDirectory().then((dir) => p.join(dir.path, 'inventory_images', item.imagePaths!.first)),
-        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+        builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
             final imageFile = File(snapshot.data!);
-            return SizedBox(
-              width: 50, // Standard ListTile leading width
-              height: 50,
-              child: imageFile.existsSync()
-                  ? ClipRRect( // Rounded corners for the image
-                      borderRadius: BorderRadius.circular(8.0),
-                      child: Image.file(
-                        imageFile,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return CircleAvatar( // Fallback if image file fails to load
-                            backgroundColor: colorScheme.secondaryContainer,
-                            child: const Icon(Icons.broken_image),
-                          );
-                        },
-                      ),
-                    )
-                  : CircleAvatar( // Fallback if image file doesn't exist at path
-                      backgroundColor: colorScheme.secondaryContainer,
-                      child: const Icon(Icons.image_not_supported),
-                    ),
-            );
-          } else if (snapshot.hasError) {
-             return CircleAvatar( // Fallback on error
-                backgroundColor: colorScheme.errorContainer,
-                child: const Icon(Icons.error_outline),
+            if (imageFile.existsSync()) {
+              return SizedBox(
+                width: 50,
+                height: 50,
+                child: ClipRRect(borderRadius: BorderRadius.circular(8), child: Image.file(imageFile, fit: BoxFit.cover)),
               );
-          } else {
-            // Show a placeholder while loading the path or if no image
-            return CircleAvatar(
-              backgroundColor: colorScheme.secondaryContainer,
-              child: const CircularProgressIndicator(),
-            );
+            }
           }
+          return CircleAvatar(
+            backgroundColor: colorScheme.secondaryContainer,
+            child: Icon(item.isFinishedItem ? Icons.inventory_2_outlined : Icons.yard_outlined),
+          );
         },
       );
-    } else {
-      // Default placeholder if no images
-      return CircleAvatar(
-        backgroundColor: colorScheme.secondaryContainer,
-        child: Text(item.name.isNotEmpty ? item.name[0].toUpperCase() : '?'),
-      );
     }
+    return CircleAvatar(
+      backgroundColor: colorScheme.secondaryContainer,
+      child: Text(item.name.isNotEmpty ? item.name[0].toUpperCase() : '?'),
+    );
   }
 }

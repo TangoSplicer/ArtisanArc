@@ -15,13 +15,17 @@ import 'package:artisanarc/core/widgets/personal_app_bar.dart';
 import 'package:artisanarc/core/widgets/searchable_selection_field.dart';
 
 class AddInventoryItemScreen extends StatefulWidget {
-  const AddInventoryItemScreen({super.key});
+  final String itemType;
+
+  const AddInventoryItemScreen({super.key, this.itemType = 'finished'});
 
   @override
   State<AddInventoryItemScreen> createState() => _AddInventoryItemScreenState();
 }
 
 class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
+  bool get _isFinishedItem => widget.itemType == 'finished';
+
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _categoryController = TextEditingController();
@@ -51,17 +55,18 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
         name: _nameController.text,
         category: _categoryController.text,
         quantity: int.parse(_quantityController.text),
-        price: double.parse(_priceController.text),
+        price: double.tryParse(_priceController.text),
         storageLocation: _storageLocationController.text.isNotEmpty ? _storageLocationController.text : null,
         imagePaths: _selectedImagePaths, // Pass the stored image paths
         lastUpdated: DateTime.now(),
+        itemType: widget.itemType,
       );
 
       try {
         await _inventoryService.createItem(newItem);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${newItem.name} added to inventory')),
+            SnackBar(content: Text('${newItem.name} added to ${_isFinishedItem ? 'created items' : 'materials stock'}')),
           );
           Navigator.pop(context, true); // Return true to indicate success
         }
@@ -78,8 +83,8 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const PersonalAppBar(
-        title: Text('Add Inventory Item'),
+      appBar: PersonalAppBar(
+        title: Text(_isFinishedItem ? 'Add Created Item' : 'Add Material Stock'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -89,15 +94,18 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
             children: <Widget>[
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Name*', border: OutlineInputBorder()),
+                decoration: InputDecoration(
+                  labelText: _isFinishedItem ? 'Created item name*' : 'Material or tool name*',
+                  border: const OutlineInputBorder(),
+                ),
                 validator: Validators.validateItemName,
               ),
               const SizedBox(height: 16),
               SearchableSelectionField<String>(
-                options: SelectionOptions.inventoryCategories,
+                options: _isFinishedItem ? SelectionOptions.finishedItemCategories : SelectionOptions.materialStockCategories,
                 value: _categoryController.text.isEmpty ? null : _categoryController.text,
                 labelText: 'Category*',
-                hintText: 'Search craft-material categories',
+                hintText: _isFinishedItem ? 'Search finished-make categories' : 'Search yarn, tools, and supply categories',
                 itemLabel: (category) => category,
                 onChanged: (category) => setState(() => _categoryController.text = category ?? ''),
                 customValueBuilder: (query) => query,
@@ -106,7 +114,10 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _quantityController,
-                decoration: const InputDecoration(labelText: 'Quantity*', border: OutlineInputBorder()),
+                decoration: InputDecoration(
+                  labelText: _isFinishedItem ? 'Number created / available*' : 'Amount available to work with*',
+                  border: const OutlineInputBorder(),
+                ),
                 keyboardType: TextInputType.number,
                 inputFormatters: <TextInputFormatter>[
                   FilteringTextInputFormatter.digitsOnly
@@ -116,7 +127,11 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _priceController,
-                decoration: const InputDecoration(labelText: 'Price (Optional)', border: OutlineInputBorder(), prefixText: '£ '),
+                decoration: InputDecoration(
+                  labelText: _isFinishedItem ? 'Sale price each (optional)' : 'Replacement cost (optional)',
+                  border: const OutlineInputBorder(),
+                  prefixText: '£ ',
+                ),
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 inputFormatters: <TextInputFormatter>[
                   FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
@@ -139,7 +154,7 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
               const SizedBox(height: 24),
               ElevatedButton.icon(
                 icon: const Icon(Icons.add),
-                label: const Text('Add Item'),
+                label: Text(_isFinishedItem ? 'Add Created Item' : 'Add Material'),
                 onPressed: _submitForm,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),

@@ -27,7 +27,7 @@ class _LowStockWidgetState extends State<LowStockWidget> {
     setState(() => _isLoading = true);
     try {
       final allItems = await _service.fetchItems();
-      final lowStock = allItems.where((item) => item.quantity <= widget.threshold).toList();
+      final lowStock = allItems.where((item) => item.isMaterialStock && item.quantity <= widget.threshold).toList();
       setState(() => _lowStockItems = lowStock);
     } catch (e) {
       if (mounted) {
@@ -60,7 +60,7 @@ class _LowStockWidgetState extends State<LowStockWidget> {
               Icon(Icons.check_circle, color: Colors.green),
               const SizedBox(width: 12),
               Text(
-                'All items well stocked!',
+                'Materials stock looks healthy!',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ],
@@ -80,7 +80,7 @@ class _LowStockWidgetState extends State<LowStockWidget> {
                 Icon(Icons.warning, color: Colors.orange),
                 const SizedBox(width: 8),
                 Text(
-                  'Low Stock Alert',
+                  'Low Materials Stock',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),

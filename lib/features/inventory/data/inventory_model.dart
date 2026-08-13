@@ -28,6 +28,12 @@ class InventoryItem extends HiveObject {
   @HiveField(7)
   DateTime lastUpdated; // Added lastUpdated
 
+  /// `finished` records are created items ready to tally or sell.
+  /// `material` records are yarn, tools, and supplies available to work with.
+  /// Null is retained for older data and inferred from its existing category.
+  @HiveField(8)
+  final String? itemType;
+
   InventoryItem({
     required this.id,
     required this.name,
@@ -36,8 +42,13 @@ class InventoryItem extends HiveObject {
     this.price,
     this.storageLocation,
     this.imagePaths, // Added to constructor
-    required this.lastUpdated, // Added to constructor
+    required this.lastUpdated, // Added lastUpdated
+    this.itemType,
   });
+
+  bool get isFinishedItem => itemType == 'finished' || (itemType == null && category.startsWith('Finished'));
+
+  bool get isMaterialStock => !isFinishedItem;
 
   // copyWith method for easy updates
   InventoryItem copyWith({
@@ -49,6 +60,7 @@ class InventoryItem extends HiveObject {
     String? storageLocation,
     List<String>? imagePaths,
     DateTime? lastUpdated,
+    String? itemType,
   }) {
     return InventoryItem(
       id: id ?? this.id,
@@ -59,6 +71,7 @@ class InventoryItem extends HiveObject {
       storageLocation: storageLocation ?? this.storageLocation,
       imagePaths: imagePaths ?? this.imagePaths,
       lastUpdated: lastUpdated ?? this.lastUpdated,
+      itemType: itemType ?? this.itemType,
     );
   }
 }

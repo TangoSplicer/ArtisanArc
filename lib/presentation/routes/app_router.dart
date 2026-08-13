@@ -70,7 +70,7 @@ class AppRouter {
           GoRoute(
             path: 'add',
             name: 'addInventoryItem',
-            builder: (context, state) => const AddInventoryItemScreen(),
+            builder: (context, state) => const AddInventoryItemScreen(itemType: 'finished'),
           ),
           GoRoute(
             path: 'detail/:itemId',
@@ -82,6 +82,18 @@ class AppRouter {
               }
               return InventoryDetailScreen(itemId: itemId);
             },
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/stock',
+        name: 'materialsStock',
+        builder: (context, state) => const InventoryScreen(viewMode: InventoryViewMode.materialsStock),
+        routes: [
+          GoRoute(
+            path: 'add',
+            name: 'addMaterialStock',
+            builder: (context, state) => const AddInventoryItemScreen(itemType: 'material'),
           ),
         ],
       ),
