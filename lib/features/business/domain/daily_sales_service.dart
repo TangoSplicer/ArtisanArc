@@ -52,4 +52,17 @@ class DailySalesService {
 
     return monthlyRevenue;
   }
+
+  Future<Map<String, double>> getRevenueByEvent() async {
+    final sales = await salesRepo.getSales();
+    final Map<String, double> eventRevenue = {};
+
+    for (final sale in sales) {
+      final name = sale.eventName?.trim();
+      if (name == null || name.isEmpty) continue;
+      eventRevenue[name] = (eventRevenue[name] ?? 0.0) + sale.total;
+    }
+
+    return eventRevenue;
+  }
 }

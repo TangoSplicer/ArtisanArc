@@ -94,7 +94,11 @@ class _DailySalesScreenState extends State<DailySalesScreen> {
                           elevation: 2,
                           child: ListTile(
                             title: Text(s.itemName ?? 'Unknown Item'),
-                            subtitle: Text('${s.sale.quantity} × £${s.sale.pricePerUnit.toStringAsFixed(2)}'),
+                            subtitle: Text([
+                              '${s.sale.quantity} × £${s.sale.pricePerUnit.toStringAsFixed(2)}',
+                              if (s.sale.eventName != null && s.sale.eventName!.isNotEmpty) s.sale.eventName!,
+                              if (s.sale.eventLocation != null && s.sale.eventLocation!.isNotEmpty) s.sale.eventLocation!,
+                            ].join(' · ')),
                             trailing: Text('£${s.sale.total.toStringAsFixed(2)}'),
                           ),
                         )),

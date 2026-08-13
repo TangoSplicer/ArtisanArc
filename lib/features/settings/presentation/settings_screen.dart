@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart'; // Added url_launcher
 import '../../../core/services/theme_service.dart';
 import '../../../core/widgets/searchable_selection_field.dart';
 import '../../../core/services/backup_service.dart';
+import '../../../core/services/sample_data_service.dart';
 import '../../../core/services/analytics_service.dart';
 import '../../../core/utils/storage_keys.dart';
 import '../domain/settings_service.dart';
@@ -182,6 +183,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
             const SizedBox(height: 16),
+            Card(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              elevation: 5,
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.auto_awesome_outlined),
+                    title: const Text('Load Starter Sample Data'),
+                    subtitle: const Text('Add crochet and knitting stock, a project, a shopping list, and market sales.'),
+                    onTap: _loadStarterData,
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: Icon(Icons.delete_forever_outlined, color: color.error),
+                    title: Text('Clear Craft Data', style: TextStyle(color: color.error)),
+                    subtitle: const Text('Remove inventory, sales, projects, shopping lists, and compliance records.'),
+                    onTap: _clearCraftData,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
             Card( // Added Analytics Card
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               elevation: 5,
@@ -328,6 +351,62 @@ class _SettingsScreenState extends State<SettingsScreen> {
           );
         }
       }
+    }
+  }
+
+  Future<void> _loadStarterData() async {
+    final hasExistingData = await SampleDataService.hasCraftData();
+    if (!mounted) return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Load Starter Sample Data'),
+        content: Text(
+          hasExistingData
+              ? 'This will replace your current inventory, sales, projects, shopping lists, and compliance records with fictional crochet and knitting examples. Create a backup first if you want to keep your current data.'
+              : 'This adds fictional crochet and knitting inventory, a project, a shopping list, and a makers-market sales example. You can clear it later in Settings.',
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(hasExistingData ? 'Replace & Load' : 'Load Data')),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+    try {
+      await SampleDataService.loadStarterData(replaceExisting: hasExistingData);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Starter data loaded. Explore Inventory, Projects, Business Tools, and Shopping.')),
+        );
+      }
+    } catch (error) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not load starter data: $error')));
+    }
+  }
+
+  Future<void> _clearCraftData() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Clear Craft Data'),
+        content: const Text('This permanently removes inventory, sales, projects, shopping lists, and compliance records from this device. Create a backup first if you may need them again.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          FilledButton.tonal(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Clear Data'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+    await SampleDataService.clearCraftData();
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Craft data cleared.')));
     }
   }
 

@@ -48,4 +48,17 @@ void main() {
     expect(result.containsKey(key), true);
     expect(result[key]!.first.itemName, 'Test Yarn');
   });
+
+  test('aggregates stall sales by event name for reporting', () async {
+    final sales = [
+      SaleRecord(id: 'market-1', itemId: 'bee', quantity: 2, pricePerUnit: 5.0, date: DateTime.now(), eventName: 'Spring Market'),
+      SaleRecord(id: 'market-2', itemId: 'basket', quantity: 1, pricePerUnit: 18.0, date: DateTime.now(), eventName: 'Spring Market'),
+      SaleRecord(id: 'ordinary-1', itemId: 'yarn', quantity: 1, pricePerUnit: 4.0, date: DateTime.now()),
+    ];
+    when(salesRepo.getSales()).thenAnswer((_) async => sales);
+
+    final result = await service.getRevenueByEvent();
+
+    expect(result, {'Spring Market': 28.0});
+  });
 }

@@ -22,6 +22,14 @@ class SaleRecord extends HiveObject {
   @HiveField(5)
   final String? buyer;
 
+  /// Optional event/session label, for example "Saturday Makers Market".
+  @HiveField(6)
+  final String? eventName;
+
+  /// Optional table, stall, or venue detail associated with the event.
+  @HiveField(7)
+  final String? eventLocation;
+
   SaleRecord({
     required this.id,
     required this.itemId,
@@ -29,6 +37,8 @@ class SaleRecord extends HiveObject {
     required this.pricePerUnit,
     required this.date,
     this.buyer,
+    this.eventName,
+    this.eventLocation,
   });
 
   double get total => quantity * pricePerUnit;

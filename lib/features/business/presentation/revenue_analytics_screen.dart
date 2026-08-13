@@ -17,6 +17,7 @@ class _RevenueAnalyticsScreenState extends State<RevenueAnalyticsScreen> {
   final BusinessService _businessService = GetIt.I<BusinessService>();
   
   Map<String, double> _monthlyRevenue = {};
+  Map<String, double> _eventRevenue = {};
   double _totalRevenue = 0.0;
   bool _isLoading = true;
 
@@ -30,11 +31,13 @@ class _RevenueAnalyticsScreenState extends State<RevenueAnalyticsScreen> {
     setState(() => _isLoading = true);
     try {
       final monthlyData = await _dailySalesService.getRevenueByMonth();
+      final eventData = await _dailySalesService.getRevenueByEvent();
       final sales = await _businessService.fetchSales();
       final total = _businessService.calculateTotalRevenue(sales);
       
       setState(() {
         _monthlyRevenue = monthlyData;
+        _eventRevenue = eventData;
         _totalRevenue = total;
       });
     } catch (e) {
@@ -68,6 +71,10 @@ class _RevenueAnalyticsScreenState extends State<RevenueAnalyticsScreen> {
                   _buildTotalRevenueCard(theme),
                   const SizedBox(height: 16),
                   _buildMonthlyBreakdown(theme),
+                  if (_eventRevenue.isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    _buildEventBreakdown(theme),
+                  ],
                 ],
               ),
             ),
@@ -99,6 +106,28 @@ class _RevenueAnalyticsScreenState extends State<RevenueAnalyticsScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEventBreakdown(ThemeData theme) {
+    final events = _eventRevenue.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    return Card(
+      elevation: 4,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Event & Stall Sales', style: theme.textTheme.titleLarge),
+            const SizedBox(height: 8),
+            ...events.map((entry) => ListTile(
+                  leading: const Icon(Icons.storefront_outlined),
+                  title: Text(entry.key),
+                  trailing: Text('£${entry.value.toStringAsFixed(2)}', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                )),
           ],
         ),
       ),

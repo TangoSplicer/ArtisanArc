@@ -60,11 +60,26 @@ class _BusinessDashboardScreenState extends State<BusinessDashboardScreen> {
             elevation: 4,
             child: ListTile(
               title: const Text('Total Revenue'),
-                trailing: const Icon(Icons.trending_up),
+              trailing: const Icon(Icons.trending_up),
               subtitle: Text('£${totalRevenue.toStringAsFixed(2)}'),
             ),
           ),
-            ListTile(
+          const SizedBox(height: 12),
+          Card(
+            color: color.primaryContainer,
+            child: ListTile(
+              leading: Icon(Icons.storefront, color: color.onPrimaryContainer),
+              title: Text('On-the-day Sales', style: TextStyle(color: color.onPrimaryContainer, fontWeight: FontWeight.w700)),
+              subtitle: Text('Quickly record sales at a table, stall, or market.', style: TextStyle(color: color.onPrimaryContainer)),
+              trailing: Icon(Icons.chevron_right, color: color.onPrimaryContainer),
+              onTap: () async {
+                await context.pushNamed('eventSales');
+                _loadSales();
+              },
+            ),
+          ),
+          const SizedBox(height: 8),
+          ListTile(
               leading: const Icon(Icons.analytics),
               title: const Text('Revenue Analytics'),
               subtitle: const Text('View detailed revenue breakdown'),

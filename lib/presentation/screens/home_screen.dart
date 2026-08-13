@@ -77,7 +77,7 @@ class HomeScreen extends StatelessWidget {
              _buildNavCard( // Added Smart Shopping card
               context,
               title: 'Smart Shopping',
-              subtitle: 'Create lists, track needs, (future: compare prices)',
+              subtitle: 'Create supply lists and track what still needs buying',
               icon: Icons.shopping_cart_checkout,
               route: '/shopping-lists', // Route to overview
               color: Colors.orangeAccent,
@@ -133,7 +133,7 @@ class HomeScreen extends StatelessWidget {
         child: InkWell(
           onTap: () {
             onTap?.call();
-            context.go(route);
+            context.push(route);
           },
           borderRadius: BorderRadius.circular(20),
           child: Container(

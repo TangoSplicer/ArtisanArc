@@ -9,6 +9,7 @@ import 'package:artisanarc/features/settings/presentation/settings_screen.dart';
 import 'package:artisanarc/features/business/presentation/business_dashboard_screen.dart';
 import 'package:artisanarc/features/business/presentation/daily_sales_screen.dart';
 import 'package:artisanarc/features/business/presentation/new_sale_entry_screen.dart';
+import 'package:artisanarc/features/business/presentation/event_sales_screen.dart';
 import 'package:artisanarc/features/project/presentation/project_list_screen.dart';
 import 'package:artisanarc/features/project/presentation/project_planner_screen.dart';
 import 'package:artisanarc/features/qr/presentation/qr_scanner_page.dart';
@@ -103,6 +104,11 @@ class AppRouter {
             path: 'new-sale',
             name: 'newSale',
             builder: (context, state) => const NewSaleEntryScreen(),
+          ),
+          GoRoute(
+            path: 'event-sales',
+            name: 'eventSales',
+            builder: (context, state) => const EventSalesScreen(),
           ),
           GoRoute(
             path: 'analytics',

@@ -7,6 +7,7 @@ import 'package:printing/printing.dart';
 import '../../../features/export/utils/export_helper.dart';
 import '../../../features/business/domain/business_service.dart';
 import '../../../features/inventory/domain/inventory_service.dart';
+import '../../../features/project/domain/project_service.dart';
 
 class ExportScreen extends StatelessWidget {
   const ExportScreen({super.key});
@@ -15,6 +16,7 @@ class ExportScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final BusinessService businessService = GetIt.I<BusinessService>();
     final InventoryService inventoryService = GetIt.I<InventoryService>();
+    final ProjectService projectService = GetIt.I<ProjectService>();
     final color = Theme.of(context).colorScheme;
 
     return Scaffold(
@@ -46,7 +48,9 @@ class ExportScreen extends StatelessWidget {
             color: color.secondary,
             onTap: () async {
               final sales = await businessService.fetchSales();
-              final csv = ExportHelper.generateCsvFromSales(sales);
+              final inventory = await inventoryService.fetchItems();
+              final itemNames = {for (final item in inventory) item.id: item.name};
+              final csv = ExportHelper.generateCsvFromSales(sales, itemNames: itemNames);
               await Printing.sharePdf(bytes: Uint8List.fromList(csv.codeUnits), filename: 'sales.csv');
             },
           ),
@@ -57,9 +61,9 @@ class ExportScreen extends StatelessWidget {
             icon: Icons.timeline,
             color: color.tertiary,
             onTap: () async {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Project reports coming soon!')),
-              );
+              final projects = await projectService.fetchProjects();
+              final report = ExportHelper.generateProjectsPdf(projects);
+              await Printing.layoutPdf(onLayout: (_) => report.save());
             },
           ),
           _buildExportOption(

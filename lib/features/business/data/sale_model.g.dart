@@ -23,13 +23,15 @@ class SaleRecordAdapter extends TypeAdapter<SaleRecord> {
       pricePerUnit: fields[3] as double,
       date: fields[4] as DateTime,
       buyer: fields[5] as String?,
+      eventName: fields[6] as String?,
+      eventLocation: fields[7] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, SaleRecord obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -41,7 +43,11 @@ class SaleRecordAdapter extends TypeAdapter<SaleRecord> {
       ..writeByte(4)
       ..write(obj.date)
       ..writeByte(5)
-      ..write(obj.buyer);
+      ..write(obj.buyer)
+      ..writeByte(6)
+      ..write(obj.eventName)
+      ..writeByte(7)
+      ..write(obj.eventLocation);
   }
 
   @override
