@@ -54,7 +54,7 @@ flutter_icons:
   remove_alpha_ios: true
 
 flutter_native_splash:
-  color: "#F5F2FF"
+  color: "#0D1B2A"
   image: "assets/icon/app_icon.png"
   android_gravity: center
   ios: false
