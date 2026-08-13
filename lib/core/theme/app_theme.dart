@@ -60,7 +60,7 @@ class AppTheme {
       bodyColor: _lightScheme.onSurface,
       displayColor: _lightScheme.onSurface,
     ).copyWith(
-      headlineMedium: const TextStyle(
+      headlineMedium: TextStyle(
         fontFamily: 'serif',
         fontSize: 22,
         fontWeight: FontWeight.bold,
@@ -92,7 +92,7 @@ class AppTheme {
       bodyColor: _darkScheme.onSurface,
       displayColor: _darkScheme.onSurface,
     ).copyWith(
-      headlineMedium: const TextStyle(
+      headlineMedium: TextStyle(
         fontFamily: 'serif',
         fontSize: 22,
         fontWeight: FontWeight.bold,
@@ -105,7 +105,7 @@ class AppTheme {
       surfaceTintColor: Colors.transparent,
       elevation: 0,
       iconTheme: IconThemeData(color: _darkScheme.onSurface),
-      titleTextStyle: const TextStyle(
+      titleTextStyle: TextStyle(
         color: _darkScheme.onSurface,
         fontSize: 22,
         fontWeight: FontWeight.w600,
@@ -143,12 +143,12 @@ class AppTheme {
     dialogTheme: DialogTheme(
       backgroundColor: const Color(0xFF211F27),
       surfaceTintColor: Colors.transparent,
-      titleTextStyle: const TextStyle(
+      titleTextStyle: TextStyle(
         color: _darkScheme.onSurface,
         fontSize: 20,
         fontWeight: FontWeight.w600,
       ),
-      contentTextStyle: const TextStyle(
+      contentTextStyle: TextStyle(
         color: _darkScheme.onSurface,
         fontSize: 14,
       ),
