@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:artisanarc/core/widgets/personal_app_bar.dart';
 import 'package:go_router/go_router.dart';
 
 class ErrorScreen extends StatelessWidget {
@@ -9,7 +10,7 @@ class ErrorScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: PersonalAppBar(
         title: const Text('Error'),
       ),
       body: Center(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:artisanarc/core/widgets/personal_app_bar.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/inventory/presentation/low_stock_widget.dart';
 import '../../core/services/analytics_service.dart';
@@ -15,7 +16,7 @@ class HomeScreen extends StatelessWidget {
     final color = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: PersonalAppBar(
         title: const Text('ArtisanArc Personal'),
         backgroundColor: color.primary,
         foregroundColor: color.onPrimary,

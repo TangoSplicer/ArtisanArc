@@ -10,6 +10,9 @@ import 'package:artisanarc/features/inventory/domain/inventory_service.dart';
 import 'package:uuid/uuid.dart'; // For generating unique IDs
 import 'package:artisanarc/core/utils/validators.dart';
 import 'package:artisanarc/core/services/permission_service.dart';
+import 'package:artisanarc/core/constants/selection_options.dart';
+import 'package:artisanarc/core/widgets/personal_app_bar.dart';
+import 'package:artisanarc/core/widgets/searchable_selection_field.dart';
 
 class AddInventoryItemScreen extends StatefulWidget {
   const AddInventoryItemScreen({super.key});
@@ -75,8 +78,8 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add Inventory Item'),
+      appBar: const PersonalAppBar(
+        title: Text('Add Inventory Item'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -90,10 +93,15 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
                 validator: Validators.validateItemName,
               ),
               const SizedBox(height: 16),
-              TextFormField(
-                controller: _categoryController,
-                decoration: const InputDecoration(labelText: 'Category*', border: OutlineInputBorder()),
-                validator: (value) => Validators.validateRequired(value, fieldName: 'Category'),
+              SearchableSelectionField<String>(
+                options: SelectionOptions.inventoryCategories,
+                value: _categoryController.text.isEmpty ? null : _categoryController.text,
+                labelText: 'Category*',
+                hintText: 'Search craft-material categories',
+                itemLabel: (category) => category,
+                onChanged: (category) => setState(() => _categoryController.text = category ?? ''),
+                customValueBuilder: (query) => query,
+                validator: (category) => Validators.validateRequired(category, fieldName: 'Category'),
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -116,9 +124,15 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
                 validator: Validators.validatePrice,
               ),
               const SizedBox(height: 16),
-              TextFormField(
-                controller: _storageLocationController,
-                decoration: const InputDecoration(labelText: 'Storage Location (Optional)', border: OutlineInputBorder()),
+              SearchableSelectionField<String>(
+                options: SelectionOptions.storageLocations,
+                value: _storageLocationController.text.isEmpty ? null : _storageLocationController.text,
+                labelText: 'Storage location',
+                hintText: 'Search a room, box, drawer, or shelf',
+                itemLabel: (location) => location,
+                onChanged: (location) => setState(() => _storageLocationController.text = location ?? ''),
+                customValueBuilder: (query) => query,
+                allowClear: true,
               ),
               const SizedBox(height: 24),
               _buildImagePickerSection(), // Added image picker section

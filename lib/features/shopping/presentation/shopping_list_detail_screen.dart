@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:artisanarc/core/widgets/personal_app_bar.dart';
 import 'package:get_it/get_it.dart';
 import 'package:artisanarc/features/shopping/data/shopping_list_model.dart';
 import 'package:artisanarc/features/shopping/domain/shopping_service.dart';
@@ -182,7 +183,7 @@ class _ShoppingListDetailScreenState extends State<ShoppingListDetailScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(
+      appBar: PersonalAppBar(
         title: _isLoading || _shoppingList == null
             ? const Text('Loading List...')
             : TextField( // Allow editing list name in AppBar

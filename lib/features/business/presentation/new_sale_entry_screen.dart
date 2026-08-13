@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:uuid/uuid.dart';
+import '../../../core/widgets/personal_app_bar.dart';
+import '../../../core/widgets/searchable_selection_field.dart';
 import '../../inventory/domain/inventory_service.dart';
 import '../../inventory/data/inventory_model.dart';
 import '../domain/business_service.dart';
@@ -16,11 +18,12 @@ class NewSaleEntryScreen extends StatefulWidget {
 class _NewSaleEntryScreenState extends State<NewSaleEntryScreen> {
   final InventoryService _inventoryService = GetIt.I<InventoryService>();
   final BusinessService _businessService = GetIt.I<BusinessService>();
+  final _formKey = GlobalKey<FormState>();
+  final _quantityController = TextEditingController();
+  final _priceController = TextEditingController();
 
   List<InventoryItem> _items = [];
   InventoryItem? _selectedItem;
-  final _quantityController = TextEditingController();
-  final _priceController = TextEditingController();
 
   @override
   void initState() {
@@ -28,65 +31,80 @@ class _NewSaleEntryScreenState extends State<NewSaleEntryScreen> {
     _loadItems();
   }
 
+  @override
+  void dispose() {
+    _quantityController.dispose();
+    _priceController.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadItems() async {
     final items = await _inventoryService.fetchItems();
-    setState(() => _items = items);
+    if (!mounted) return;
+    setState(() {
+      _items = [...items]..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+    });
   }
 
   Future<void> _submitSale() async {
-    if (_selectedItem == null) return;
+    if (!_formKey.currentState!.validate() || _selectedItem == null) return;
 
     final sale = SaleRecord(
       id: const Uuid().v4(),
       itemId: _selectedItem!.id,
-      quantity: int.tryParse(_quantityController.text) ?? 0,
-      pricePerUnit: double.tryParse(_priceController.text) ?? 0.0,
+      quantity: int.parse(_quantityController.text),
+      pricePerUnit: double.parse(_priceController.text),
       date: DateTime.now(),
     );
 
     await _businessService.createSale(sale);
-    Navigator.pop(context);
+    if (mounted) Navigator.pop(context, true);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('New Sale')),
+      appBar: const PersonalAppBar(title: Text('New Sale')),
       body: Padding(
         padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            DropdownButton<InventoryItem>(
-              value: _selectedItem,
-              hint: const Text('Select Inventory Item'),
-              isExpanded: true,
-              items: _items.map((item) {
-                return DropdownMenuItem(
-                  value: item,
-                  child: Text(item.name),
-                );
-              }).toList(),
-              onChanged: (item) => setState(() => _selectedItem = item),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: _quantityController,
-              decoration: const InputDecoration(labelText: 'Quantity Sold'),
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: _priceController,
-              decoration: const InputDecoration(labelText: 'Price Per Unit (£)'),
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton.icon(
-              onPressed: _submitSale,
-              icon: const Icon(Icons.save),
-              label: const Text('Record Sale'),
-            ),
-          ],
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: [
+              SearchableSelectionField<InventoryItem>(
+                options: _items,
+                value: _selectedItem,
+                labelText: 'Inventory item',
+                hintText: 'Search by item, category, or location',
+                emptyMessage: 'No matching inventory items',
+                itemLabel: (item) => item.name,
+                itemSubtitle: (item) => '${item.category} · ${item.quantity} in stock${item.storageLocation == null || item.storageLocation!.isEmpty ? '' : ' · ${item.storageLocation}'}',
+                searchTerms: (item) => [item.name, item.category, item.storageLocation ?? ''],
+                onChanged: (item) => setState(() => _selectedItem = item),
+                validator: (item) => item == null ? 'Select an inventory item' : null,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _quantityController,
+                decoration: const InputDecoration(labelText: 'Quantity sold', border: OutlineInputBorder()),
+                keyboardType: TextInputType.number,
+                validator: (value) => (int.tryParse(value ?? '') ?? 0) > 0 ? null : 'Enter a quantity greater than zero',
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _priceController,
+                decoration: const InputDecoration(labelText: 'Price per unit (£)', border: OutlineInputBorder()),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                validator: (value) => (double.tryParse(value ?? '') ?? -1) >= 0 ? null : 'Enter a valid price',
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
+                onPressed: _submitSale,
+                icon: const Icon(Icons.save),
+                label: const Text('Record Sale'),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -5,6 +5,8 @@ import 'package:uuid/uuid.dart';
 import 'package:artisanarc/core/constants/compliance_tags.dart';
 import 'package:artisanarc/features/compliance/data/compliance_model.dart';
 import 'package:artisanarc/features/compliance/domain/compliance_service.dart';
+import 'package:artisanarc/core/widgets/personal_app_bar.dart';
+import 'package:artisanarc/core/widgets/searchable_selection_field.dart';
 
 class ComplianceScreen extends StatefulWidget {
   const ComplianceScreen({super.key});
@@ -143,7 +145,7 @@ class _ComplianceScreenState extends State<ComplianceScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(
+      appBar: PersonalAppBar(
         title: Text(_editingEntryId != null ? 'Edit Compliance Entry' : 'Compliance Tracker'),
         backgroundColor: theme.colorScheme.primaryContainer,
       ),
@@ -169,26 +171,22 @@ class _ComplianceScreenState extends State<ComplianceScreen> {
       key: _formKey,
       child: Column(
         children: [
-          DropdownButtonFormField<ComplianceTag>(
+          SearchableSelectionField<ComplianceTag>(
+            options: predefinedComplianceTags,
             value: _selectedTag,
-            decoration: const InputDecoration(labelText: 'Certification*', border: OutlineInputBorder()),
-            items: predefinedComplianceTags.map((ComplianceTag tag) {
-              return DropdownMenuItem<ComplianceTag>(
-                value: tag,
-                child: Text(tag.name, overflow: TextOverflow.ellipsis),
-              );
-            }).toList(),
-            onChanged: (ComplianceTag? newValue) {
+            labelText: 'Safety or compliance record*',
+            hintText: 'Search record, region, or craft',
+            emptyMessage: 'No matching records',
+            itemLabel: (tag) => tag.name,
+            itemSubtitle: (tag) => '${tag.country} · ${tag.applicableCraft.join(', ')}',
+            searchTerms: (tag) => [tag.name, tag.country, ...tag.applicableCraft],
+            onChanged: (newValue) {
               setState(() {
                 _selectedTag = newValue;
-                if (newValue != null) {
-                  _craftController.text = newValue.applicableCraft.join(', ');
-                } else {
-                  _craftController.clear();
-                }
+                _craftController.text = newValue?.applicableCraft.join(', ') ?? '';
               });
             },
-            validator: (value) => value == null ? 'Please select a certification' : null,
+            validator: (value) => value == null ? 'Please select a record' : null,
           ),
           const SizedBox(height: 12),
           TextFormField(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:artisanarc/core/widgets/personal_app_bar.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import '../domain/daily_sales_service.dart';
@@ -52,7 +53,7 @@ class _DailySalesScreenState extends State<DailySalesScreen> {
         : sortedDates;
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: PersonalAppBar(
         title: const Text('Daily Sales Tracker'),
         backgroundColor: color.primary,
         foregroundColor: color.onPrimary,

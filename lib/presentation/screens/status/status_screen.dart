@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:artisanarc/core/widgets/personal_app_bar.dart';
 import '../../../core/utils/premium_checker.dart';
 
 class StatusScreen extends StatefulWidget {
@@ -13,7 +14,7 @@ class _StatusScreenState extends State<StatusScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(
+      appBar: PersonalAppBar(
         title: const Text('App Status'),
         elevation: 0,
         backgroundColor: theme.colorScheme.surface,

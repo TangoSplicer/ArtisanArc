@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:artisanarc/core/widgets/personal_app_bar.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:artisanarc/features/shopping/data/shopping_list_model.dart';
@@ -42,7 +43,7 @@ class _ShoppingListOverviewScreenState extends State<ShoppingListOverviewScreen>
   }
 
   void _navigateToDetailScreen(String listId) {
-    context.push('/shopping-list/$listId').then((_) => _loadShoppingLists());
+    context.push('/shopping-lists/$listId').then((_) => _loadShoppingLists());
   }
 
   Future<void> _showCreateListDialog() async {
@@ -143,7 +144,7 @@ class _ShoppingListOverviewScreenState extends State<ShoppingListOverviewScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: PersonalAppBar(
         title: const Text('Shopping Lists'),
       ),
       body: _isLoading

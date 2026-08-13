@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:artisanarc/core/widgets/personal_app_bar.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
@@ -9,6 +10,8 @@ import 'package:uuid/uuid.dart';
 import '../data/inventory_model.dart';
 import '../domain/inventory_service.dart';
 import '../../qr/presentation/qr_generator_widget.dart';
+import '../../../core/constants/selection_options.dart';
+import '../../../core/widgets/searchable_selection_field.dart';
 
 class InventoryDetailScreen extends StatefulWidget {
   final String itemId;
@@ -184,13 +187,13 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
 
     if (_item == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Item Not Found')),
+        appBar: PersonalAppBar(title: const Text('Item Not Found')),
         body: const Center(child: Text('Item not found')),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: PersonalAppBar(
         title: Text(_item!.name),
         actions: [
           if (_isEditing) ...[
@@ -325,9 +328,14 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
                 decoration: const InputDecoration(labelText: 'Name'),
               ),
               const SizedBox(height: 16),
-              TextField(
-                controller: _categoryController,
-                decoration: const InputDecoration(labelText: 'Category'),
+              SearchableSelectionField<String>(
+                options: SelectionOptions.inventoryCategories,
+                value: _categoryController.text.isEmpty ? null : _categoryController.text,
+                labelText: 'Category',
+                hintText: 'Search craft-material categories',
+                itemLabel: (category) => category,
+                onChanged: (category) => setState(() => _categoryController.text = category ?? ''),
+                customValueBuilder: (query) => query,
               ),
               const SizedBox(height: 16),
               TextField(
@@ -342,9 +350,15 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
               ),
               const SizedBox(height: 16),
-              TextField(
-                controller: _locationController,
-                decoration: const InputDecoration(labelText: 'Storage Location'),
+              SearchableSelectionField<String>(
+                options: SelectionOptions.storageLocations,
+                value: _locationController.text.isEmpty ? null : _locationController.text,
+                labelText: 'Storage location',
+                hintText: 'Search a room, box, drawer, or shelf',
+                itemLabel: (location) => location,
+                onChanged: (location) => setState(() => _locationController.text = location ?? ''),
+                customValueBuilder: (query) => query,
+                allowClear: true,
               ),
             ] else ...[
               _buildDetailRow('Name', _item!.name),

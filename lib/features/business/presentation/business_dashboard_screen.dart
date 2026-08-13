@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:artisanarc/core/widgets/personal_app_bar.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart'; // Added go_router
 import '../domain/business_service.dart';
@@ -36,7 +37,7 @@ class _BusinessDashboardScreenState extends State<BusinessDashboardScreen> {
     final totalRevenue = _service.calculateTotalRevenue(_sales);
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: PersonalAppBar(
         title: const Text('Business Tools'),
         backgroundColor: color.primary,
         foregroundColor: color.onPrimary,

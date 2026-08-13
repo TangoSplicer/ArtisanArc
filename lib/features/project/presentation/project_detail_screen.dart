@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:artisanarc/core/widgets/personal_app_bar.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -113,7 +114,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
 
     if (_project == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Project Not Found')),
+        appBar: PersonalAppBar(title: const Text('Project Not Found')),
         body: const Center(child: Text('Project not found')),
       );
     }
@@ -121,7 +122,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
     final theme = Theme.of(context);
     
     return Scaffold(
-      appBar: AppBar(
+      appBar: PersonalAppBar(
         title: Text(_project!.name),
         backgroundColor: theme.colorScheme.primary,
         foregroundColor: theme.colorScheme.onPrimary,

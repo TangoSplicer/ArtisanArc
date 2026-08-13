@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:artisanarc/core/widgets/personal_app_bar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:get_it/get_it.dart';
 import 'package:printing/printing.dart';
@@ -17,7 +18,7 @@ class ExportScreen extends StatelessWidget {
     final color = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: PersonalAppBar(
         title: const Text('Reports & Export'),
         backgroundColor: color.primary,
         foregroundColor: color.onPrimary,

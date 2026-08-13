@@ -1,5 +1,6 @@
 import 'dart:io'; // For File
 import 'package:flutter/material.dart';
+import 'package:artisanarc/core/widgets/personal_app_bar.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart'; // Added go_router
 import 'package:path_provider/path_provider.dart'; // For getApplicationDocumentsDirectory
@@ -48,7 +49,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
     final color = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: PersonalAppBar(
         title: const Text('Inventory'),
         backgroundColor: color.primary,
         foregroundColor: color.onPrimary,

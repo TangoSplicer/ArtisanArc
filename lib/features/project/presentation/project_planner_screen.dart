@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:artisanarc/core/widgets/personal_app_bar.dart';
 import 'package:get_it/get_it.dart';
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart'; // For date formatting
@@ -11,6 +12,9 @@ import 'package:artisanarc/features/project/domain/usecases/get_project_by_id.da
 import 'package:artisanarc/features/project/domain/usecases/update_project.dart';
 import 'package:artisanarc/features/project/data/project_model.dart'; // Use data model instead
 import 'package:artisanarc/features/project/domain/entities/supply_need.dart'; // Import SupplyNeed
+import 'package:artisanarc/features/inventory/domain/inventory_service.dart';
+import 'package:artisanarc/core/constants/selection_options.dart';
+import 'package:artisanarc/core/widgets/searchable_selection_field.dart';
 
 
 class ProjectPlannerScreen extends StatefulWidget {
@@ -27,6 +31,7 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
   late final CreateProject _createProjectUseCase;
   late final GetProjectById _getProjectByIdUseCase;
   late final UpdateProject _updateProjectUseCase;
+  late final InventoryService _inventoryService;
 
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
@@ -38,6 +43,7 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
 
   List<Milestone> _milestones = [];
   List<SupplyNeed> _supplyNeeds = []; // Added SupplyNeeds list
+  List<String> _inventoryItemNames = [];
 
   bool _isLoading = false;
   bool get _isEditMode => widget.projectId != null;
@@ -52,10 +58,25 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
     _createProjectUseCase = GetIt.I<CreateProject>();
     _getProjectByIdUseCase = GetIt.I<GetProjectById>();
     _updateProjectUseCase = GetIt.I<UpdateProject>();
+    _inventoryService = GetIt.I<InventoryService>();
+    _loadInventoryItemNames();
 
     if (_isEditMode) {
       _loadProjectDetails();
     }
+  }
+
+  Future<void> _loadInventoryItemNames() async {
+    final items = await _inventoryService.fetchItems();
+    if (!mounted) return;
+    setState(() {
+      _inventoryItemNames = items
+          .map((item) => item.name.trim())
+          .where((name) => name.isNotEmpty)
+          .toSet()
+          .toList()
+        ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    });
   }
 
   Future<void> _loadProjectDetails() async {
@@ -253,7 +274,7 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: PersonalAppBar(
         title: Text(_isEditMode ? 'Edit Project' : 'Add New Project'),
         backgroundColor: colorScheme.primary,
         foregroundColor: colorScheme.onPrimary,
@@ -294,26 +315,15 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
                       maxLines: 3,
                     ),
                     const SizedBox(height: 16),
-                     TextFormField(
-                      controller: _craftController,
-                      decoration: const InputDecoration(
-                        labelText: 'Craft Type (e.g., Knitting, Woodwork)',
-                        border: OutlineInputBorder(),
-                        // Suffix icon could also work for AI assistant, but AppBar is cleaner
-                      ),
-                      onChanged: (value) {
-                        // Rebuild actions in AppBar if craft type becomes empty/non-empty
-                        // This is a bit heavy, a dedicated ValueListenableBuilder for the button might be better
-                        // For simplicity, we'll rely on next field interaction or save attempt to update AppBar if needed,
-                        // or accept that the button might not appear/disappear instantly on typing.
-                        // A more reactive way: make _craftController a ValueNotifier or use a Form field's onChanged
-                        // to call setState for just the button's visibility if it were part of the body.
-                        // For AppBar, it's trickier without a full rebuild or a custom AppBar.
-                        // For now, let's ensure it appears if text is present on build/rebuild.
-                        if((value.isNotEmpty && !_isCraftTypeNotEmptyForAI()) || (value.isEmpty && _isCraftTypeNotEmptyForAI())) {
-                           setState(() {}); // Trigger rebuild to show/hide AI button
-                        }
-                      },
+                     SearchableSelectionField<String>(
+                      options: SelectionOptions.craftTypes,
+                      value: _craftController.text.isEmpty ? null : _craftController.text,
+                      labelText: 'Craft type',
+                      hintText: 'Search a craft or add your own',
+                      itemLabel: (craft) => craft,
+                      onChanged: (craft) => setState(() => _craftController.text = craft ?? ''),
+                      customValueBuilder: (query) => query,
+                      allowClear: true,
                     ),
                     const SizedBox(height: 16),
                     Row(
@@ -494,27 +504,46 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
 
   void _addOrEditSupplyNeed({SupplyNeed? existingSupplyNeed, int? index}) {
     final isEditingSupply = existingSupplyNeed != null;
-    final itemNameController = TextEditingController(text: existingSupplyNeed?.itemName);
+    String selectedItemName = existingSupplyNeed?.itemName ?? '';
+    String selectedUnit = existingSupplyNeed?.unit ?? '';
     final quantityController = TextEditingController(text: existingSupplyNeed?.quantityNeeded.toString());
-    final unitController = TextEditingController(text: existingSupplyNeed?.unit);
-    // TODO: Consider pre-defined units or a better UX for unit input
 
     showDialog(
       context: context,
       builder: (dialogContext) {
-        return AlertDialog(
+        return StatefulBuilder(
+          builder: (context, setDialogState) => AlertDialog(
           title: Text(isEditingSupply ? 'Edit Supply Need' : 'Add Supply Need'),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextField(controller: itemNameController, decoration: const InputDecoration(labelText: 'Item Name')),
+                SearchableSelectionField<String>(
+                  options: _inventoryItemNames,
+                  value: selectedItemName.isEmpty ? null : selectedItemName,
+                  labelText: 'Supply item',
+                  hintText: 'Search inventory or add a new supply',
+                  emptyMessage: 'No matching inventory items',
+                  itemLabel: (item) => item,
+                  onChanged: (item) => setDialogState(() => selectedItemName = item ?? ''),
+                  customValueBuilder: (query) => query,
+                ),
+                const SizedBox(height: 12),
                 TextField(
                   controller: quantityController,
-                  decoration: const InputDecoration(labelText: 'Quantity Needed'),
+                  decoration: const InputDecoration(labelText: 'Quantity needed'),
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 ),
-                TextField(controller: unitController, decoration: const InputDecoration(labelText: 'Unit (e.g., meters, pcs)')),
+                const SizedBox(height: 12),
+                SearchableSelectionField<String>(
+                  options: SelectionOptions.supplyUnits,
+                  value: selectedUnit.isEmpty ? null : selectedUnit,
+                  labelText: 'Unit',
+                  hintText: 'Search unit or add your own',
+                  itemLabel: (unit) => unit,
+                  onChanged: (unit) => setDialogState(() => selectedUnit = unit ?? ''),
+                  customValueBuilder: (query) => query,
+                ),
               ],
             ),
           ),
@@ -522,9 +551,9 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
             TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')),
             TextButton(
               onPressed: () {
-                final itemName = itemNameController.text;
+                final itemName = selectedItemName.trim();
                 final quantity = double.tryParse(quantityController.text);
-                final unit = unitController.text;
+                final unit = selectedUnit.trim();
 
                 if (itemName.isNotEmpty && quantity != null && quantity > 0 && unit.isNotEmpty) {
                   final newSupplyNeed = SupplyNeed(
@@ -552,6 +581,7 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
               child: Text(isEditingSupply ? 'Save' : 'Add'),
             ),
           ],
+          ),
         );
       },
     );

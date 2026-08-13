@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:artisanarc/core/widgets/personal_app_bar.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart'; // Added url_launcher
 
 import '../../../core/services/theme_service.dart';
+import '../../../core/widgets/searchable_selection_field.dart';
 import '../../../core/services/backup_service.dart';
 import '../../../core/services/analytics_service.dart';
 import '../../../core/utils/storage_keys.dart';
@@ -68,7 +70,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final currentThemeMode = Provider.of<ThemeService>(context).currentThemeMode;
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: PersonalAppBar(
         title: const Text('Settings'),
         backgroundColor: color.primary,
         foregroundColor: color.onPrimary,
@@ -94,19 +96,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   children: [
                     const Text('Language & Region', style: TextStyle(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 10),
-                    DropdownButton<String>(
+                    SearchableSelectionField<String>(
+                      options: const ['en_GB', 'en_US'],
                       value: _selectedLocale,
-                      isExpanded: true,
+                      labelText: 'Language and region',
+                      hintText: 'Search language or region',
+                      itemLabel: (locale) => locale == 'en_GB' ? 'English (UK)' : 'English (US)',
+                      itemSubtitle: (locale) => locale == 'en_GB' ? 'Pound sterling and UK date formats' : 'US date formats',
+                      searchTerms: (locale) => [locale, 'English', locale == 'en_GB' ? 'United Kingdom Britain UK' : 'United States America US'],
                       onChanged: (value) {
                         if (value != null) {
                           setState(() => _selectedLocale = value);
                           _service.changeLocale(value);
                         }
                       },
-                      items: const [
-                        DropdownMenuItem(value: 'en_GB', child: Text('English (UK)')),
-                        DropdownMenuItem(value: 'en_US', child: Text('English (US)')),
-                      ],
                     ),
                   ],
                 ),
