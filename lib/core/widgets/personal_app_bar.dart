@@ -27,17 +27,25 @@ class PersonalAppBar extends StatelessWidget implements PreferredSizeWidget {
   });
 
   void _goBackOrHome(BuildContext context) {
-    if (context.canPop()) {
-      context.pop();
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
     } else {
       context.go('/home');
     }
   }
 
+  bool _isHomeRoute(BuildContext context) {
+    try {
+      return GoRouterState.of(context).matchedLocation == '/home';
+    } on GoError {
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final isHome = GoRouterState.of(context).matchedLocation == '/home';
-    final canPop = context.canPop();
+    final isHome = _isHomeRoute(context);
+    final canPop = Navigator.of(context).canPop();
     final mergedActions = <Widget>[
       ...?actions,
       if (showHomeAction && !isHome && canPop)
