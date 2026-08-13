@@ -16,7 +16,7 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ArtisanArc Home'),
+        title: const Text('ArtisanArc Personal'),
         backgroundColor: color.primary,
         foregroundColor: color.onPrimary,
       ),

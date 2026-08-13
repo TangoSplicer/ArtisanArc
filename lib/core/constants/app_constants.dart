@@ -1,5 +1,5 @@
 class AppConstants {
-  static const String appName = 'ArtisanArc';
+  static const String appName = 'ArtisanArc Personal';
   static const String appVersion = '1.1.0';
   static const String appDescription = 'Elegant craft supply organiser and personal toolkit';
   static const double defaultVATRate = 0.20;
@@ -20,7 +20,7 @@ class AppConstants {
   static const String currencyCode = 'GBP';
   static const String supportEmail = 'personal@artisanarc.app';
   static const String feedbackEmail = 'personal@artisanarc.app';
-  static const String websiteUrl = 'https://artisanarc.app';
+  static const String websiteUrl = 'https://github.com/TangoSplicer/ArtisanArc';
   static const List<String> allFeatures = [
     'Unlimited inventory items',
     'Unlimited projects',

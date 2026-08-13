@@ -55,7 +55,7 @@ class ArtisanArcApp extends StatelessWidget {
       child: Consumer<ThemeService>(
         builder: (context, themeService, child) {
           return MaterialApp.router(
-            title: 'ArtisanArc',
+            title: 'ArtisanArc Personal',
             debugShowCheckedModeBanner: false,
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,

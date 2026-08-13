@@ -14,7 +14,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   final List<Widget> _pages = const [
     _OnboardingPage(
-      title: 'Welcome to ArtisanArc',
+      title: 'Welcome to ArtisanArc Personal',
       description: 'Your organised space for crafting, planning, and thriving.',
       icon: Icons.auto_awesome,
     ),
