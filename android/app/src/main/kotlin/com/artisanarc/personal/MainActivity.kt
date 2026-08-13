@@ -1,4 +1,4 @@
-package com.example.artisanarc
+package com.artisanarc.personal
 
 import io.flutter.embedding.android.FlutterActivity
 
