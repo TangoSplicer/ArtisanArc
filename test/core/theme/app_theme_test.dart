@@ -9,6 +9,8 @@ double _contrastRatio(Color first, Color second) {
 }
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('AppTheme dark mode', () {
     test('uses readable body and heading text on dark surfaces', () {
       final theme = AppTheme.darkTheme;
