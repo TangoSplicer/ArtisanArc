@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   static const ColorScheme _lightScheme = ColorScheme.light(
@@ -57,11 +56,12 @@ class AppTheme {
   static final ThemeData lightTheme = ThemeData(
     colorScheme: _lightScheme,
     scaffoldBackgroundColor: _lightScheme.background,
-    textTheme: GoogleFonts.workSansTextTheme().apply(
+    textTheme: ThemeData.light().textTheme.apply(
       bodyColor: _lightScheme.onSurface,
       displayColor: _lightScheme.onSurface,
     ).copyWith(
-      headlineMedium: GoogleFonts.playfairDisplay(
+      headlineMedium: const TextStyle(
+        fontFamily: 'serif',
         fontSize: 22,
         fontWeight: FontWeight.bold,
         color: _lightScheme.onSurface,
@@ -88,11 +88,12 @@ class AppTheme {
   static final ThemeData darkTheme = ThemeData(
     colorScheme: _darkScheme,
     scaffoldBackgroundColor: _darkScheme.background,
-    textTheme: GoogleFonts.workSansTextTheme(ThemeData.dark().textTheme).apply(
+    textTheme: ThemeData.dark().textTheme.apply(
       bodyColor: _darkScheme.onSurface,
       displayColor: _darkScheme.onSurface,
     ).copyWith(
-      headlineMedium: GoogleFonts.playfairDisplay(
+      headlineMedium: const TextStyle(
+        fontFamily: 'serif',
         fontSize: 22,
         fontWeight: FontWeight.bold,
         color: _darkScheme.onSurface,
@@ -104,7 +105,7 @@ class AppTheme {
       surfaceTintColor: Colors.transparent,
       elevation: 0,
       iconTheme: IconThemeData(color: _darkScheme.onSurface),
-      titleTextStyle: GoogleFonts.workSans(
+      titleTextStyle: const TextStyle(
         color: _darkScheme.onSurface,
         fontSize: 22,
         fontWeight: FontWeight.w600,
@@ -142,12 +143,12 @@ class AppTheme {
     dialogTheme: DialogTheme(
       backgroundColor: const Color(0xFF211F27),
       surfaceTintColor: Colors.transparent,
-      titleTextStyle: GoogleFonts.workSans(
+      titleTextStyle: const TextStyle(
         color: _darkScheme.onSurface,
         fontSize: 20,
         fontWeight: FontWeight.w600,
       ),
-      contentTextStyle: GoogleFonts.workSans(
+      contentTextStyle: const TextStyle(
         color: _darkScheme.onSurface,
         fontSize: 14,
       ),
