@@ -1,4 +1,5 @@
 import 'package:csv/csv.dart';
+import 'package:pdf/pdf.dart' show PdfColors;
 import 'package:pdf/widgets.dart' as pw;
 import 'package:artisanarc/features/business/data/sale_model.dart';
 import 'package:artisanarc/features/inventory/data/inventory_model.dart';
@@ -80,7 +81,7 @@ class ExportHelper {
             ...projects.map((project) => pw.Container(
                   margin: const pw.EdgeInsets.only(bottom: 12),
                   padding: const pw.EdgeInsets.all(10),
-                  decoration: pw.BoxDecoration(border: pw.Border.all(color: pw.PdfColors.grey)),
+                  decoration: pw.BoxDecoration(border: pw.Border.all(color: PdfColors.grey)),
                   child: pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
