@@ -4,6 +4,7 @@ import '../../features/business/data/sale_model.dart';
 import '../../features/business/data/stall_session_model.dart';
 import '../../features/compliance/data/compliance_model.dart';
 import '../../features/project/data/project_model.dart';
+import '../../features/project/data/production_run_model.dart';
 import '../../features/project/domain/entities/supply_need.dart';
 import '../../features/shopping/data/shopping_list_model.dart';
 
@@ -13,6 +14,7 @@ void registerHiveAdapters() {
   _registerAdapterIfNotRegistered(StallSessionAdapter());
   _registerAdapterIfNotRegistered(ComplianceEntryAdapter());
   _registerAdapterIfNotRegistered(ProjectAdapter());
+  _registerAdapterIfNotRegistered(ProductionRunAdapter());
   _registerAdapterIfNotRegistered(MilestoneAdapter());
   _registerAdapterIfNotRegistered(SupplyNeedAdapter());
   _registerAdapterIfNotRegistered(ShoppingListAdapter());

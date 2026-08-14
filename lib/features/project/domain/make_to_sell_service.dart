@@ -4,6 +4,8 @@ import '../../inventory/data/inventory_model.dart';
 import '../../inventory/data/inventory_repository.dart';
 import '../data/project_model.dart';
 import '../data/project_repository.dart';
+import '../data/production_run_model.dart';
+import '../data/production_run_repository.dart';
 import 'entities/supply_need.dart';
 
 /// A material requirement resolved against the current local material stock.
@@ -69,21 +71,28 @@ class CompletedMakeResult {
     required this.finishedItem,
     required this.updatedProject,
     required this.materialsConsumed,
+    required this.productionRun,
   });
 
   final InventoryItem finishedItem;
   final Project updatedProject;
   final List<InventoryItem> materialsConsumed;
+  final ProductionRun productionRun;
 }
 
 /// Coordinates a project completion using the existing offline Hive
 /// repositories. A make is only completed when every linked consumable has
 /// enough available stock; reusable tools remain linked but are not deducted.
 class MakeToSellService {
-  MakeToSellService(this._inventoryRepository, this._projectRepository);
+  MakeToSellService(
+    this._inventoryRepository,
+    this._projectRepository,
+    this._productionRunRepository,
+  );
 
   final InventoryRepository _inventoryRepository;
   final ProjectRepository _projectRepository;
+  final ProductionRunRepository _productionRunRepository;
   final Uuid _uuid = const Uuid();
 
   Future<MakeToSellPreview> preview(Project project,
@@ -139,6 +148,7 @@ class MakeToSellService {
 
     final now = DateTime.now();
     final updatedMaterials = <InventoryItem>[];
+    var materialCost = 0.0;
     for (final status in stockPreview.materials
         .where((status) => status.supplyNeed.isConsumable)) {
       final material = status.inventoryItem!;
@@ -148,6 +158,9 @@ class MakeToSellService {
       );
       await _inventoryRepository.updateItem(updated);
       updatedMaterials.add(updated);
+      final costEach =
+          status.supplyNeed.estimatedCostEach ?? material.price ?? 0;
+      materialCost += costEach * status.quantityToConsume;
     }
 
     final outputName = (finishedItemName ?? '').trim().isEmpty
@@ -181,10 +194,23 @@ class MakeToSellService {
     );
     await _projectRepository.saveProject(updatedProject);
 
+    final productionRun = ProductionRun(
+      id: _uuid.v4(),
+      projectId: project.id,
+      finishedItemId: finishedItem.id,
+      finishedItemName: finishedItem.name,
+      outputQuantity: outputQuantity,
+      materialCost: materialCost,
+      completedAt: now,
+      notes: cleanNotes,
+    );
+    await _productionRunRepository.saveRun(productionRun);
+
     return CompletedMakeResult(
       finishedItem: finishedItem,
       updatedProject: updatedProject,
       materialsConsumed: updatedMaterials,
+      productionRun: productionRun,
     );
   }
 

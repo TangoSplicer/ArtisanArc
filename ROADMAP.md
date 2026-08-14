@@ -28,7 +28,7 @@ The current build already provides searchable craft-focused selection controls, 
 | **1.3 — Safe foundation** | Release reliability and data protection | Updates install cleanly and local maker data is resilient | **Delivered in v1.3.0+8** |
 | **1.4 — Make to sell** | Material-to-finished-item workflow | A project can consume supplies and produce finished inventory | **Delivered in v1.4.0+9; release verification pending** |
 | **1.5 — Better stall days** | Event selling and reconciliation | A maker can run a whole table/stall session offline | **Delivered in v1.5.0+10; release verification pending** |
-| **1.6 — Know the numbers** | Cost, profit and stock insights | Decisions are based on profit and materials, not only revenue | **High** |
+| **1.6 — Know the numbers** | Cost, profit and stock insights | Decisions are based on profit and materials, not only revenue | **Delivered in v1.6.0+11; release verification pending** |
 | **1.7 — Everyday polish** | Fast daily use, accessibility and personalisation | Less tapping, fewer errors and better long-term usability | **Medium** |
 | **Later, only if needed** | Optional expansion | Controlled scope without weakening the Personal Edition | **Deliberate** |
 
@@ -150,6 +150,16 @@ Revenue is useful, but the next reporting layer should help answer whether a mak
 Costing should remain transparent. The user must be able to override a suggested material cost and see where a number came from. Avoid over-complicated tax calculations in the Personal Edition; retain exportable records instead.
 
 ---
+
+## Delivery record — v1.6.0+11
+
+| Delivered capability | Implementation outcome |
+|---|---|
+| Captured production costs | Each completed make saves a local production run with its material cost at the time of completion, preventing later replacement costs from rewriting historical profit. |
+| Honest gross-profit view | Analytics shows revenue, material cost of sales, gross profit and gross margin. Sales without a linked production-cost snapshot remain visible and are clearly flagged as having an unknown material cost. |
+| Item and stock insight | Best-selling created items show net units sold, remaining finished quantity and attributable profit, while recent movement history records completed makes, sales, returns and void restorations. |
+| Event profitability | Closed or historical stall sessions show revenue, captured material cost and direct table/travel costs, then calculate profit after those direct costs. |
+| Data resilience | Production-cost history is included in snapshots, portable backups, restore previews and the Settings clear-data workflow. |
 
 # 1.7 — Everyday polish
 

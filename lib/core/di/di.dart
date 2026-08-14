@@ -11,6 +11,7 @@ import '../../features/business/data/stall_session_repository.dart';
 import '../../features/business/domain/business_service.dart';
 import '../../features/business/domain/daily_sales_service.dart';
 import '../../features/business/domain/stall_session_service.dart';
+import '../../features/business/domain/profit_reporting_service.dart';
 
 // Compliance
 import '../../features/compliance/data/compliance_repository.dart';
@@ -22,6 +23,7 @@ import '../../features/settings/domain/settings_service.dart';
 
 // Project
 import '../../features/project/data/project_repository.dart';
+import '../../features/project/data/production_run_repository.dart';
 import '../../features/project/domain/project_service.dart';
 import '../../features/project/domain/make_to_sell_service.dart';
 
@@ -68,6 +70,13 @@ Future<void> configureDependencies() async {
         getIt<BusinessRepository>(),
         getIt<InventoryRepository>(),
       ));
+  getIt.registerLazySingleton<ProfitReportingService>(
+      () => ProfitReportingService(
+            getIt<BusinessRepository>(),
+            getIt<InventoryRepository>(),
+            getIt<ProductionRunRepository>(),
+            getIt<StallSessionRepository>(),
+          ));
 
   // Compliance Feature
   getIt.registerLazySingleton<ComplianceRepository>(
@@ -83,11 +92,14 @@ Future<void> configureDependencies() async {
 
   // Project Feature
   getIt.registerLazySingleton<ProjectRepository>(() => ProjectRepositoryImpl());
+  getIt.registerLazySingleton<ProductionRunRepository>(
+      () => ProductionRunRepositoryImpl());
   getIt.registerLazySingleton<ProjectService>(
       () => ProjectServiceImpl(getIt<ProjectRepository>()));
   getIt.registerLazySingleton<MakeToSellService>(() => MakeToSellService(
         getIt<InventoryRepository>(),
         getIt<ProjectRepository>(),
+        getIt<ProductionRunRepository>(),
       ));
 
   // Register Project Use Cases

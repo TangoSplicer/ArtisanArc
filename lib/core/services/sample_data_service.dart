@@ -13,6 +13,7 @@ class SampleDataService {
   static const _salesBox = 'salesBox';
   static const _stallSessionsBox = 'stallSessionsBox';
   static const _projectsBox = 'projectsBox';
+  static const _productionRunsBox = 'productionRunsBox';
   static const _shoppingListsBox = 'shoppingListsBox';
   static const _complianceBox = 'complianceBox';
 
@@ -21,11 +22,13 @@ class SampleDataService {
     final sales = await Hive.openBox<SaleRecord>(_salesBox);
     final sessions = await Hive.openBox(_stallSessionsBox);
     final projects = await Hive.openBox<Project>(_projectsBox);
+    final productionRuns = await Hive.openBox(_productionRunsBox);
     final shopping = await Hive.openBox<ShoppingList>(_shoppingListsBox);
     return inventory.isNotEmpty ||
         sales.isNotEmpty ||
         sessions.isNotEmpty ||
         projects.isNotEmpty ||
+        productionRuns.isNotEmpty ||
         shopping.isNotEmpty;
   }
 
@@ -39,6 +42,7 @@ class SampleDataService {
     final sales = await Hive.openBox<SaleRecord>(_salesBox);
     final sessions = await Hive.openBox(_stallSessionsBox);
     final projects = await Hive.openBox<Project>(_projectsBox);
+    final productionRuns = await Hive.openBox(_productionRunsBox);
     final shopping = await Hive.openBox<ShoppingList>(_shoppingListsBox);
 
     if (replaceExisting) {
@@ -47,6 +51,7 @@ class SampleDataService {
         sales.clear(),
         sessions.clear(),
         projects.clear(),
+        productionRuns.clear(),
         shopping.clear()
       ]);
     }
@@ -256,6 +261,7 @@ class SampleDataService {
     final sales = await Hive.openBox<SaleRecord>(_salesBox);
     final sessions = await Hive.openBox(_stallSessionsBox);
     final projects = await Hive.openBox<Project>(_projectsBox);
+    final productionRuns = await Hive.openBox(_productionRunsBox);
     final shopping = await Hive.openBox<ShoppingList>(_shoppingListsBox);
     final compliance = await Hive.openBox(_complianceBox);
     await Future.wait([
@@ -263,6 +269,7 @@ class SampleDataService {
       sales.clear(),
       sessions.clear(),
       projects.clear(),
+      productionRuns.clear(),
       shopping.clear(),
       compliance.clear(),
     ]);

@@ -57,6 +57,7 @@ class BackupService {
     'stallSessionsBox',
     'complianceBox',
     'projectsBox',
+    'productionRunsBox',
     'shoppingListsBox',
   ];
   static const _manifestName = 'artisanarc-backup-manifest.json';

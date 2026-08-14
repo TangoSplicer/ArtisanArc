@@ -2,6 +2,8 @@ import 'package:artisanarc/features/inventory/data/inventory_model.dart';
 import 'package:artisanarc/features/inventory/data/inventory_repository.dart';
 import 'package:artisanarc/features/project/data/project_model.dart';
 import 'package:artisanarc/features/project/data/project_repository.dart';
+import 'package:artisanarc/features/project/data/production_run_model.dart';
+import 'package:artisanarc/features/project/data/production_run_repository.dart';
 import 'package:artisanarc/features/project/domain/entities/supply_need.dart';
 import 'package:artisanarc/features/project/domain/make_to_sell_service.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -26,6 +28,16 @@ class MemoryInventoryRepository implements InventoryRepository {
 
   @override
   Future<void> updateItem(InventoryItem item) async => _items[item.id] = item;
+}
+
+class MemoryProductionRunRepository implements ProductionRunRepository {
+  final Map<String, ProductionRun> _runs = {};
+
+  @override
+  Future<List<ProductionRun>> getRuns() async => _runs.values.toList();
+
+  @override
+  Future<void> saveRun(ProductionRun run) async => _runs[run.id] = run;
 }
 
 class MemoryProjectRepository implements ProjectRepository {
@@ -92,6 +104,7 @@ void main() {
             quantityNeeded: 2.0,
             unit: 'ball',
             inventoryItemId: 'cotton',
+            estimatedCostEach: 2.0,
           ),
           SupplyNeed(
             id: 'hook-need',
@@ -104,7 +117,8 @@ void main() {
         ],
       );
       final projects = MemoryProjectRepository([project]);
-      final service = MakeToSellService(inventory, projects);
+      final productionRuns = MemoryProductionRunRepository();
+      final service = MakeToSellService(inventory, projects, productionRuns);
 
       final result = await service.complete(
         project: project,
@@ -119,6 +133,9 @@ void main() {
       expect(result.finishedItem.quantity, 2);
       expect(result.finishedItem.category, 'Finished Crochet Makes');
       expect(result.finishedItem.price, 18.0);
+      expect(result.productionRun.materialCost, 8.0);
+      expect(
+          (await productionRuns.getRuns()).single.id, result.productionRun.id);
       expect(result.updatedProject.finishedItemIds, [result.finishedItem.id]);
       expect(result.updatedProject.productionNotes.single,
           contains('One extra square'));
@@ -145,7 +162,8 @@ void main() {
         ],
       );
       final projects = MemoryProjectRepository([project]);
-      final service = MakeToSellService(inventory, projects);
+      final productionRuns = MemoryProductionRunRepository();
+      final service = MakeToSellService(inventory, projects, productionRuns);
 
       await expectLater(
         service.complete(project: project, outputQuantity: 1),
@@ -158,6 +176,7 @@ void main() {
           isEmpty);
       expect((await projects.getProjectById(project.id))!.finishedItemIds,
           isEmpty);
+      expect(await productionRuns.getRuns(), isEmpty);
     });
   });
 }
