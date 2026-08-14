@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:artisanarc/core/widgets/personal_app_bar.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import '../domain/usecases/get_project_by_id.dart';
 import '../domain/usecases/update_project.dart';
 import '../data/project_model.dart';
 import '../domain/entities/supply_need.dart';
-import '../../ai/presentation/craft_ai_widget.dart';
+import '../domain/make_to_sell_service.dart';
 import '../../../core/utils/date_helpers.dart';
 
 class ProjectDetailScreen extends StatefulWidget {
@@ -22,8 +21,10 @@ class ProjectDetailScreen extends StatefulWidget {
 class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   final GetProjectById _getProjectUseCase = GetIt.I<GetProjectById>();
   final UpdateProject _updateProjectUseCase = GetIt.I<UpdateProject>();
-  
+  final MakeToSellService _makeToSellService = GetIt.I<MakeToSellService>();
+
   Project? _project;
+  Map<String, MaterialStockStatus> _stockStatusBySupplyId = const {};
   bool _isLoading = true;
 
   @override
@@ -36,7 +37,9 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
     setState(() => _isLoading = true);
     try {
       final project = await _getProjectUseCase(widget.projectId);
+      if (!mounted) return;
       setState(() => _project = project);
+      if (project != null) await _loadMaterialStatuses(project);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -44,7 +47,22 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
         );
       }
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _loadMaterialStatuses(Project project) async {
+    try {
+      final preview = await _makeToSellService.preview(project);
+      if (!mounted) return;
+      setState(() {
+        _stockStatusBySupplyId = {
+          for (final status in preview.materials) status.supplyNeed.id: status,
+        };
+      });
+    } catch (_) {
+      // The project itself remains usable if a material record was removed.
+      if (mounted) setState(() => _stockStatusBySupplyId = const {});
     }
   }
 
@@ -98,6 +116,191 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
     }
   }
 
+  Future<void> _openCompleteMakeDialog() async {
+    final project = _project;
+    if (project == null) return;
+
+    final quantityController = TextEditingController(text: '1');
+    final priceController = TextEditingController();
+    final notesController = TextEditingController();
+    MakeToSellPreview preview = await _makeToSellService.preview(project);
+    if (!mounted) return;
+    bool isWorking = false;
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          Future<void> refreshPreview(String value) async {
+            final quantity = int.tryParse(value) ?? 1;
+            if (quantity < 1) return;
+            final refreshed = await _makeToSellService.preview(
+              project,
+              outputQuantity: quantity,
+            );
+            if (Navigator.of(dialogContext).mounted) {
+              setDialogState(() => preview = refreshed);
+            }
+          }
+
+          return AlertDialog(
+            title: const Text('Complete Make'),
+            content: SizedBox(
+              width: 420,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(project.name,
+                        style: Theme.of(context).textTheme.titleMedium),
+                    const SizedBox(height: 6),
+                    const Text(
+                        'Record a finished-item tally and deduct only linked consumable materials.'),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: quantityController,
+                      decoration: const InputDecoration(
+                        labelText: 'Finished items made',
+                        border: OutlineInputBorder(),
+                      ),
+                      keyboardType: TextInputType.number,
+                      onChanged: refreshPreview,
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: priceController,
+                      decoration: const InputDecoration(
+                        labelText: 'Sale price per item (optional)',
+                        prefixText: '£ ',
+                        border: OutlineInputBorder(),
+                      ),
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
+                    ),
+                    const SizedBox(height: 16),
+                    Text('Material check',
+                        style: Theme.of(context).textTheme.titleSmall),
+                    const SizedBox(height: 6),
+                    if (preview.materials.isEmpty)
+                      const Text(
+                          'No supply requirements are attached to this project.')
+                    else
+                      ...preview.materials.map(
+                        (status) => ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: Icon(
+                            status.hasEnoughStock
+                                ? Icons.check_circle_outline
+                                : Icons.error_outline,
+                            color: status.hasEnoughStock
+                                ? Colors.green
+                                : Theme.of(context).colorScheme.error,
+                          ),
+                          title: Text(status.supplyNeed.itemName),
+                          subtitle: Text(
+                            status.isLinked
+                                ? '${status.availableQuantity} available · ${status.quantityToReserve} reserved'
+                                : status.issue,
+                          ),
+                          trailing: Text(
+                            status.supplyNeed.isConsumable
+                                ? 'Use ${status.quantityToConsume}'
+                                : 'Reusable',
+                          ),
+                        ),
+                      ),
+                    if (!preview.canComplete) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        'Link or replenish the highlighted consumables before completing this make.',
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.error),
+                      ),
+                    ],
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: notesController,
+                      decoration: const InputDecoration(
+                        labelText: 'Partial / waste note (optional)',
+                        hintText: 'For example: one item had a yarn flaw',
+                        border: OutlineInputBorder(),
+                      ),
+                      minLines: 2,
+                      maxLines: 3,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed:
+                    isWorking ? null : () => Navigator.of(dialogContext).pop(),
+                child: const Text('Cancel'),
+              ),
+              FilledButton.icon(
+                onPressed: isWorking || !preview.canComplete
+                    ? null
+                    : () async {
+                        final quantity = int.tryParse(quantityController.text);
+                        if (quantity == null || quantity < 1) {
+                          ScaffoldMessenger.of(dialogContext).showSnackBar(
+                            const SnackBar(
+                                content: Text(
+                                    'Enter a whole number of finished items.')),
+                          );
+                          return;
+                        }
+                        setDialogState(() => isWorking = true);
+                        try {
+                          final result = await _makeToSellService.complete(
+                            project: project,
+                            outputQuantity: quantity,
+                            salePrice: double.tryParse(priceController.text),
+                            notes: notesController.text,
+                          );
+                          if (!Navigator.of(dialogContext).mounted) return;
+                          Navigator.of(dialogContext).pop();
+                          if (!mounted) return;
+                          setState(() => _project = result.updatedProject);
+                          await _loadMaterialStatuses(result.updatedProject);
+                          if (!mounted) return;
+                          ScaffoldMessenger.of(this.context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                  '${result.finishedItem.quantity} finished item(s) added to Inventory.'),
+                              action: SnackBarAction(
+                                label: 'View',
+                                onPressed: () => this.context.push(
+                                    '/inventory/detail/${result.finishedItem.id}'),
+                              ),
+                            ),
+                          );
+                        } catch (e) {
+                          if (Navigator.of(dialogContext).mounted) {
+                            setDialogState(() => isWorking = false);
+                            ScaffoldMessenger.of(dialogContext).showSnackBar(
+                              SnackBar(
+                                  content: Text('Could not complete make: $e')),
+                            );
+                          }
+                        }
+                      },
+                icon: const Icon(Icons.check_circle_outline),
+                label: Text(isWorking ? 'Completing…' : 'Complete Make'),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+
+    quantityController.dispose();
+    priceController.dispose();
+    notesController.dispose();
+  }
+
   double get _projectProgress {
     if (_project == null || _project!.milestones.isEmpty) return 0.0;
     final completed = _project!.milestones.where((m) => m.isCompleted).length;
@@ -120,7 +323,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
     }
 
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       appBar: PersonalAppBar(
         title: Text(_project!.name),
@@ -131,13 +334,21 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
             IconButton(
               icon: const Icon(Icons.lightbulb_outline),
               onPressed: () {
-                context.push('/ai-assistant/${Uri.encodeComponent(_project!.craftType!)}');
+                context.push(
+                    '/ai-assistant/${Uri.encodeComponent(_project!.craftType!)}');
               },
             ),
           IconButton(
+            icon: const Icon(Icons.inventory_2_outlined),
+            tooltip: 'Complete Make',
+            onPressed: _openCompleteMakeDialog,
+          ),
+          IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () {
-              context.push('/projects/edit/${_project!.id}').then((_) => _loadProject());
+              context
+                  .push('/projects/edit/${_project!.id}')
+                  .then((_) => _loadProject());
             },
           ),
         ],
@@ -170,13 +381,15 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
           children: [
             Text('Project Overview', style: theme.textTheme.titleLarge),
             const SizedBox(height: 16),
-            if (_project!.description != null && _project!.description!.isNotEmpty) ...[
+            if (_project!.description != null &&
+                _project!.description!.isNotEmpty) ...[
               Text('Description', style: theme.textTheme.titleMedium),
               const SizedBox(height: 4),
               Text(_project!.description!),
               const SizedBox(height: 16),
             ],
-            if (_project!.craftType != null && _project!.craftType!.isNotEmpty) ...[
+            if (_project!.craftType != null &&
+                _project!.craftType!.isNotEmpty) ...[
               Text('Craft Type', style: theme.textTheme.titleMedium),
               const SizedBox(height: 4),
               Chip(
@@ -192,7 +405,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Start Date', style: theme.textTheme.titleMedium),
-                      Text(_project!.startDate != null 
+                      Text(_project!.startDate != null
                           ? DateHelpers.formatForDisplay(_project!.startDate!)
                           : 'Not set'),
                     ],
@@ -203,7 +416,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('End Date', style: theme.textTheme.titleMedium),
-                      Text(_project!.endDate != null 
+                      Text(_project!.endDate != null
                           ? DateHelpers.formatForDisplay(_project!.endDate!)
                           : 'Not set'),
                     ],
@@ -230,7 +443,8 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
             LinearProgressIndicator(
               value: _projectProgress,
               backgroundColor: theme.colorScheme.surfaceVariant,
-              valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+              valueColor:
+                  AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
             ),
             const SizedBox(height: 8),
             Text(
@@ -267,19 +481,23 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                 itemCount: _project!.milestones.length,
                 itemBuilder: (context, index) {
                   final milestone = _project!.milestones[index];
-                  final isOverdue = DateHelpers.isOverdue(milestone.dueDate) && !milestone.isCompleted;
-                  final isDueSoon = DateHelpers.isDueSoon(milestone.dueDate) && !milestone.isCompleted;
-                  
+                  final isOverdue = DateHelpers.isOverdue(milestone.dueDate) &&
+                      !milestone.isCompleted;
+                  final isDueSoon = DateHelpers.isDueSoon(milestone.dueDate) &&
+                      !milestone.isCompleted;
+
                   return ListTile(
                     leading: IconButton(
                       icon: Icon(
-                        milestone.isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
-                        color: milestone.isCompleted 
-                            ? Colors.green 
-                            : isOverdue 
-                                ? Colors.red 
-                                : isDueSoon 
-                                    ? Colors.orange 
+                        milestone.isCompleted
+                            ? Icons.check_circle
+                            : Icons.radio_button_unchecked,
+                        color: milestone.isCompleted
+                            ? Colors.green
+                            : isOverdue
+                                ? Colors.red
+                                : isDueSoon
+                                    ? Colors.orange
                                     : null,
                       ),
                       onPressed: () => _toggleMilestone(index),
@@ -287,7 +505,9 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                     title: Text(
                       milestone.name,
                       style: TextStyle(
-                        decoration: milestone.isCompleted ? TextDecoration.lineThrough : null,
+                        decoration: milestone.isCompleted
+                            ? TextDecoration.lineThrough
+                            : null,
                       ),
                     ),
                     subtitle: Column(
@@ -296,14 +516,20 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                         Text(
                           'Due: ${DateHelpers.formatForDisplay(milestone.dueDate)}',
                           style: TextStyle(
-                            color: isOverdue ? Colors.red : isDueSoon ? Colors.orange : null,
+                            color: isOverdue
+                                ? Colors.red
+                                : isDueSoon
+                                    ? Colors.orange
+                                    : null,
                           ),
                         ),
-                        if (milestone.description != null && milestone.description!.isNotEmpty)
+                        if (milestone.description != null &&
+                            milestone.description!.isNotEmpty)
                           Text(milestone.description!),
                       ],
                     ),
-                    isThreeLine: milestone.description != null && milestone.description!.isNotEmpty,
+                    isThreeLine: milestone.description != null &&
+                        milestone.description!.isNotEmpty,
                   );
                 },
               ),
@@ -332,11 +558,22 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                 itemCount: _project!.supplyNeeds.length,
                 itemBuilder: (context, index) {
                   final supply = _project!.supplyNeeds[index];
-                  
+                  final status = _stockStatusBySupplyId[supply.id];
+                  final linked = status != null && status.isLinked;
+                  final short = linked && !status.hasEnoughStock;
+                  final availability = status == null
+                      ? 'Not linked to Materials Stock'
+                      : !linked
+                          ? 'Linked material was removed'
+                          : '${status.availableQuantity} available · ${status.quantityToReserve} reserved'
+                              '${short ? ' · Short by ${status.quantityToReserve - status.availableQuantity}' : ''}';
+
                   return ListTile(
                     leading: IconButton(
                       icon: Icon(
-                        supply.isSourced ? Icons.check_box : Icons.check_box_outline_blank,
+                        supply.isSourced
+                            ? Icons.check_box
+                            : Icons.check_box_outline_blank,
                         color: supply.isSourced ? Colors.green : null,
                       ),
                       onPressed: () => _toggleSupplyNeed(index),
@@ -344,15 +581,35 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                     title: Text(
                       supply.itemName,
                       style: TextStyle(
-                        decoration: supply.isSourced ? TextDecoration.lineThrough : null,
+                        decoration: supply.isSourced
+                            ? TextDecoration.lineThrough
+                            : null,
                       ),
                     ),
                     subtitle: Text(
-                      '${supply.quantityNeeded} ${supply.unit}',
+                      '${supply.quantityNeeded} ${supply.unit} · '
+                      '${supply.isConsumable ? 'Consumed on completion' : 'Reusable tool'}\n'
+                      '$availability',
                       style: TextStyle(
-                        decoration: supply.isSourced ? TextDecoration.lineThrough : null,
+                        color: short ? theme.colorScheme.error : null,
+                        decoration: supply.isSourced
+                            ? TextDecoration.lineThrough
+                            : null,
                       ),
                     ),
+                    trailing: Icon(
+                      !linked
+                          ? Icons.link_off_outlined
+                          : short
+                              ? Icons.warning_amber_rounded
+                              : Icons.link_outlined,
+                      color: !linked
+                          ? theme.colorScheme.outline
+                          : short
+                              ? theme.colorScheme.error
+                              : Colors.green,
+                    ),
+                    isThreeLine: true,
                   );
                 },
               ),

@@ -32,6 +32,7 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
   final _quantityController = TextEditingController();
   final _priceController = TextEditingController();
   final _storageLocationController = TextEditingController();
+  final _reorderPointController = TextEditingController();
   List<String> _selectedImagePaths = []; // To store paths of copied images
   final ImagePicker _picker = ImagePicker();
 
@@ -45,6 +46,7 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
     _quantityController.dispose();
     _priceController.dispose();
     _storageLocationController.dispose();
+    _reorderPointController.dispose();
     super.dispose();
   }
 
@@ -56,17 +58,23 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
         category: _categoryController.text,
         quantity: int.parse(_quantityController.text),
         price: double.tryParse(_priceController.text),
-        storageLocation: _storageLocationController.text.isNotEmpty ? _storageLocationController.text : null,
+        storageLocation: _storageLocationController.text.isNotEmpty
+            ? _storageLocationController.text
+            : null,
         imagePaths: _selectedImagePaths, // Pass the stored image paths
         lastUpdated: DateTime.now(),
         itemType: widget.itemType,
+        reorderPoint:
+            _isFinishedItem ? null : int.tryParse(_reorderPointController.text),
       );
 
       try {
         await _inventoryService.createItem(newItem);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${newItem.name} added to ${_isFinishedItem ? 'created items' : 'materials stock'}')),
+            SnackBar(
+                content: Text(
+                    '${newItem.name} added to ${_isFinishedItem ? 'created items' : 'materials stock'}')),
           );
           Navigator.pop(context, true); // Return true to indicate success
         }
@@ -84,7 +92,8 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PersonalAppBar(
-        title: Text(_isFinishedItem ? 'Add Created Item' : 'Add Material Stock'),
+        title:
+            Text(_isFinishedItem ? 'Add Created Item' : 'Add Material Stock'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -95,27 +104,39 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
-                  labelText: _isFinishedItem ? 'Created item name*' : 'Material or tool name*',
+                  labelText: _isFinishedItem
+                      ? 'Created item name*'
+                      : 'Material or tool name*',
                   border: const OutlineInputBorder(),
                 ),
                 validator: Validators.validateItemName,
               ),
               const SizedBox(height: 16),
               SearchableSelectionField<String>(
-                options: _isFinishedItem ? SelectionOptions.finishedItemCategories : SelectionOptions.materialStockCategories,
-                value: _categoryController.text.isEmpty ? null : _categoryController.text,
+                options: _isFinishedItem
+                    ? SelectionOptions.finishedItemCategories
+                    : SelectionOptions.materialStockCategories,
+                value: _categoryController.text.isEmpty
+                    ? null
+                    : _categoryController.text,
                 labelText: 'Category*',
-                hintText: _isFinishedItem ? 'Search finished-make categories' : 'Search yarn, tools, and supply categories',
+                hintText: _isFinishedItem
+                    ? 'Search finished-make categories'
+                    : 'Search yarn, tools, and supply categories',
                 itemLabel: (category) => category,
-                onChanged: (category) => setState(() => _categoryController.text = category ?? ''),
+                onChanged: (category) =>
+                    setState(() => _categoryController.text = category ?? ''),
                 customValueBuilder: (query) => query,
-                validator: (category) => Validators.validateRequired(category, fieldName: 'Category'),
+                validator: (category) => Validators.validateRequired(category,
+                    fieldName: 'Category'),
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _quantityController,
                 decoration: InputDecoration(
-                  labelText: _isFinishedItem ? 'Number created / available*' : 'Amount available to work with*',
+                  labelText: _isFinishedItem
+                      ? 'Number created / available*'
+                      : 'Amount available to work with*',
                   border: const OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
@@ -128,24 +149,46 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
               TextFormField(
                 controller: _priceController,
                 decoration: InputDecoration(
-                  labelText: _isFinishedItem ? 'Sale price each (optional)' : 'Replacement cost (optional)',
+                  labelText: _isFinishedItem
+                      ? 'Sale price each (optional)'
+                      : 'Replacement cost (optional)',
                   border: const OutlineInputBorder(),
                   prefixText: '£ ',
                 ),
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
                 inputFormatters: <TextInputFormatter>[
                   FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
                 ],
                 validator: Validators.validatePrice,
               ),
+              if (!_isFinishedItem) ...[
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _reorderPointController,
+                  decoration: const InputDecoration(
+                    labelText: 'Reorder point (optional)',
+                    helperText:
+                        'Flag this material as low stock at or below this amount.',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly,
+                  ],
+                ),
+              ],
               const SizedBox(height: 16),
               SearchableSelectionField<String>(
                 options: SelectionOptions.storageLocations,
-                value: _storageLocationController.text.isEmpty ? null : _storageLocationController.text,
+                value: _storageLocationController.text.isEmpty
+                    ? null
+                    : _storageLocationController.text,
                 labelText: 'Storage location',
                 hintText: 'Search a room, box, drawer, or shelf',
                 itemLabel: (location) => location,
-                onChanged: (location) => setState(() => _storageLocationController.text = location ?? ''),
+                onChanged: (location) => setState(
+                    () => _storageLocationController.text = location ?? ''),
                 customValueBuilder: (query) => query,
                 allowClear: true,
               ),
@@ -154,7 +197,8 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
               const SizedBox(height: 24),
               ElevatedButton.icon(
                 icon: const Icon(Icons.add),
-                label: Text(_isFinishedItem ? 'Add Created Item' : 'Add Material'),
+                label:
+                    Text(_isFinishedItem ? 'Add Created Item' : 'Add Material'),
                 onPressed: _submitForm,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -191,7 +235,8 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
                   // However, during selection, we only have the filename part here.
                   // For simplicity, just show filename. Thumbnails would need full path reconstruction.
                   return Chip(
-                    label: Text(path.basename(imagePath)), // Display only the filename
+                    label: Text(
+                        path.basename(imagePath)), // Display only the filename
                     onDeleted: () {
                       setState(() {
                         _selectedImagePaths.remove(imagePath);
@@ -212,7 +257,8 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
       if (!hasPermission) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Camera permission is required to add images')),
+            const SnackBar(
+                content: Text('Camera permission is required to add images')),
           );
         }
         return;
@@ -224,7 +270,8 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
 
       if (pickedFiles.isNotEmpty) {
         final appDocDir = await getApplicationDocumentsDirectory();
-        final imagesDir = Directory(path.join(appDocDir.path, 'inventory_images'));
+        final imagesDir =
+            Directory(path.join(appDocDir.path, 'inventory_images'));
 
         if (!await imagesDir.exists()) {
           await imagesDir.create(recursive: true);
@@ -232,7 +279,8 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
 
         List<String> newImagePaths = [];
         for (XFile pickedFile in pickedFiles) {
-          final fileName = '${_uuid.v4()}${path.extension(pickedFile.path)}'; // Create a unique filename
+          final fileName =
+              '${_uuid.v4()}${path.extension(pickedFile.path)}'; // Create a unique filename
           final localImagePath = path.join(imagesDir.path, fileName);
 
           final File imageFile = File(pickedFile.path);
@@ -246,7 +294,7 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
         });
       }
     } catch (e) {
-      if(mounted) {
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error picking images: $e')),
         );

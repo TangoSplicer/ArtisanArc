@@ -25,6 +25,8 @@ class ProjectAdapter extends TypeAdapter<Project> {
       endDate: fields[5] as DateTime?,
       milestones: (fields[6] as List?)?.cast<Milestone>(),
       supplyNeeds: (fields[9] as List?)?.cast<SupplyNeed>(),
+      finishedItemIds: (fields[10] as List?)?.cast<String>(),
+      productionNotes: (fields[11] as List?)?.cast<String>(),
       createdAt: fields[7] as DateTime,
       lastUpdatedAt: fields[8] as DateTime?,
     );
@@ -33,7 +35,7 @@ class ProjectAdapter extends TypeAdapter<Project> {
   @override
   void write(BinaryWriter writer, Project obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -53,8 +55,15 @@ class ProjectAdapter extends TypeAdapter<Project> {
       ..writeByte(8)
       ..write(obj.lastUpdatedAt)
       ..writeByte(9)
-      ..write(obj.supplyNeeds);
+      ..write(obj.supplyNeeds)
+      ..writeByte(10)
+      ..write(obj.finishedItemIds)
+      ..writeByte(11)
+      ..write(obj.productionNotes);
   }
+
+  @override
+  int get hashCode => typeId.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -62,9 +71,6 @@ class ProjectAdapter extends TypeAdapter<Project> {
       other is ProjectAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
-
-  @override
-  int get hashCode => typeId.hashCode;
 }
 
 class MilestoneAdapter extends TypeAdapter<Milestone> {
@@ -103,12 +109,12 @@ class MilestoneAdapter extends TypeAdapter<Milestone> {
   }
 
   @override
+  int get hashCode => typeId.hashCode;
+
+  @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is MilestoneAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
-
-  @override
-  int get hashCode => typeId.hashCode;
 }

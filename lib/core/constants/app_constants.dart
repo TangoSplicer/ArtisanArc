@@ -1,7 +1,8 @@
 class AppConstants {
   static const String appName = 'ArtisanArc Personal';
-  static const String appVersion = '1.3.0';
-  static const String appDescription = 'Elegant craft supply organiser and personal toolkit';
+  static const String appVersion = '1.4.0';
+  static const String appDescription =
+      'Elegant craft supply organiser and personal toolkit';
   static const double defaultVATRate = 0.20;
   static const double ukVATThreshold = 85000.0;
   static const double usVATThreshold = 100000.0;

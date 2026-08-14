@@ -27,7 +27,13 @@ class _LowStockWidgetState extends State<LowStockWidget> {
     setState(() => _isLoading = true);
     try {
       final allItems = await _service.fetchItems();
-      final lowStock = allItems.where((item) => item.isMaterialStock && item.quantity <= widget.threshold).toList();
+      final lowStock = allItems
+          .where(
+            (item) =>
+                item.isMaterialStock &&
+                item.quantity <= (item.reorderPoint ?? widget.threshold),
+          )
+          .toList();
       setState(() => _lowStockItems = lowStock);
     } catch (e) {
       if (mounted) {
@@ -82,8 +88,8 @@ class _LowStockWidgetState extends State<LowStockWidget> {
                 Text(
                   'Low Materials Stock',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
               ],
             ),
@@ -101,7 +107,9 @@ class _LowStockWidgetState extends State<LowStockWidget> {
                     child: Text(item.quantity.toString()),
                   ),
                   title: Text(item.name),
-                  subtitle: Text(item.category),
+                  subtitle: Text(
+                    '${item.category} · Reorder at ${item.reorderPoint ?? widget.threshold}',
+                  ),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                 );
               },

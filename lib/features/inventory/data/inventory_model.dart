@@ -34,6 +34,11 @@ class InventoryItem extends HiveObject {
   @HiveField(8)
   final String? itemType;
 
+  /// Optional material-specific low-stock threshold. When it is unset, the
+  /// global low-stock threshold remains in effect.
+  @HiveField(9)
+  final int? reorderPoint;
+
   InventoryItem({
     required this.id,
     required this.name,
@@ -44,9 +49,12 @@ class InventoryItem extends HiveObject {
     this.imagePaths, // Added to constructor
     required this.lastUpdated, // Added lastUpdated
     this.itemType,
+    this.reorderPoint,
   });
 
-  bool get isFinishedItem => itemType == 'finished' || (itemType == null && category.startsWith('Finished'));
+  bool get isFinishedItem =>
+      itemType == 'finished' ||
+      (itemType == null && category.startsWith('Finished'));
 
   bool get isMaterialStock => !isFinishedItem;
 
@@ -61,6 +69,8 @@ class InventoryItem extends HiveObject {
     List<String>? imagePaths,
     DateTime? lastUpdated,
     String? itemType,
+    int? reorderPoint,
+    bool clearReorderPoint = false,
   }) {
     return InventoryItem(
       id: id ?? this.id,
@@ -72,6 +82,8 @@ class InventoryItem extends HiveObject {
       imagePaths: imagePaths ?? this.imagePaths,
       lastUpdated: lastUpdated ?? this.lastUpdated,
       itemType: itemType ?? this.itemType,
+      reorderPoint:
+          clearReorderPoint ? null : reorderPoint ?? this.reorderPoint,
     );
   }
 }

@@ -26,16 +26,17 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
   final InventoryService _service = GetIt.I<InventoryService>();
   final ImagePicker _picker = ImagePicker();
   final Uuid _uuid = const Uuid();
-  
+
   InventoryItem? _item;
   bool _isLoading = true;
   bool _isEditing = false;
-  
+
   late TextEditingController _nameController;
   late TextEditingController _categoryController;
   late TextEditingController _quantityController;
   late TextEditingController _priceController;
   late TextEditingController _locationController;
+  late TextEditingController _reorderPointController;
 
   @override
   void initState() {
@@ -65,9 +66,14 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
   void _initializeControllers() {
     _nameController = TextEditingController(text: _item?.name);
     _categoryController = TextEditingController(text: _item?.category);
-    _quantityController = TextEditingController(text: _item?.quantity.toString());
-    _priceController = TextEditingController(text: _item?.price?.toString() ?? '');
-    _locationController = TextEditingController(text: _item?.storageLocation ?? '');
+    _quantityController =
+        TextEditingController(text: _item?.quantity.toString());
+    _priceController =
+        TextEditingController(text: _item?.price?.toString() ?? '');
+    _locationController =
+        TextEditingController(text: _item?.storageLocation ?? '');
+    _reorderPointController =
+        TextEditingController(text: _item?.reorderPoint?.toString() ?? '');
   }
 
   Future<void> _saveChanges() async {
@@ -78,7 +84,10 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
       category: _categoryController.text,
       quantity: int.tryParse(_quantityController.text) ?? _item!.quantity,
       price: double.tryParse(_priceController.text),
-      storageLocation: _locationController.text.isEmpty ? null : _locationController.text,
+      storageLocation:
+          _locationController.text.isEmpty ? null : _locationController.text,
+      reorderPoint: int.tryParse(_reorderPointController.text),
+      clearReorderPoint: _reorderPointController.text.trim().isEmpty,
       lastUpdated: DateTime.now(),
     );
 
@@ -123,7 +132,8 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
         final File imageFile = File(pickedFile.path);
         await imageFile.copy(localImagePath);
 
-        final updatedPaths = List<String>.from(_item!.imagePaths ?? [])..add(fileName);
+        final updatedPaths = List<String>.from(_item!.imagePaths ?? [])
+          ..add(fileName);
         final updatedItem = _item!.copyWith(
           imagePaths: updatedPaths,
           lastUpdated: DateTime.now(),
@@ -251,7 +261,7 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
 
   Widget _buildImageGallery() {
     final images = _item?.imagePaths ?? [];
-    
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -273,7 +283,8 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
                   itemBuilder: (context, index) {
                     return FutureBuilder<String>(
                       future: getApplicationDocumentsDirectory().then(
-                        (dir) => p.join(dir.path, 'inventory_images', images[index]),
+                        (dir) =>
+                            p.join(dir.path, 'inventory_images', images[index]),
                       ),
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
@@ -300,7 +311,8 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
                           margin: const EdgeInsets.only(right: 8),
                           width: 120,
                           color: Colors.grey[300],
-                          child: const Center(child: CircularProgressIndicator()),
+                          child:
+                              const Center(child: CircularProgressIndicator()),
                         );
                       },
                     );
@@ -329,45 +341,88 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
               ),
               const SizedBox(height: 16),
               SearchableSelectionField<String>(
-                options: _item!.isFinishedItem ? SelectionOptions.finishedItemCategories : SelectionOptions.materialStockCategories,
-                value: _categoryController.text.isEmpty ? null : _categoryController.text,
+                options: _item!.isFinishedItem
+                    ? SelectionOptions.finishedItemCategories
+                    : SelectionOptions.materialStockCategories,
+                value: _categoryController.text.isEmpty
+                    ? null
+                    : _categoryController.text,
                 labelText: 'Category',
-                hintText: _item!.isFinishedItem ? 'Search finished-make categories' : 'Search yarn, tools, and supply categories',
+                hintText: _item!.isFinishedItem
+                    ? 'Search finished-make categories'
+                    : 'Search yarn, tools, and supply categories',
                 itemLabel: (category) => category,
-                onChanged: (category) => setState(() => _categoryController.text = category ?? ''),
+                onChanged: (category) =>
+                    setState(() => _categoryController.text = category ?? ''),
                 customValueBuilder: (query) => query,
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: _quantityController,
-                decoration: InputDecoration(labelText: _item!.isFinishedItem ? 'Created / available tally' : 'Amount available to work with'),
+                decoration: InputDecoration(
+                    labelText: _item!.isFinishedItem
+                        ? 'Created / available tally'
+                        : 'Amount available to work with'),
                 keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: _priceController,
-                decoration: InputDecoration(labelText: _item!.isFinishedItem ? 'Sale price each (£)' : 'Replacement cost (£)'),
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                decoration: InputDecoration(
+                    labelText: _item!.isFinishedItem
+                        ? 'Sale price each (£)'
+                        : 'Replacement cost (£)'),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
               ),
+              if (_item!.isMaterialStock) ...[
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _reorderPointController,
+                  decoration: const InputDecoration(
+                    labelText: 'Reorder point (optional)',
+                    helperText:
+                        'Show this material as low stock at or below this amount.',
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+              ],
               const SizedBox(height: 16),
               SearchableSelectionField<String>(
                 options: SelectionOptions.storageLocations,
-                value: _locationController.text.isEmpty ? null : _locationController.text,
+                value: _locationController.text.isEmpty
+                    ? null
+                    : _locationController.text,
                 labelText: 'Storage location',
                 hintText: 'Search a room, box, drawer, or shelf',
                 itemLabel: (location) => location,
-                onChanged: (location) => setState(() => _locationController.text = location ?? ''),
+                onChanged: (location) =>
+                    setState(() => _locationController.text = location ?? ''),
                 customValueBuilder: (query) => query,
                 allowClear: true,
               ),
             ] else ...[
               _buildDetailRow('Name', _item!.name),
-              _buildDetailRow('Type', _item!.isFinishedItem ? 'Created item' : 'Material stock'),
+              _buildDetailRow('Type',
+                  _item!.isFinishedItem ? 'Created item' : 'Material stock'),
               _buildDetailRow('Category', _item!.category),
-              _buildDetailRow(_item!.isFinishedItem ? 'Created / available tally' : 'Amount available', _item!.quantity.toString()),
-              _buildDetailRow(_item!.isFinishedItem ? 'Sale price' : 'Replacement cost', _item!.price != null ? '£${_item!.price!.toStringAsFixed(2)}' : 'Not set'),
-              _buildDetailRow('Storage Location', _item!.storageLocation ?? 'Not set'),
-              _buildDetailRow('Last Updated', _item!.lastUpdated.toString().split(' ')[0]),
+              _buildDetailRow(
+                  _item!.isFinishedItem
+                      ? 'Created / available tally'
+                      : 'Amount available',
+                  _item!.quantity.toString()),
+              _buildDetailRow(
+                  _item!.isFinishedItem ? 'Sale price' : 'Replacement cost',
+                  _item!.price != null
+                      ? '£${_item!.price!.toStringAsFixed(2)}'
+                      : 'Not set'),
+              if (_item!.isMaterialStock)
+                _buildDetailRow('Reorder point',
+                    _item!.reorderPoint?.toString() ?? 'Use global threshold'),
+              _buildDetailRow(
+                  'Storage Location', _item!.storageLocation ?? 'Not set'),
+              _buildDetailRow(
+                  'Last Updated', _item!.lastUpdated.toString().split(' ')[0]),
             ],
           ],
         ),
@@ -386,8 +441,8 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
             child: Text(
               label,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+                    fontWeight: FontWeight.w600,
+                  ),
             ),
           ),
           Expanded(

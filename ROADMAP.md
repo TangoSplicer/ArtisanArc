@@ -25,8 +25,8 @@ The current build already provides searchable craft-focused selection controls, 
 
 | Release iteration | Theme | Outcome | Priority |
 |---|---|---|---|
-| **1.3 — Safe foundation** | Release reliability and data protection | Updates install cleanly and local maker data is resilient | **Critical** |
-| **1.4 — Make to sell** | Material-to-finished-item workflow | A project can consume supplies and produce finished inventory | **Highest user value** |
+| **1.3 — Safe foundation** | Release reliability and data protection | Updates install cleanly and local maker data is resilient | **Delivered in v1.3.0+8** |
+| **1.4 — Make to sell** | Material-to-finished-item workflow | A project can consume supplies and produce finished inventory | **Delivered in v1.4.0+9; release verification pending** |
 | **1.5 — Better stall days** | Event selling and reconciliation | A maker can run a whole table/stall session offline | **High** |
 | **1.6 — Know the numbers** | Cost, profit and stock insights | Decisions are based on profit and materials, not only revenue | **High** |
 | **1.7 — Everyday polish** | Fast daily use, accessibility and personalisation | Less tapping, fewer errors and better long-term usability | **Medium** |
@@ -78,6 +78,17 @@ The separate inventories become most useful when ArtisanArc can describe the tra
 ## Acceptance scenario
 
 A maker can select a crochet project, confirm that it used two balls of yarn, safety eyes and stuffing, create three finished keyrings, and immediately see lower material quantities plus three more saleable created items.
+
+## Delivery record — v1.4.0+9
+
+| Delivered capability | Implementation outcome |
+|---|---|
+| Linked bill of materials | Each project supply can link to a specific Materials Stock record, capture an estimated unit cost, and distinguish a consumable from a reusable tool. |
+| Complete Make | The project detail screen validates live local stock, lets the maker choose the completed quantity and optional sale price/waste note, then creates a saleable finished-item tally. |
+| Safe material deduction | Only linked consumables are reduced; an unlinked or short consumable blocks completion before any records are changed. Linked reusable tools remain visible but are never deducted. |
+| Reservations and shortages | Project supplies show available, reserved and short amounts, with clear linked/unlinked status. |
+| Reorder points | Materials have optional item-specific reorder points, used by the low-stock dashboard in preference to the global threshold. |
+| Local traceability | Completed projects retain generated finished-item IDs and local production notes; detailed stock-movement and profit reporting remain scheduled for **1.6**. |
 
 ---
 

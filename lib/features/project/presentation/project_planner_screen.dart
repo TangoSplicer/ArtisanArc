@@ -3,7 +3,6 @@ import 'package:artisanarc/core/widgets/personal_app_bar.dart';
 import 'package:get_it/get_it.dart';
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart'; // For date formatting
-import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart'; // For navigation
 
 // Assuming these use cases exist and are registered with GetIt
@@ -13,9 +12,9 @@ import 'package:artisanarc/features/project/domain/usecases/update_project.dart'
 import 'package:artisanarc/features/project/data/project_model.dart'; // Use data model instead
 import 'package:artisanarc/features/project/domain/entities/supply_need.dart'; // Import SupplyNeed
 import 'package:artisanarc/features/inventory/domain/inventory_service.dart';
+import 'package:artisanarc/features/inventory/data/inventory_model.dart';
 import 'package:artisanarc/core/constants/selection_options.dart';
 import 'package:artisanarc/core/widgets/searchable_selection_field.dart';
-
 
 class ProjectPlannerScreen extends StatefulWidget {
   final String? projectId; // Nullable for add mode
@@ -36,14 +35,15 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController(); // Added description
-  final _craftController = TextEditingController(); // Will be replaced or improved
+  final _craftController =
+      TextEditingController(); // Will be replaced or improved
 
   DateTime _startDate = DateTime.now();
   DateTime? _endDate; // Nullable
 
   List<Milestone> _milestones = [];
   List<SupplyNeed> _supplyNeeds = []; // Added SupplyNeeds list
-  List<String> _inventoryItemNames = [];
+  List<InventoryItem> _materialItems = [];
 
   bool _isLoading = false;
   bool get _isEditMode => widget.projectId != null;
@@ -59,24 +59,21 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
     _getProjectByIdUseCase = GetIt.I<GetProjectById>();
     _updateProjectUseCase = GetIt.I<UpdateProject>();
     _inventoryService = GetIt.I<InventoryService>();
-    _loadInventoryItemNames();
+    _loadMaterialItems();
 
     if (_isEditMode) {
       _loadProjectDetails();
     }
   }
 
-  Future<void> _loadInventoryItemNames() async {
+  Future<void> _loadMaterialItems() async {
     final items = await _inventoryService.fetchItems();
     if (!mounted) return;
     setState(() {
-      _inventoryItemNames = items
-          .where((item) => item.isMaterialStock)
-          .map((item) => item.name.trim())
-          .where((name) => name.isNotEmpty)
-          .toSet()
+      _materialItems = items
+          .where((item) => item.isMaterialStock && item.name.trim().isNotEmpty)
           .toList()
-        ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+        ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
     });
   }
 
@@ -88,24 +85,31 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
         _editingProject = project;
         _nameController.text = project.name;
         _descriptionController.text = project.description ?? '';
-        _craftController.text = project.craftType ?? ''; // Assuming craftType is a simple string for now
+        _craftController.text = project.craftType ??
+            ''; // Assuming craftType is a simple string for now
         _startDate = project.startDate ?? DateTime.now();
         _endDate = project.endDate;
         // Milestones need to be mutable for completion status, so create new instances
-        _milestones = project.milestones.map((m) => Milestone( // Ensure Milestone class has these fields
-          id: m.id, // Make sure Milestone class has id
-          name: m.name,
-          description: m.description, // Make sure Milestone class has description
-          dueDate: m.dueDate,
-          isCompleted: m.isCompleted,
-        )).toList();
-        _supplyNeeds = List<SupplyNeed>.from(project.supplyNeeds.map((s) => s.copyWith())); // Deep copy
+        _milestones = project.milestones
+            .map((m) => Milestone(
+                  // Ensure Milestone class has these fields
+                  id: m.id, // Make sure Milestone class has id
+                  name: m.name,
+                  description: m
+                      .description, // Make sure Milestone class has description
+                  dueDate: m.dueDate,
+                  isCompleted: m.isCompleted,
+                ))
+            .toList();
+        _supplyNeeds = List<SupplyNeed>.from(
+            project.supplyNeeds.map((s) => s.copyWith())); // Deep copy
       } else {
-         if (mounted) {
+        if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-           const SnackBar(content: Text('Error: Project not found. Creating a new one.')),
+            const SnackBar(
+                content: Text('Error: Project not found. Creating a new one.')),
           );
-         }
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -131,44 +135,57 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
   void _addOrEditMilestone({Milestone? existingMilestone, int? index}) {
     final isEditingMilestone = existingMilestone != null;
     final nameController = TextEditingController(text: existingMilestone?.name);
-    final descriptionController = TextEditingController(text: existingMilestone?.description);
-    DateTime dueDate = existingMilestone?.dueDate ?? DateTime.now().add(const Duration(days: 7));
+    final descriptionController =
+        TextEditingController(text: existingMilestone?.description);
+    DateTime dueDate = existingMilestone?.dueDate ??
+        DateTime.now().add(const Duration(days: 7));
 
     showDialog(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
           title: Text(isEditingMilestone ? 'Edit Milestone' : 'Add Milestone'),
-          content: StatefulBuilder( // Use StatefulBuilder for date picker update
-            builder: (BuildContext context, StateSetter setStateDialog) {
-              return SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(controller: nameController, decoration: const InputDecoration(labelText: 'Milestone Name')),
-                    TextField(controller: descriptionController, decoration: const InputDecoration(labelText: 'Description (Optional)')),
-                    const SizedBox(height: 10),
-                    ListTile(
-                      title: Text('Due Date: ${DateFormat.yMMMd().format(dueDate)}'),
-                      trailing: const Icon(Icons.calendar_today),
-                      onTap: () async {
-                        final picked = await showDatePicker(
-                          context: dialogContext,
-                          initialDate: dueDate,
-                          firstDate: DateTime.now().subtract(const Duration(days: 365)), // Allow past for flexibility
-                          lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
-                        );
-                        if (picked != null && picked != dueDate) {
-                          setStateDialog(() => dueDate = picked);
-                        }
-                      },
-                    ),
-                  ],
-                ),
-              );
-            }),
+          content: StatefulBuilder(// Use StatefulBuilder for date picker update
+              builder: (BuildContext context, StateSetter setStateDialog) {
+            return SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                      controller: nameController,
+                      decoration:
+                          const InputDecoration(labelText: 'Milestone Name')),
+                  TextField(
+                      controller: descriptionController,
+                      decoration: const InputDecoration(
+                          labelText: 'Description (Optional)')),
+                  const SizedBox(height: 10),
+                  ListTile(
+                    title:
+                        Text('Due Date: ${DateFormat.yMMMd().format(dueDate)}'),
+                    trailing: const Icon(Icons.calendar_today),
+                    onTap: () async {
+                      final picked = await showDatePicker(
+                        context: dialogContext,
+                        initialDate: dueDate,
+                        firstDate: DateTime.now().subtract(const Duration(
+                            days: 365)), // Allow past for flexibility
+                        lastDate:
+                            DateTime.now().add(const Duration(days: 365 * 5)),
+                      );
+                      if (picked != null && picked != dueDate) {
+                        setStateDialog(() => dueDate = picked);
+                      }
+                    },
+                  ),
+                ],
+              ),
+            );
+          }),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')),
+            TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: const Text('Cancel')),
             TextButton(
               onPressed: () {
                 if (nameController.text.isNotEmpty) {
@@ -199,7 +216,8 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
 
   void _toggleMilestoneCompletion(int index) {
     setState(() {
-      _milestones[index] = _milestones[index].copyWith(isCompleted: !_milestones[index].isCompleted);
+      _milestones[index] = _milestones[index]
+          .copyWith(isCompleted: !_milestones[index].isCompleted);
     });
   }
 
@@ -212,11 +230,14 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
       id: _isEditMode ? widget.projectId! : _uuid.v4(),
       name: _nameController.text,
       description: _descriptionController.text,
-      craftType: _craftController.text, // This needs better handling (e.g., dropdown, tags)
+      craftType: _craftController
+          .text, // This needs better handling (e.g., dropdown, tags)
       startDate: _startDate,
       endDate: _endDate,
       milestones: _milestones,
       supplyNeeds: _supplyNeeds, // Added supplyNeeds to save
+      finishedItemIds: _isEditMode ? _editingProject!.finishedItemIds : [],
+      productionNotes: _isEditMode ? _editingProject!.productionNotes : [],
       createdAt: _isEditMode ? _editingProject!.createdAt : DateTime.now(),
       lastUpdatedAt: DateTime.now(),
     );
@@ -229,16 +250,17 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
       }
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Project ${projectData.name} saved successfully!')),
+          SnackBar(
+              content: Text('Project ${projectData.name} saved successfully!')),
         );
         Navigator.pop(context, true); // Return true to indicate success
       }
     } catch (e) {
-       if (mounted) {
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error saving project: $e')),
         );
-       }
+      }
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -280,13 +302,15 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
         backgroundColor: colorScheme.primary,
         foregroundColor: colorScheme.onPrimary,
         actions: [
-          if (_craftController.text.isNotEmpty) // Show AI button only if craftType is set
+          if (_craftController
+              .text.isNotEmpty) // Show AI button only if craftType is set
             IconButton(
               icon: const Icon(Icons.lightbulb_outline),
               tooltip: 'Get AI Crafting Hints',
               onPressed: () {
                 // Ensure craftType is URL safe or handle encoding if needed by router
-                context.push('/ai-assistant/${Uri.encodeComponent(_craftController.text)}');
+                context.push(
+                    '/ai-assistant/${Uri.encodeComponent(_craftController.text)}');
               },
             ),
           IconButton(
@@ -296,7 +320,9 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
           ),
         ],
       ),
-      body: _isLoading && _isEditMode && _editingProject == null // Show loader only on initial edit load
+      body: _isLoading &&
+              _isEditMode &&
+              _editingProject == null // Show loader only on initial edit load
           ? const Center(child: CircularProgressIndicator())
           : Padding(
               padding: const EdgeInsets.all(16.0),
@@ -306,23 +332,32 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
                   children: <Widget>[
                     TextFormField(
                       controller: _nameController,
-                      decoration: const InputDecoration(labelText: 'Project Name*', border: OutlineInputBorder()),
-                      validator: (value) => (value == null || value.isEmpty) ? 'Please enter a project name' : null,
+                      decoration: const InputDecoration(
+                          labelText: 'Project Name*',
+                          border: OutlineInputBorder()),
+                      validator: (value) => (value == null || value.isEmpty)
+                          ? 'Please enter a project name'
+                          : null,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _descriptionController,
-                      decoration: const InputDecoration(labelText: 'Description', border: OutlineInputBorder()),
+                      decoration: const InputDecoration(
+                          labelText: 'Description',
+                          border: OutlineInputBorder()),
                       maxLines: 3,
                     ),
                     const SizedBox(height: 16),
-                     SearchableSelectionField<String>(
+                    SearchableSelectionField<String>(
                       options: SelectionOptions.craftTypes,
-                      value: _craftController.text.isEmpty ? null : _craftController.text,
+                      value: _craftController.text.isEmpty
+                          ? null
+                          : _craftController.text,
                       labelText: 'Craft type',
                       hintText: 'Search a craft or add your own',
                       itemLabel: (craft) => craft,
-                      onChanged: (craft) => setState(() => _craftController.text = craft ?? ''),
+                      onChanged: (craft) =>
+                          setState(() => _craftController.text = craft ?? ''),
                       customValueBuilder: (query) => query,
                       allowClear: true,
                     ),
@@ -331,14 +366,16 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
                       children: [
                         Expanded(
                           child: ListTile(
-                            title: Text('Start Date: ${DateFormat.yMMMd().format(_startDate)}'),
+                            title: Text(
+                                'Start Date: ${DateFormat.yMMMd().format(_startDate)}'),
                             trailing: const Icon(Icons.calendar_today),
                             onTap: () => _selectDate(context, true),
                           ),
                         ),
                         Expanded(
                           child: ListTile(
-                            title: Text('End Date: ${_endDate != null ? DateFormat.yMMMd().format(_endDate!) : 'Not set'}'),
+                            title: Text(
+                                'End Date: ${_endDate != null ? DateFormat.yMMMd().format(_endDate!) : 'Not set'}'),
                             trailing: const Icon(Icons.calendar_today),
                             onTap: () => _selectDate(context, false),
                           ),
@@ -348,11 +385,13 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
                     const SizedBox(height: 24),
                     _buildMilestonesSection(context, colorScheme),
                     const SizedBox(height: 24),
-                    _buildSupplyNeedsSection(context, colorScheme), // Added Supply Needs Section
+                    _buildSupplyNeedsSection(
+                        context, colorScheme), // Added Supply Needs Section
                     const SizedBox(height: 32),
                     ElevatedButton.icon(
                       icon: const Icon(Icons.save_alt_outlined),
-                      label: Text(_isEditMode ? 'Update Project' : 'Save Project'),
+                      label:
+                          Text(_isEditMode ? 'Update Project' : 'Save Project'),
                       onPressed: _isLoading ? null : _saveProject,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: colorScheme.primary,
@@ -367,7 +406,8 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
     );
   }
 
-  Widget _buildMilestonesSection(BuildContext context, ColorScheme colorScheme) {
+  Widget _buildMilestonesSection(
+      BuildContext context, ColorScheme colorScheme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -400,34 +440,50 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
                 child: ListTile(
                   leading: IconButton(
                     icon: Icon(
-                      milestone.isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
-                      color: milestone.isCompleted ? colorScheme.secondary : null,
+                      milestone.isCompleted
+                          ? Icons.check_circle
+                          : Icons.radio_button_unchecked,
+                      color:
+                          milestone.isCompleted ? colorScheme.secondary : null,
                     ),
                     onPressed: () => _toggleMilestoneCompletion(index),
                   ),
                   title: Text(
                     milestone.name,
                     style: TextStyle(
-                      decoration: milestone.isCompleted ? TextDecoration.lineThrough : null,
+                      decoration: milestone.isCompleted
+                          ? TextDecoration.lineThrough
+                          : null,
                     ),
                   ),
                   subtitle: Text(
                     'Due: ${DateFormat.yMMMd().format(milestone.dueDate)}\n${milestone.description ?? ''}',
                     style: TextStyle(
-                      decoration: milestone.isCompleted ? TextDecoration.lineThrough : null,
+                      decoration: milestone.isCompleted
+                          ? TextDecoration.lineThrough
+                          : null,
                     ),
                   ),
                   trailing: PopupMenuButton<String>(
                     onSelected: (value) {
                       if (value == 'edit') {
-                        _addOrEditMilestone(existingMilestone: milestone, index: index);
+                        _addOrEditMilestone(
+                            existingMilestone: milestone, index: index);
                       } else if (value == 'delete') {
                         setState(() => _milestones.removeAt(index));
                       }
                     },
-                    itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                      const PopupMenuItem<String>(value: 'edit', child: ListTile(leading: Icon(Icons.edit), title: Text('Edit'))),
-                      const PopupMenuItem<String>(value: 'delete', child: ListTile(leading: Icon(Icons.delete), title: Text('Delete'))),
+                    itemBuilder: (BuildContext context) =>
+                        <PopupMenuEntry<String>>[
+                      const PopupMenuItem<String>(
+                          value: 'edit',
+                          child: ListTile(
+                              leading: Icon(Icons.edit), title: Text('Edit'))),
+                      const PopupMenuItem<String>(
+                          value: 'delete',
+                          child: ListTile(
+                              leading: Icon(Icons.delete),
+                              title: Text('Delete'))),
                     ],
                   ),
                   isThreeLine: (milestone.description ?? '').isNotEmpty,
@@ -439,7 +495,8 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
     );
   }
 
-  Widget _buildSupplyNeedsSection(BuildContext context, ColorScheme colorScheme) {
+  Widget _buildSupplyNeedsSection(
+      BuildContext context, ColorScheme colorScheme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -472,27 +529,47 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
                 child: ListTile(
                   leading: IconButton(
                     icon: Icon(
-                      supply.isSourced ? Icons.check_box : Icons.check_box_outline_blank,
+                      supply.isSourced
+                          ? Icons.check_box
+                          : Icons.check_box_outline_blank,
                       color: supply.isSourced ? colorScheme.secondary : null,
                     ),
                     onPressed: () => _toggleSupplySourced(index),
                   ),
-                  title: Text(supply.itemName, style: TextStyle(decoration: supply.isSourced ? TextDecoration.lineThrough : null)),
+                  title: Text(supply.itemName,
+                      style: TextStyle(
+                          decoration: supply.isSourced
+                              ? TextDecoration.lineThrough
+                              : null)),
                   subtitle: Text(
-                    'Needed: ${supply.quantityNeeded} ${supply.unit}',
-                    style: TextStyle(decoration: supply.isSourced ? TextDecoration.lineThrough : null)
+                    'Needed: ${supply.quantityNeeded} ${supply.unit}'
+                    '${supply.inventoryItemId == null ? ' · Not linked to Materials Stock' : ' · Linked to Materials Stock'}'
+                    '${supply.isConsumable ? ' · Consumed on completion' : ' · Reusable tool'}',
+                    style: TextStyle(
+                        decoration: supply.isSourced
+                            ? TextDecoration.lineThrough
+                            : null),
                   ),
                   trailing: PopupMenuButton<String>(
                     onSelected: (value) {
                       if (value == 'edit') {
-                        _addOrEditSupplyNeed(existingSupplyNeed: supply, index: index);
+                        _addOrEditSupplyNeed(
+                            existingSupplyNeed: supply, index: index);
                       } else if (value == 'delete') {
                         setState(() => _supplyNeeds.removeAt(index));
                       }
                     },
-                    itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                      const PopupMenuItem<String>(value: 'edit', child: ListTile(leading: Icon(Icons.edit), title: Text('Edit'))),
-                      const PopupMenuItem<String>(value: 'delete', child: ListTile(leading: Icon(Icons.delete), title: Text('Delete'))),
+                    itemBuilder: (BuildContext context) =>
+                        <PopupMenuEntry<String>>[
+                      const PopupMenuItem<String>(
+                          value: 'edit',
+                          child: ListTile(
+                              leading: Icon(Icons.edit), title: Text('Edit'))),
+                      const PopupMenuItem<String>(
+                          value: 'delete',
+                          child: ListTile(
+                              leading: Icon(Icons.delete),
+                              title: Text('Delete'))),
                     ],
                   ),
                 ),
@@ -506,91 +583,193 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
   void _addOrEditSupplyNeed({SupplyNeed? existingSupplyNeed, int? index}) {
     final isEditingSupply = existingSupplyNeed != null;
     String selectedItemName = existingSupplyNeed?.itemName ?? '';
+    String? selectedItemId = existingSupplyNeed?.inventoryItemId;
     String selectedUnit = existingSupplyNeed?.unit ?? '';
-    final quantityController = TextEditingController(text: existingSupplyNeed?.quantityNeeded.toString());
+    bool isConsumable = existingSupplyNeed?.isConsumable ?? true;
+    final quantityController = TextEditingController(
+        text: existingSupplyNeed?.quantityNeeded.toString());
+    final estimatedCostController = TextEditingController(
+      text: existingSupplyNeed?.estimatedCostEach?.toString() ?? '',
+    );
 
     showDialog(
       context: context,
       builder: (dialogContext) {
         return StatefulBuilder(
-          builder: (context, setDialogState) => AlertDialog(
-          title: Text(isEditingSupply ? 'Edit Supply Need' : 'Add Supply Need'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SearchableSelectionField<String>(
-                  options: _inventoryItemNames,
-                  value: selectedItemName.isEmpty ? null : selectedItemName,
-                  labelText: 'Supply item',
-                  hintText: 'Search inventory or add a new supply',
-                  emptyMessage: 'No matching inventory items',
-                  itemLabel: (item) => item,
-                  onChanged: (item) => setDialogState(() => selectedItemName = item ?? ''),
-                  customValueBuilder: (query) => query,
+          builder: (context, setDialogState) {
+            InventoryItem? selectedMaterial;
+            for (final item in _materialItems) {
+              if (item.id == selectedItemId) {
+                selectedMaterial = item;
+                break;
+              }
+            }
+            final visibleValue = selectedMaterial ??
+                (selectedItemName.isEmpty
+                    ? null
+                    : InventoryItem(
+                        id: '',
+                        name: selectedItemName,
+                        category: 'Unlinked supply',
+                        quantity: 0,
+                        lastUpdated: DateTime.now(),
+                        itemType: 'material',
+                      ));
+
+            return AlertDialog(
+              title: Text(
+                  isEditingSupply ? 'Edit Supply Need' : 'Add Supply Need'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SearchableSelectionField<InventoryItem>(
+                      options: _materialItems,
+                      value: visibleValue,
+                      labelText: 'Material stock item',
+                      hintText:
+                          'Search Materials Stock or add an unlinked supply',
+                      emptyMessage: 'No matching material stock items',
+                      itemLabel: (item) => item.name,
+                      itemSubtitle: (item) =>
+                          '${item.quantity} available · ${item.category}',
+                      searchTerms: (item) =>
+                          [item.category, item.storageLocation ?? ''],
+                      onChanged: (item) {
+                        setDialogState(() {
+                          selectedItemName = item?.name ?? '';
+                          selectedItemId =
+                              item == null || item.id.isEmpty ? null : item.id;
+                          if (item != null && item.id.isNotEmpty) {
+                            if (item.price != null) {
+                              estimatedCostController.text =
+                                  item.price!.toStringAsFixed(2);
+                            }
+                            if (!isEditingSupply) {
+                              isConsumable = !_isReusableTool(item);
+                            }
+                          }
+                        });
+                      },
+                      customValueBuilder: (query) => InventoryItem(
+                        id: '',
+                        name: query,
+                        category: 'Unlinked supply',
+                        quantity: 0,
+                        lastUpdated: DateTime.now(),
+                        itemType: 'material',
+                      ),
+                      allowClear: true,
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: quantityController,
+                      decoration:
+                          const InputDecoration(labelText: 'Quantity needed'),
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
+                    ),
+                    const SizedBox(height: 12),
+                    SearchableSelectionField<String>(
+                      options: SelectionOptions.supplyUnits,
+                      value: selectedUnit.isEmpty ? null : selectedUnit,
+                      labelText: 'Unit',
+                      hintText: 'Search unit or add your own',
+                      itemLabel: (unit) => unit,
+                      onChanged: (unit) =>
+                          setDialogState(() => selectedUnit = unit ?? ''),
+                      customValueBuilder: (query) => query,
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: estimatedCostController,
+                      decoration: const InputDecoration(
+                        labelText: 'Estimated cost per unit (optional)',
+                        prefixText: '£ ',
+                      ),
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
+                    ),
+                    const SizedBox(height: 8),
+                    SwitchListTile.adaptive(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text('Consume when a make is completed'),
+                      subtitle: Text(
+                        isConsumable
+                            ? 'This material stock will reduce.'
+                            : 'This linked reusable tool will not reduce.',
+                      ),
+                      value: isConsumable,
+                      onChanged: (value) =>
+                          setDialogState(() => isConsumable = value),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: quantityController,
-                  decoration: const InputDecoration(labelText: 'Quantity needed'),
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: const Text('Cancel'),
                 ),
-                const SizedBox(height: 12),
-                SearchableSelectionField<String>(
-                  options: SelectionOptions.supplyUnits,
-                  value: selectedUnit.isEmpty ? null : selectedUnit,
-                  labelText: 'Unit',
-                  hintText: 'Search unit or add your own',
-                  itemLabel: (unit) => unit,
-                  onChanged: (unit) => setDialogState(() => selectedUnit = unit ?? ''),
-                  customValueBuilder: (query) => query,
+                TextButton(
+                  onPressed: () {
+                    final itemName = selectedItemName.trim();
+                    final quantity = double.tryParse(quantityController.text);
+                    final unit = selectedUnit.trim();
+
+                    if (itemName.isNotEmpty &&
+                        quantity != null &&
+                        quantity > 0 &&
+                        unit.isNotEmpty) {
+                      final newSupplyNeed = SupplyNeed(
+                        id: existingSupplyNeed?.id ?? _uuid.v4(),
+                        itemName: itemName,
+                        quantityNeeded: quantity,
+                        unit: unit,
+                        isSourced: existingSupplyNeed?.isSourced ?? false,
+                        inventoryItemId: selectedItemId,
+                        estimatedCostEach:
+                            double.tryParse(estimatedCostController.text),
+                        isConsumable: isConsumable,
+                      );
+                      setState(() {
+                        if (isEditingSupply && index != null) {
+                          _supplyNeeds[index] = newSupplyNeed;
+                        } else {
+                          _supplyNeeds.add(newSupplyNeed);
+                        }
+                      });
+                      Navigator.pop(dialogContext);
+                    } else {
+                      ScaffoldMessenger.of(dialogContext).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                              'Please fill all required fields correctly.'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  },
+                  child: Text(isEditingSupply ? 'Save' : 'Add'),
                 ),
               ],
-            ),
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')),
-            TextButton(
-              onPressed: () {
-                final itemName = selectedItemName.trim();
-                final quantity = double.tryParse(quantityController.text);
-                final unit = selectedUnit.trim();
-
-                if (itemName.isNotEmpty && quantity != null && quantity > 0 && unit.isNotEmpty) {
-                  final newSupplyNeed = SupplyNeed(
-                    id: existingSupplyNeed?.id ?? _uuid.v4(),
-                    itemName: itemName,
-                    quantityNeeded: quantity,
-                    unit: unit,
-                    isSourced: existingSupplyNeed?.isSourced ?? false,
-                  );
-                  setState(() {
-                    if (isEditingSupply && index != null) {
-                      _supplyNeeds[index] = newSupplyNeed;
-                    } else {
-                      _supplyNeeds.add(newSupplyNeed);
-                    }
-                  });
-                  Navigator.pop(dialogContext);
-                } else {
-                  // Optional: Show a small error in the dialog if validation fails
-                  ScaffoldMessenger.of(dialogContext).showSnackBar(
-                    const SnackBar(content: Text('Please fill all fields correctly.'), backgroundColor: Colors.red),
-                  );
-                }
-              },
-              child: Text(isEditingSupply ? 'Save' : 'Add'),
-            ),
-          ],
-          ),
+            );
+          },
         );
       },
     );
   }
 
+  bool _isReusableTool(InventoryItem item) {
+    final text = '${item.name} ${item.category}'.toLowerCase();
+    return ['hook', 'needle', 'tool', 'scissor', 'ruler', 'gauge', 'blocking']
+        .any(text.contains);
+  }
+
   void _toggleSupplySourced(int index) {
     setState(() {
-      _supplyNeeds[index] = _supplyNeeds[index].copyWith(isSourced: !_supplyNeeds[index].isSourced);
+      _supplyNeeds[index] = _supplyNeeds[index]
+          .copyWith(isSourced: !_supplyNeeds[index].isSourced);
     });
   }
 }

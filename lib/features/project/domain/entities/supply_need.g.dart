@@ -22,13 +22,16 @@ class SupplyNeedAdapter extends TypeAdapter<SupplyNeed> {
       quantityNeeded: fields[2] as double,
       unit: fields[3] as String,
       isSourced: fields[4] as bool,
+      inventoryItemId: fields[5] as String?,
+      estimatedCostEach: fields[6] as double?,
+      isConsumable: fields[7] == null ? true : fields[7] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, SupplyNeed obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -38,8 +41,17 @@ class SupplyNeedAdapter extends TypeAdapter<SupplyNeed> {
       ..writeByte(3)
       ..write(obj.unit)
       ..writeByte(4)
-      ..write(obj.isSourced);
+      ..write(obj.isSourced)
+      ..writeByte(5)
+      ..write(obj.inventoryItemId)
+      ..writeByte(6)
+      ..write(obj.estimatedCostEach)
+      ..writeByte(7)
+      ..write(obj.isConsumable);
   }
+
+  @override
+  int get hashCode => typeId.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -47,7 +59,4 @@ class SupplyNeedAdapter extends TypeAdapter<SupplyNeed> {
       other is SupplyNeedAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
-
-  @override
-  int get hashCode => typeId.hashCode;
 }

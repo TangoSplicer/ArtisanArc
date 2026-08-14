@@ -12,7 +12,8 @@ part 'project_model.g.dart';
 @HiveType(typeId: 3) // Was 3 in the file read
 class Project extends HiveObject {
   @HiveField(0)
-  String id; // Assuming it can be final if set by Uuid, but making it non-final for flexibility if Hive needs to set it.
+  String
+      id; // Assuming it can be final if set by Uuid, but making it non-final for flexibility if Hive needs to set it.
 
   @HiveField(1)
   String name;
@@ -41,6 +42,15 @@ class Project extends HiveObject {
   @HiveField(9)
   List<SupplyNeed> supplyNeeds; // Added
 
+  /// Finished inventory tallies created from this project.
+  @HiveField(10)
+  List<String> finishedItemIds;
+
+  /// Local-only notes recorded for each completed make, including partial
+  /// production and any waste note supplied by the maker.
+  @HiveField(11)
+  List<String> productionNotes;
+
   Project({
     required this.id,
     required this.name,
@@ -50,10 +60,14 @@ class Project extends HiveObject {
     this.endDate,
     List<Milestone>? milestones,
     List<SupplyNeed>? supplyNeeds,
+    List<String>? finishedItemIds,
+    List<String>? productionNotes,
     required this.createdAt,
     this.lastUpdatedAt,
   })  : milestones = milestones ?? [],
-        supplyNeeds = supplyNeeds ?? [];
+        supplyNeeds = supplyNeeds ?? [],
+        finishedItemIds = finishedItemIds ?? [],
+        productionNotes = productionNotes ?? [];
 
   Project copyWith({
     String? id,
@@ -64,6 +78,8 @@ class Project extends HiveObject {
     DateTime? endDate,
     List<Milestone>? milestones,
     List<SupplyNeed>? supplyNeeds,
+    List<String>? finishedItemIds,
+    List<String>? productionNotes,
     DateTime? createdAt,
     DateTime? lastUpdatedAt,
   }) {
@@ -74,8 +90,16 @@ class Project extends HiveObject {
       craftType: craftType ?? this.craftType,
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
-      milestones: milestones ?? List<Milestone>.from(this.milestones.map((m) => m.copyWith())), // Deep copy
-      supplyNeeds: supplyNeeds ?? List<SupplyNeed>.from(this.supplyNeeds.map((s) => s.copyWith())), // Deep copy
+      milestones: milestones ??
+          List<Milestone>.from(
+              this.milestones.map((m) => m.copyWith())), // Deep copy
+      supplyNeeds: supplyNeeds ??
+          List<SupplyNeed>.from(
+              this.supplyNeeds.map((s) => s.copyWith())), // Deep copy
+      finishedItemIds:
+          finishedItemIds ?? List<String>.from(this.finishedItemIds),
+      productionNotes:
+          productionNotes ?? List<String>.from(this.productionNotes),
       createdAt: createdAt ?? this.createdAt,
       lastUpdatedAt: lastUpdatedAt ?? this.lastUpdatedAt,
     );
@@ -83,7 +107,8 @@ class Project extends HiveObject {
 }
 
 @HiveType(typeId: 5) // Changed from 2 to 5 to resolve collision
-class Milestone extends HiveObject { // Extended HiveObject
+class Milestone extends HiveObject {
+  // Extended HiveObject
   @HiveField(0)
   String id; // Added ID
 

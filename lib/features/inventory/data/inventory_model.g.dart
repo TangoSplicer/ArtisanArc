@@ -26,13 +26,14 @@ class InventoryItemAdapter extends TypeAdapter<InventoryItem> {
       imagePaths: (fields[6] as List?)?.cast<String>(),
       lastUpdated: fields[7] as DateTime,
       itemType: fields[8] as String?,
+      reorderPoint: fields[9] as int?,
     );
   }
 
   @override
   void write(BinaryWriter writer, InventoryItem obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(10)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -50,8 +51,13 @@ class InventoryItemAdapter extends TypeAdapter<InventoryItem> {
       ..writeByte(7)
       ..write(obj.lastUpdated)
       ..writeByte(8)
-      ..write(obj.itemType);
+      ..write(obj.itemType)
+      ..writeByte(9)
+      ..write(obj.reorderPoint);
   }
+
+  @override
+  int get hashCode => typeId.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -59,7 +65,4 @@ class InventoryItemAdapter extends TypeAdapter<InventoryItem> {
       other is InventoryItemAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
-
-  @override
-  int get hashCode => typeId.hashCode;
 }
