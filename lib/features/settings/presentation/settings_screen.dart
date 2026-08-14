@@ -29,11 +29,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _isVATRegistered = false;
   bool _resetOnboarding = false;
   ThemeMode _themeMode = ThemeMode.system;
+  AutomaticSnapshotInfo? _latestSnapshot;
 
   @override
   void initState() {
     super.initState();
     _loadSettings();
+    _loadLatestSnapshot();
+  }
+
+  Future<void> _loadLatestSnapshot() async {
+    final snapshot = await BackupService.latestAutomaticSnapshot();
+    if (mounted) setState(() => _latestSnapshot = snapshot);
   }
 
   Future<void> _loadSettings() async {
@@ -161,22 +168,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            Card( // Added Backup & Restore Card
+            Card(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               elevation: 5,
               child: Column(
                 children: [
                   ListTile(
-                    leading: const Icon(Icons.backup),
-                    title: const Text('Backup Data'),
-                    subtitle: const Text('Export all your data to a file'),
+                    leading: const Icon(Icons.shield_outlined),
+                    title: const Text('Automatic Safety Snapshots'),
+                    subtitle: Text(
+                      _latestSnapshot == null
+                          ? 'A rotating local snapshot is created after craft data is available.'
+                          : 'Latest: ${_latestSnapshot!.description}. The five newest snapshots are retained on this device.',
+                    ),
+                    trailing: IconButton(
+                      tooltip: 'Create safety snapshot now',
+                      icon: const Icon(Icons.add_circle_outline),
+                      onPressed: _createSafetySnapshot,
+                    ),
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.ios_share_outlined),
+                    title: const Text('Export Portable Backup'),
+                    subtitle: const Text('Create a shareable protected copy of your craft data.'),
                     onTap: _exportBackup,
                   ),
                   const Divider(height: 1),
                   ListTile(
                     leading: const Icon(Icons.restore),
-                    title: const Text('Restore Data'),
-                    subtitle: const Text('Import data from a backup file'),
+                    title: const Text('Restore Portable Backup'),
+                    subtitle: const Text('Preview the backup before replacing local craft data.'),
                     onTap: _importBackup,
                   ),
                 ],
@@ -297,6 +319,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  Future<void> _createSafetySnapshot() async {
+    try {
+      final snapshot = await BackupService.createAutomaticSnapshot(reason: 'created from Settings');
+      if (!mounted) return;
+      setState(() => _latestSnapshot = snapshot);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(snapshot == null ? 'There is no craft data to snapshot yet.' : 'Safety snapshot created.')),
+      );
+    } catch (error) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not create a safety snapshot: $error')));
+    }
+  }
+
   Future<void> _exportBackup() async {
     try {
       await BackupService.exportBackup();
@@ -315,42 +350,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _importBackup() async {
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Import Backup'),
-        content: const Text('This will replace all current data. Are you sure?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Import'),
-          ),
-        ],
-      ),
-    );
+    try {
+      final preview = await BackupService.pickBackupForRestore();
+      if (preview == null || !mounted) return;
 
-    if (confirm == true) {
-      try {
-        final success = await BackupService.importBackup();
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(success ? 'Backup imported successfully!' : 'Import cancelled'),
-            ),
-          );
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error importing backup: $e')),
-          );
-        }
+      final confirm = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Restore Portable Backup'),
+          content: Text(
+            'Backup created: ${preview.createdAt.toLocal()}\n\nIncludes: ${preview.includedBoxes.join(', ')}\n\nYour current data will first be protected in a new automatic safety snapshot. Restoring requires you to close and reopen ArtisanArc afterwards.',
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+            FilledButton.tonal(onPressed: () => Navigator.pop(context, true), child: const Text('Restore & Restart')),
+          ],
+        ),
+      );
+
+      if (confirm != true) return;
+      await BackupService.restorePortableBackup(preview);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Backup restored. Close and reopen ArtisanArc to load the restored data.')),
+        );
       }
+    } catch (error) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not restore backup: $error')));
     }
   }
 

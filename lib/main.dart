@@ -10,6 +10,7 @@ import 'core/utils/storage_keys.dart';
 import 'core/theme/app_theme.dart';
 import 'core/services/theme_service.dart';
 import 'core/services/notification_service.dart';
+import 'core/services/backup_service.dart';
 import 'presentation/routes/app_router.dart';
 import 'presentation/screens/splash_screen.dart';
 import 'presentation/onboarding/onboarding_screen.dart';
@@ -20,6 +21,13 @@ void main() async {
   // Initialize Hive
   await Hive.initFlutter();
   registerHiveAdapters();
+
+  // Keep a short rotating local safety history without requiring an account or network.
+  try {
+    await BackupService.createStartupSnapshotIfDue();
+  } catch (error) {
+    debugPrint('Automatic backup snapshot skipped: $error');
+  }
   
   // Configure dependencies
   await configureDependencies();
