@@ -55,7 +55,7 @@ class SearchableSelectionField<T> extends FormField<T> {
               child: InputDecorator(
                 decoration: InputDecoration(
                   labelText: labelText,
-                  hintText: hintText,
+                  hintText: selectedLabel == null ? hintText : null,
                   border: const OutlineInputBorder(),
                   errorText: field.errorText,
                   suffixIcon: Row(
@@ -77,16 +77,13 @@ class SearchableSelectionField<T> extends FormField<T> {
                   ),
                 ),
                 isEmpty: selectedLabel == null || selectedLabel.isEmpty,
-                child: Text(
-                  selectedLabel ?? (hintText ?? 'Select $labelText'),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: selectedLabel == null
-                      ? Theme.of(field.context).textTheme.bodyLarge?.copyWith(
-                            color: Theme.of(field.context).hintColor,
-                          )
-                      : null,
-                ),
+                child: selectedLabel == null
+                    ? const SizedBox.shrink()
+                    : Text(
+                        selectedLabel,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
               ),
             );
           },

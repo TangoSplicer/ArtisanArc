@@ -22,6 +22,8 @@ void main() {
       ),
     );
 
+    expect(find.text('Search material'), findsOneWidget);
+
     await tester.tap(find.byType(InkWell));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), 'yarn');
@@ -34,6 +36,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(selectedMaterial, 'Wool Yarn');
+    expect(find.text('Wool Yarn'), findsOneWidget);
+    expect(find.text('Search material'), findsNothing);
   });
 
   testWidgets('top-level feature screen exposes Home when no back stack exists', (tester) async {
