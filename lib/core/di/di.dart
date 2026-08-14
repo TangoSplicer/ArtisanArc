@@ -7,8 +7,10 @@ import '../../features/inventory/domain/inventory_service.dart';
 
 // Business
 import '../../features/business/data/business_repository.dart';
+import '../../features/business/data/stall_session_repository.dart';
 import '../../features/business/domain/business_service.dart';
 import '../../features/business/domain/daily_sales_service.dart';
+import '../../features/business/domain/stall_session_service.dart';
 
 // Compliance
 import '../../features/compliance/data/compliance_repository.dart';
@@ -59,6 +61,13 @@ Future<void> configureDependencies() async {
       () => BusinessRepositoryImpl());
   getIt.registerLazySingleton<BusinessService>(
       () => BusinessServiceImpl(getIt<BusinessRepository>()));
+  getIt.registerLazySingleton<StallSessionRepository>(
+      () => StallSessionRepositoryImpl());
+  getIt.registerLazySingleton<StallSessionService>(() => StallSessionService(
+        getIt<StallSessionRepository>(),
+        getIt<BusinessRepository>(),
+        getIt<InventoryRepository>(),
+      ));
 
   // Compliance Feature
   getIt.registerLazySingleton<ComplianceRepository>(

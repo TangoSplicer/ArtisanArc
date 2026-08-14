@@ -27,7 +27,7 @@ The current build already provides searchable craft-focused selection controls, 
 |---|---|---|---|
 | **1.3 — Safe foundation** | Release reliability and data protection | Updates install cleanly and local maker data is resilient | **Delivered in v1.3.0+8** |
 | **1.4 — Make to sell** | Material-to-finished-item workflow | A project can consume supplies and produce finished inventory | **Delivered in v1.4.0+9; release verification pending** |
-| **1.5 — Better stall days** | Event selling and reconciliation | A maker can run a whole table/stall session offline | **High** |
+| **1.5 — Better stall days** | Event selling and reconciliation | A maker can run a whole table/stall session offline | **Delivered in v1.5.0+10; release verification pending** |
 | **1.6 — Know the numbers** | Cost, profit and stock insights | Decisions are based on profit and materials, not only revenue | **High** |
 | **1.7 — Everyday polish** | Fast daily use, accessibility and personalisation | Less tapping, fewer errors and better long-term usability | **Medium** |
 | **Later, only if needed** | Optional expansion | Controlled scope without weakening the Personal Edition | **Deliberate** |
@@ -113,6 +113,16 @@ The current On-the-day Sales page captures sales quickly. The next step is to ma
 ## Acceptance scenario
 
 At a market, a maker starts a session, records card and cash sales, applies one discount, corrects a mistaken sale, closes the session, and sees expected cash, event revenue, fees and stock changes without an internet connection.
+
+## Delivery record — v1.5.0+10
+
+| Delivered capability | Implementation outcome |
+|---|---|
+| Active offline session | A single active event session retains its event/venue, cash float, table fee and travel cost locally until cash-up. |
+| Basket and payments | Fast plus/minus controls create a multi-item basket with cash, card, bank-transfer or other payment records; optional basket discounts are allocated transparently across the saved sale lines. |
+| Corrections without deletion | Returns create a linked negative-revenue record and restore finished-item stock. Voids require a reason, preserve the original record, exclude its revenue and restore stock. |
+| Cash-up and close | The close screen compares counted cash against expected cash, shows direct costs and net sales after those costs, then stores closeout notes locally. |
+| Receipt and exports | A saved basket can be shared as a local text receipt. Sales CSV/PDF exports now include payment method, discount, status, session ID and adjustment reason. |
 
 ---
 

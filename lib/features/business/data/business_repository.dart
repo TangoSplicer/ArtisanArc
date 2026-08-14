@@ -3,6 +3,7 @@ import 'sale_model.dart';
 
 abstract class BusinessRepository {
   Future<void> createSale(SaleRecord sale);
+  Future<void> updateSale(SaleRecord sale);
   Future<List<SaleRecord>> getSales();
   Future<void> deleteSale(String id);
 }
@@ -19,6 +20,12 @@ class BusinessRepositoryImpl implements BusinessRepository {
 
   @override
   Future<void> createSale(SaleRecord sale) async {
+    final box = await _getBox();
+    await box.put(sale.id, sale);
+  }
+
+  @override
+  Future<void> updateSale(SaleRecord sale) async {
     final box = await _getBox();
     await box.put(sale.id, sale);
   }

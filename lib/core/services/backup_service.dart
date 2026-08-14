@@ -22,9 +22,11 @@ class BackupPreview {
     required this.reason,
   });
 
-  String get description => '${includedBoxes.length} data area${includedBoxes.length == 1 ? '' : 's'} · ${_formatDate(createdAt)}';
+  String get description =>
+      '${includedBoxes.length} data area${includedBoxes.length == 1 ? '' : 's'} · ${_formatDate(createdAt)}';
 
-  static String _formatDate(DateTime value) => value.toLocal().toString().split('.').first;
+  static String _formatDate(DateTime value) =>
+      value.toLocal().toString().split('.').first;
 }
 
 /// Metadata for an on-device automatic safety snapshot.
@@ -41,7 +43,8 @@ class AutomaticSnapshotInfo {
     required this.reason,
   });
 
-  String get description => '${includedBoxes.length} data area${includedBoxes.length == 1 ? '' : 's'} · ${BackupPreview._formatDate(createdAt)}';
+  String get description =>
+      '${includedBoxes.length} data area${includedBoxes.length == 1 ? '' : 's'} · ${BackupPreview._formatDate(createdAt)}';
 }
 
 /// Creates portable backup archives and short-lived automatic on-device safety snapshots.
@@ -51,6 +54,7 @@ class BackupService {
   static const _boxNames = <String>[
     'inventoryBox',
     'salesBox',
+    'stallSessionsBox',
     'complianceBox',
     'projectsBox',
     'shoppingListsBox',
@@ -84,21 +88,25 @@ class BackupService {
     final documents = await getApplicationDocumentsDirectory();
     final names = <String>[];
     for (final name in _boxNames) {
-      if (await File(p.join(documents.path, '$name.hive')).exists()) names.add(name);
+      if (await File(p.join(documents.path, '$name.hive')).exists())
+        names.add(name);
     }
     return names;
   }
 
-  static Future<AutomaticSnapshotInfo?> createAutomaticSnapshot({String reason = 'scheduled safety snapshot'}) async {
+  static Future<AutomaticSnapshotInfo?> createAutomaticSnapshot(
+      {String reason = 'scheduled safety snapshot'}) async {
     await _flushOpenBoxes();
     final includedBoxes = await _availableBoxNames();
     if (includedBoxes.isEmpty) return null;
 
     final automaticRoot = await _automaticRoot();
     final createdAt = DateTime.now();
-    final snapshotDirectory = Directory(p.join(automaticRoot.path, _snapshotDirectoryName(createdAt)));
+    final snapshotDirectory = Directory(
+        p.join(automaticRoot.path, _snapshotDirectoryName(createdAt)));
     await snapshotDirectory.create(recursive: true);
-    await _copyBoxesToDirectory(snapshotDirectory, includedBoxes, createdAt, reason);
+    await _copyBoxesToDirectory(
+        snapshotDirectory, includedBoxes, createdAt, reason);
     await _trimAutomaticSnapshots();
 
     return AutomaticSnapshotInfo(
@@ -112,7 +120,9 @@ class BackupService {
   /// Creates at most one normal safety snapshot per interval when the app starts.
   static Future<void> createStartupSnapshotIfDue() async {
     final snapshots = await listAutomaticSnapshots();
-    if (snapshots.isNotEmpty && DateTime.now().difference(snapshots.first.createdAt) < _automaticSnapshotInterval) return;
+    if (snapshots.isNotEmpty &&
+        DateTime.now().difference(snapshots.first.createdAt) <
+            _automaticSnapshotInterval) return;
     await createAutomaticSnapshot(reason: 'app startup');
   }
 
@@ -124,7 +134,8 @@ class BackupService {
       final manifest = File(p.join(entity.path, _manifestName));
       if (!await manifest.exists()) continue;
       try {
-        final data = jsonDecode(await manifest.readAsString()) as Map<String, dynamic>;
+        final data =
+            jsonDecode(await manifest.readAsString()) as Map<String, dynamic>;
         final createdAt = DateTime.parse(data['createdAt'] as String);
         final boxes = (data['includedBoxes'] as List<dynamic>).cast<String>();
         snapshots.add(AutomaticSnapshotInfo(
@@ -149,15 +160,19 @@ class BackupService {
   static Future<File> createPortableBackup() async {
     await _flushOpenBoxes();
     final includedBoxes = await _availableBoxNames();
-    if (includedBoxes.isEmpty) throw StateError('There is no craft data to back up yet.');
+    if (includedBoxes.isEmpty)
+      throw StateError('There is no craft data to back up yet.');
 
     final root = await _backupRoot();
     final createdAt = DateTime.now();
-    final workingDirectory = Directory(p.join(root.path, '_export_${_snapshotDirectoryName(createdAt)}'));
+    final workingDirectory = Directory(
+        p.join(root.path, '_export_${_snapshotDirectoryName(createdAt)}'));
     await workingDirectory.create(recursive: true);
     try {
-      await _copyBoxesToDirectory(workingDirectory, includedBoxes, createdAt, 'portable export');
-      final archive = File(p.join(root.path, 'artisanarc-backup-${_fileTimestamp(createdAt)}.zip'));
+      await _copyBoxesToDirectory(
+          workingDirectory, includedBoxes, createdAt, 'portable export');
+      final archive = File(p.join(
+          root.path, 'artisanarc-backup-${_fileTimestamp(createdAt)}.zip'));
       final encoder = ZipFileEncoder();
       encoder.create(archive.path);
       await for (final entity in workingDirectory.list()) {
@@ -166,7 +181,8 @@ class BackupService {
       encoder.close();
       return archive;
     } finally {
-      if (await workingDirectory.exists()) await workingDirectory.delete(recursive: true);
+      if (await workingDirectory.exists())
+        await workingDirectory.delete(recursive: true);
     }
   }
 
@@ -175,7 +191,8 @@ class BackupService {
       final archive = await createPortableBackup();
       await Share.shareXFiles(
         [XFile(archive.path)],
-        text: 'ArtisanArc Personal backup — ${DateTime.now().toLocal().toString().split(' ').first}',
+        text:
+            'ArtisanArc Personal backup — ${DateTime.now().toLocal().toString().split(' ').first}',
       );
     } catch (error) {
       throw Exception('Failed to export backup: $error');
@@ -194,20 +211,35 @@ class BackupService {
   static Future<BackupPreview> previewPortableBackup(File archiveFile) async {
     try {
       final archive = ZipDecoder().decodeBytes(await archiveFile.readAsBytes());
-      final manifestFile = archive.files.where((file) => file.name == _manifestName).cast<ArchiveFile?>().firstWhere(
+      final manifestFile = archive.files
+          .where((file) => file.name == _manifestName)
+          .cast<ArchiveFile?>()
+          .firstWhere(
             (file) => file != null,
             orElse: () => null,
           );
-      if (manifestFile == null || !manifestFile.isFile) throw const FormatException('Missing ArtisanArc backup manifest.');
-      final manifest = jsonDecode(utf8.decode(manifestFile.content as List<int>)) as Map<String, dynamic>;
-      if (manifest['formatVersion'] != _formatVersion) throw const FormatException('This backup format is not supported by this version of ArtisanArc.');
-      final includedBoxes = (manifest['includedBoxes'] as List<dynamic>).cast<String>();
-      if (includedBoxes.isEmpty || includedBoxes.any((name) => !_boxNames.contains(name))) {
-        throw const FormatException('The backup contains an invalid data area.');
+      if (manifestFile == null || !manifestFile.isFile)
+        throw const FormatException('Missing ArtisanArc backup manifest.');
+      final manifest =
+          jsonDecode(utf8.decode(manifestFile.content as List<int>))
+              as Map<String, dynamic>;
+      if (manifest['formatVersion'] != _formatVersion)
+        throw const FormatException(
+            'This backup format is not supported by this version of ArtisanArc.');
+      final includedBoxes =
+          (manifest['includedBoxes'] as List<dynamic>).cast<String>();
+      if (includedBoxes.isEmpty ||
+          includedBoxes.any((name) => !_boxNames.contains(name))) {
+        throw const FormatException(
+            'The backup contains an invalid data area.');
       }
-      final archiveNames = archive.files.where((file) => file.isFile).map((file) => file.name).toSet();
+      final archiveNames = archive.files
+          .where((file) => file.isFile)
+          .map((file) => file.name)
+          .toSet();
       for (final boxName in includedBoxes) {
-        if (!archiveNames.contains('$boxName.hive')) throw FormatException('The backup is missing $boxName data.');
+        if (!archiveNames.contains('$boxName.hive'))
+          throw FormatException('The backup is missing $boxName data.');
       }
       return BackupPreview(
         archiveFile: archiveFile,
@@ -224,9 +256,11 @@ class BackupService {
   /// Callers should ask the user for confirmation after [previewPortableBackup].
   static Future<void> restorePortableBackup(BackupPreview preview) async {
     await createAutomaticSnapshot(reason: 'before restore');
-    final archive = ZipDecoder().decodeBytes(await preview.archiveFile.readAsBytes());
+    final archive =
+        ZipDecoder().decodeBytes(await preview.archiveFile.readAsBytes());
     final archiveFiles = <String, ArchiveFile>{
-      for (final file in archive.files.where((file) => file.isFile)) file.name: file,
+      for (final file in archive.files.where((file) => file.isFile))
+        file.name: file,
     };
     final documents = await getApplicationDocumentsDirectory();
 
@@ -234,7 +268,8 @@ class BackupService {
     for (final boxName in preview.includedBoxes) {
       final target = File(p.join(documents.path, '$boxName.hive'));
       final source = archiveFiles['$boxName.hive'];
-      if (source == null) throw FormatException('The backup is missing $boxName data.');
+      if (source == null)
+        throw FormatException('The backup is missing $boxName data.');
       await target.writeAsBytes(source.content as List<int>, flush: true);
     }
   }
@@ -256,17 +291,21 @@ class BackupService {
       'reason': reason,
       'includedBoxes': boxNames,
     };
-    await File(p.join(targetDirectory.path, _manifestName)).writeAsString(jsonEncode(manifest), flush: true);
+    await File(p.join(targetDirectory.path, _manifestName))
+        .writeAsString(jsonEncode(manifest), flush: true);
   }
 
   static Future<void> _trimAutomaticSnapshots() async {
     final snapshots = await listAutomaticSnapshots();
     for (final snapshot in snapshots.skip(_automaticRetentionCount)) {
-      if (await snapshot.directory.exists()) await snapshot.directory.delete(recursive: true);
+      if (await snapshot.directory.exists())
+        await snapshot.directory.delete(recursive: true);
     }
   }
 
-  static String _snapshotDirectoryName(DateTime value) => 'snapshot-${_fileTimestamp(value)}';
+  static String _snapshotDirectoryName(DateTime value) =>
+      'snapshot-${_fileTimestamp(value)}';
 
-  static String _fileTimestamp(DateTime value) => value.toIso8601String().replaceAll(':', '-').replaceAll('.', '-');
+  static String _fileTimestamp(DateTime value) =>
+      value.toIso8601String().replaceAll(':', '-').replaceAll('.', '-');
 }

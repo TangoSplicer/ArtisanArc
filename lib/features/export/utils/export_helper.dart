@@ -11,15 +11,39 @@ class ExportHelper {
     Map<String, String> itemNames = const {},
   }) {
     final List<List<dynamic>> rows = [
-      ['Item Name', 'Quantity', 'Price Per Unit', 'Date', 'Buyer', 'Event / Session', 'Table / Venue'],
+      [
+        'Item Name',
+        'Quantity',
+        'Price Per Unit',
+        'Discount',
+        'Net Total',
+        'Payment Method',
+        'Status',
+        'Date',
+        'Buyer',
+        'Event / Session',
+        'Table / Venue',
+        'Session ID',
+        'Adjustment Reason',
+      ],
       ...sales.map((sale) => [
             itemNames[sale.itemId] ?? sale.itemId,
             sale.quantity,
             sale.pricePerUnit,
+            sale.discountAmount,
+            sale.total,
+            sale.paymentMethod,
+            sale.isVoid
+                ? 'Voided'
+                : sale.isReturn
+                    ? 'Return'
+                    : 'Sale',
             sale.date.toIso8601String(),
             sale.buyer ?? '',
             sale.eventName ?? '',
             sale.eventLocation ?? '',
+            sale.sessionId ?? '',
+            sale.adjustmentReason ?? '',
           ]),
     ];
     return const ListToCsvConverter().convert(rows);
@@ -50,16 +74,30 @@ class ExportHelper {
         build: (context) => [
           pw.Text('Sales Report', style: pw.TextStyle(fontSize: 24)),
           pw.TableHelper.fromTextArray(
-            headers: ['Item', 'Qty', 'Unit Price', 'Total', 'Buyer', 'Event / Session', 'Table / Venue'],
+            headers: [
+              'Item',
+              'Qty',
+              'Unit',
+              'Discount',
+              'Total',
+              'Payment',
+              'Status',
+              'Event / Session'
+            ],
             data: sales.map((s) {
               return [
                 itemNames[s.itemId] ?? s.itemId,
                 s.quantity,
                 '£${s.pricePerUnit}',
+                '£${s.discountAmount.toStringAsFixed(2)}',
                 '£${s.total.toStringAsFixed(2)}',
-                s.buyer ?? '',
+                s.paymentMethod,
+                s.isVoid
+                    ? 'Voided'
+                    : s.isReturn
+                        ? 'Return'
+                        : 'Sale',
                 s.eventName ?? '',
-                s.eventLocation ?? '',
               ];
             }).toList(),
           ),
@@ -82,17 +120,24 @@ class ExportHelper {
             ...projects.map((project) => pw.Container(
                   margin: const pw.EdgeInsets.only(bottom: 12),
                   padding: const pw.EdgeInsets.all(10),
-                  decoration: pw.BoxDecoration(border: pw.Border.all(color: PdfColors.grey)),
+                  decoration: pw.BoxDecoration(
+                      border: pw.Border.all(color: PdfColors.grey)),
                   child: pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
-                      pw.Text(project.name, style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
-                      if ((project.craftType ?? '').isNotEmpty) pw.Text('Craft: ${project.craftType}'),
-                      if ((project.description ?? '').isNotEmpty) pw.Text(project.description!),
+                      pw.Text(project.name,
+                          style: pw.TextStyle(
+                              fontSize: 16, fontWeight: pw.FontWeight.bold)),
+                      if ((project.craftType ?? '').isNotEmpty)
+                        pw.Text('Craft: ${project.craftType}'),
+                      if ((project.description ?? '').isNotEmpty)
+                        pw.Text(project.description!),
                       pw.SizedBox(height: 6),
-                      pw.Text('Milestones: ${project.milestones.where((m) => m.isCompleted).length}/${project.milestones.length} completed'),
+                      pw.Text(
+                          'Milestones: ${project.milestones.where((m) => m.isCompleted).length}/${project.milestones.length} completed'),
                       if (project.supplyNeeds.isNotEmpty)
-                        pw.Text('Supplies: ${project.supplyNeeds.map((s) => '${s.quantityNeeded} ${s.unit} ${s.itemName}').join(', ')}'),
+                        pw.Text(
+                            'Supplies: ${project.supplyNeeds.map((s) => '${s.quantityNeeded} ${s.unit} ${s.itemName}').join(', ')}'),
                     ],
                   ),
                 )),

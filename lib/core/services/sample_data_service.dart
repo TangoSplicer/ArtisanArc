@@ -11,6 +11,7 @@ import '../../features/shopping/data/shopping_list_model.dart';
 class SampleDataService {
   static const _inventoryBox = 'inventoryBox';
   static const _salesBox = 'salesBox';
+  static const _stallSessionsBox = 'stallSessionsBox';
   static const _projectsBox = 'projectsBox';
   static const _shoppingListsBox = 'shoppingListsBox';
   static const _complianceBox = 'complianceBox';
@@ -18,10 +19,12 @@ class SampleDataService {
   static Future<bool> hasCraftData() async {
     final inventory = await Hive.openBox<InventoryItem>(_inventoryBox);
     final sales = await Hive.openBox<SaleRecord>(_salesBox);
+    final sessions = await Hive.openBox(_stallSessionsBox);
     final projects = await Hive.openBox<Project>(_projectsBox);
     final shopping = await Hive.openBox<ShoppingList>(_shoppingListsBox);
     return inventory.isNotEmpty ||
         sales.isNotEmpty ||
+        sessions.isNotEmpty ||
         projects.isNotEmpty ||
         shopping.isNotEmpty;
   }
@@ -34,6 +37,7 @@ class SampleDataService {
 
     final inventory = await Hive.openBox<InventoryItem>(_inventoryBox);
     final sales = await Hive.openBox<SaleRecord>(_salesBox);
+    final sessions = await Hive.openBox(_stallSessionsBox);
     final projects = await Hive.openBox<Project>(_projectsBox);
     final shopping = await Hive.openBox<ShoppingList>(_shoppingListsBox);
 
@@ -41,6 +45,7 @@ class SampleDataService {
       await Future.wait([
         inventory.clear(),
         sales.clear(),
+        sessions.clear(),
         projects.clear(),
         shopping.clear()
       ]);
@@ -249,12 +254,14 @@ class SampleDataService {
   static Future<void> clearCraftData() async {
     final inventory = await Hive.openBox<InventoryItem>(_inventoryBox);
     final sales = await Hive.openBox<SaleRecord>(_salesBox);
+    final sessions = await Hive.openBox(_stallSessionsBox);
     final projects = await Hive.openBox<Project>(_projectsBox);
     final shopping = await Hive.openBox<ShoppingList>(_shoppingListsBox);
     final compliance = await Hive.openBox(_complianceBox);
     await Future.wait([
       inventory.clear(),
       sales.clear(),
+      sessions.clear(),
       projects.clear(),
       shopping.clear(),
       compliance.clear(),

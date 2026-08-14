@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:artisanarc/presentation/screens/home_screen.dart';
 import 'package:artisanarc/presentation/screens/splash_screen.dart';
@@ -9,7 +8,7 @@ import 'package:artisanarc/features/settings/presentation/settings_screen.dart';
 import 'package:artisanarc/features/business/presentation/business_dashboard_screen.dart';
 import 'package:artisanarc/features/business/presentation/daily_sales_screen.dart';
 import 'package:artisanarc/features/business/presentation/new_sale_entry_screen.dart';
-import 'package:artisanarc/features/business/presentation/event_sales_screen.dart';
+import 'package:artisanarc/features/business/presentation/stall_session_screen.dart';
 import 'package:artisanarc/features/project/presentation/project_list_screen.dart';
 import 'package:artisanarc/features/project/presentation/project_planner_screen.dart';
 import 'package:artisanarc/features/qr/presentation/qr_scanner_page.dart';
@@ -27,15 +26,15 @@ import 'package:artisanarc/features/inventory/presentation/inventory_detail_scre
 import 'package:artisanarc/features/business/presentation/revenue_analytics_screen.dart';
 import 'package:artisanarc/features/project/presentation/project_detail_screen.dart';
 
-
 class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: '/splash',
     errorBuilder: (context, state) => ErrorScreen(error: state.error?.message),
     redirect: (context, state) async {
       const storage = FlutterSecureStorage();
-      final seenOnboarding = await storage.read(key: StorageKeys.onboardingComplete) == 'true';
-      
+      final seenOnboarding =
+          await storage.read(key: StorageKeys.onboardingComplete) == 'true';
+
       if (state.matchedLocation == '/splash') {
         return seenOnboarding ? '/home' : '/onboarding';
       }
@@ -47,7 +46,7 @@ class AppRouter {
         name: 'splash',
         builder: (context, state) => const SplashScreen(),
       ),
-       GoRoute(
+      GoRoute(
         path: '/',
         name: 'root',
         builder: (context, state) => const HomeScreen(),
@@ -70,7 +69,8 @@ class AppRouter {
           GoRoute(
             path: 'add',
             name: 'addInventoryItem',
-            builder: (context, state) => const AddInventoryItemScreen(itemType: 'finished'),
+            builder: (context, state) =>
+                const AddInventoryItemScreen(itemType: 'finished'),
           ),
           GoRoute(
             path: 'detail/:itemId',
@@ -88,12 +88,14 @@ class AppRouter {
       GoRoute(
         path: '/stock',
         name: 'materialsStock',
-        builder: (context, state) => const InventoryScreen(viewMode: InventoryViewMode.materialsStock),
+        builder: (context, state) =>
+            const InventoryScreen(viewMode: InventoryViewMode.materialsStock),
         routes: [
           GoRoute(
             path: 'add',
             name: 'addMaterialStock',
-            builder: (context, state) => const AddInventoryItemScreen(itemType: 'material'),
+            builder: (context, state) =>
+                const AddInventoryItemScreen(itemType: 'material'),
           ),
         ],
       ),
@@ -120,7 +122,7 @@ class AppRouter {
           GoRoute(
             path: 'event-sales',
             name: 'eventSales',
-            builder: (context, state) => const EventSalesScreen(),
+            builder: (context, state) => const StallSessionScreen(),
           ),
           GoRoute(
             path: 'analytics',

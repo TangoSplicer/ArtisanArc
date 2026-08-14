@@ -25,13 +25,20 @@ class SaleRecordAdapter extends TypeAdapter<SaleRecord> {
       buyer: fields[5] as String?,
       eventName: fields[6] as String?,
       eventLocation: fields[7] as String?,
+      sessionId: fields[8] as String?,
+      paymentMethod: fields[9] == null ? 'cash' : fields[9] as String,
+      discountAmount: fields[10] == null ? 0.0 : fields[10] as double,
+      isReturn: fields[11] == null ? false : fields[11] as bool,
+      isVoid: fields[12] == null ? false : fields[12] as bool,
+      adjustmentReason: fields[13] as String?,
+      relatedSaleId: fields[14] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, SaleRecord obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(15)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -47,8 +54,25 @@ class SaleRecordAdapter extends TypeAdapter<SaleRecord> {
       ..writeByte(6)
       ..write(obj.eventName)
       ..writeByte(7)
-      ..write(obj.eventLocation);
+      ..write(obj.eventLocation)
+      ..writeByte(8)
+      ..write(obj.sessionId)
+      ..writeByte(9)
+      ..write(obj.paymentMethod)
+      ..writeByte(10)
+      ..write(obj.discountAmount)
+      ..writeByte(11)
+      ..write(obj.isReturn)
+      ..writeByte(12)
+      ..write(obj.isVoid)
+      ..writeByte(13)
+      ..write(obj.adjustmentReason)
+      ..writeByte(14)
+      ..write(obj.relatedSaleId);
   }
+
+  @override
+  int get hashCode => typeId.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -56,7 +80,4 @@ class SaleRecordAdapter extends TypeAdapter<SaleRecord> {
       other is SaleRecordAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
-
-  @override
-  int get hashCode => typeId.hashCode;
 }
