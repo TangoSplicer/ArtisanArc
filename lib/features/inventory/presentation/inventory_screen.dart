@@ -71,6 +71,11 @@ class _InventoryScreenState extends State<InventoryScreen> {
     final color = Theme.of(context).colorScheme;
     final totalQuantity =
         _items.fold<int>(0, (sum, item) => sum + item.quantity);
+    final measuredMaterialSummary = _items
+        .where((item) => item.usesMeasuredQuantity)
+        .map((item) => item.formattedStockQuantity)
+        .take(3)
+        .join(' · ');
     final finishedValue = _items.fold<double>(
         0, (sum, item) => sum + item.quantity * (item.price ?? 0));
 
@@ -80,6 +85,15 @@ class _InventoryScreenState extends State<InventoryScreen> {
         backgroundColor: color.primary,
         foregroundColor: color.onPrimary,
         actions: [
+          if (!_isFinishedView)
+            IconButton(
+              icon: const Icon(Icons.local_shipping_outlined),
+              tooltip: 'Suppliers and purchases',
+              onPressed: () async {
+                await context.pushNamed('procurement');
+                _loadItems();
+              },
+            ),
           IconButton(
             icon: const Icon(Icons.fact_check_outlined),
             tooltip: 'Run stocktake',
@@ -152,7 +166,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                         subtitle: Text(
                           _isFinishedView
                               ? '${_items.length} created-item line${_items.length == 1 ? '' : 's'} · £${finishedValue.toStringAsFixed(2)} potential sales value'
-                              : '${_items.length} material line${_items.length == 1 ? '' : 's'} · yarn, tools, and supplies',
+                              : '${_items.length} material line${_items.length == 1 ? '' : 's'} · ${measuredMaterialSummary.isEmpty ? 'yarn, tools, and supplies' : measuredMaterialSummary}',
                           style: TextStyle(color: color.onPrimaryContainer),
                         ),
                       ),
@@ -172,7 +186,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                       subtitle: Text(
                         _isFinishedView
                             ? 'Tally: ${item.quantity} made / available · ${item.category}\nSale price: ${item.price != null ? '£${item.price!.toStringAsFixed(2)}' : 'Not set'} · Location: ${item.storageLocation ?? 'Not set'}'
-                            : 'Available: ${item.quantity} · ${item.category}\nLocation: ${item.storageLocation ?? 'Not set'}${item.price == null ? '' : ' · Replacement cost: £${item.price!.toStringAsFixed(2)}'}',
+                            : 'Available: ${item.formattedStockQuantity} · ${item.category}\nLocation: ${item.storageLocation ?? 'Not set'}${item.price == null ? '' : ' · Latest unit cost: £${item.price!.toStringAsFixed(2)}'}',
                       ),
                       trailing: IconButton(
                         icon: const Icon(Icons.qr_code_2),

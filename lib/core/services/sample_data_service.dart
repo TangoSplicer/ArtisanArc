@@ -11,6 +11,8 @@ import '../../features/shopping/data/shopping_list_model.dart';
 class SampleDataService {
   static const _inventoryBox = 'inventoryBox';
   static const _stockAdjustmentsBox = 'stockAdjustmentsBox';
+  static const _suppliersBox = 'suppliersBox';
+  static const _materialPurchasesBox = 'materialPurchasesBox';
   static const _salesBox = 'salesBox';
   static const _stallSessionsBox = 'stallSessionsBox';
   static const _projectsBox = 'projectsBox';
@@ -21,6 +23,8 @@ class SampleDataService {
   static Future<bool> hasCraftData() async {
     final inventory = await Hive.openBox<InventoryItem>(_inventoryBox);
     final stockAdjustments = await Hive.openBox(_stockAdjustmentsBox);
+    final suppliers = await Hive.openBox(_suppliersBox);
+    final purchases = await Hive.openBox(_materialPurchasesBox);
     final sales = await Hive.openBox<SaleRecord>(_salesBox);
     final sessions = await Hive.openBox(_stallSessionsBox);
     final projects = await Hive.openBox<Project>(_projectsBox);
@@ -28,6 +32,8 @@ class SampleDataService {
     final shopping = await Hive.openBox<ShoppingList>(_shoppingListsBox);
     return inventory.isNotEmpty ||
         stockAdjustments.isNotEmpty ||
+        suppliers.isNotEmpty ||
+        purchases.isNotEmpty ||
         sales.isNotEmpty ||
         sessions.isNotEmpty ||
         projects.isNotEmpty ||
@@ -43,6 +49,8 @@ class SampleDataService {
 
     final inventory = await Hive.openBox<InventoryItem>(_inventoryBox);
     final stockAdjustments = await Hive.openBox(_stockAdjustmentsBox);
+    final suppliers = await Hive.openBox(_suppliersBox);
+    final purchases = await Hive.openBox(_materialPurchasesBox);
     final sales = await Hive.openBox<SaleRecord>(_salesBox);
     final sessions = await Hive.openBox(_stallSessionsBox);
     final projects = await Hive.openBox<Project>(_projectsBox);
@@ -53,6 +61,8 @@ class SampleDataService {
       await Future.wait([
         inventory.clear(),
         stockAdjustments.clear(),
+        suppliers.clear(),
+        purchases.clear(),
         sales.clear(),
         sessions.clear(),
         projects.clear(),
@@ -264,6 +274,8 @@ class SampleDataService {
   static Future<void> clearCraftData() async {
     final inventory = await Hive.openBox<InventoryItem>(_inventoryBox);
     final stockAdjustments = await Hive.openBox(_stockAdjustmentsBox);
+    final suppliers = await Hive.openBox(_suppliersBox);
+    final purchases = await Hive.openBox(_materialPurchasesBox);
     final sales = await Hive.openBox<SaleRecord>(_salesBox);
     final sessions = await Hive.openBox(_stallSessionsBox);
     final projects = await Hive.openBox<Project>(_projectsBox);

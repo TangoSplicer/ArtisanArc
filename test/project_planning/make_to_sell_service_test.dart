@@ -145,6 +145,38 @@ void main() {
     });
 
     test(
+        'deducts exact decimal measured material stock when the project unit matches',
+        () async {
+      final measuredCotton =
+          material(id: 'cotton-g', name: 'Cotton yarn', quantity: 250).copyWith(
+              measuredQuantity: 250, measurementUnit: 'gram', price: 0.02);
+      final inventory = MemoryInventoryRepository([measuredCotton]);
+      final project = projectWithSupplies(
+        supplyNeeds: [
+          SupplyNeed(
+            id: 'cotton-grams',
+            itemName: 'Cotton yarn',
+            quantityNeeded: 37.5,
+            unit: 'gram',
+            inventoryItemId: 'cotton-g',
+            estimatedCostEach: 0.02,
+          ),
+        ],
+      );
+      final projects = MemoryProjectRepository([project]);
+      final productionRuns = MemoryProductionRunRepository();
+      final service = MakeToSellService(inventory, projects, productionRuns);
+
+      final result =
+          await service.complete(project: project, outputQuantity: 2);
+
+      final remaining = (await inventory.getItemById('cotton-g'))!;
+      expect(remaining.measuredQuantity, 175);
+      expect(remaining.measurementUnit, 'gram');
+      expect(result.productionRun.materialCost, 1.5);
+    });
+
+    test(
         'does not write material, finished, or project records when linked stock is short',
         () async {
       final inventory = MemoryInventoryRepository([

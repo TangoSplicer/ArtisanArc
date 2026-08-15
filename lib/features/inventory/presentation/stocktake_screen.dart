@@ -49,7 +49,7 @@ class _StocktakeScreenState extends State<StocktakeScreen> {
     _countControllers.clear();
     for (final item in items) {
       _countControllers[item.id] =
-          TextEditingController(text: '${item.quantity}');
+          TextEditingController(text: '${item.availableStockQuantity}');
     }
     setState(() {
       _items = items;
@@ -58,24 +58,29 @@ class _StocktakeScreenState extends State<StocktakeScreen> {
   }
 
   int get _varianceCount => _items.where((item) {
-        return int.tryParse(_countControllers[item.id]?.text ?? '') !=
-            item.quantity;
+        return double.tryParse(_countControllers[item.id]?.text ?? '') !=
+            item.availableStockQuantity;
       }).length;
 
   Future<void> _saveStocktake() async {
     if (_isSaving) return;
-    final counts = <InventoryItem, int>{};
+    final counts = <InventoryItem, num>{};
     for (final item in _items) {
-      final count = int.tryParse(_countControllers[item.id]?.text ?? '');
-      if (count == null || count < 0) {
+      final count = double.tryParse(_countControllers[item.id]?.text ?? '');
+      final needsWholeCount = item.isFinishedItem || !item.usesMeasuredQuantity;
+      if (count == null ||
+          count < 0 ||
+          (needsWholeCount && count != count.roundToDouble())) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(
-                  'Enter a whole count of zero or more for ${item.name}.')),
+            content: Text(needsWholeCount
+                ? 'Enter a whole count of zero or more for ${item.name}.'
+                : 'Enter a measured count of zero or more for ${item.name}.'),
+          ),
         );
         return;
       }
-      if (count != item.quantity) counts[item] = count;
+      if (count != item.availableStockQuantity) counts[item] = count;
     }
     if (counts.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -171,7 +176,7 @@ class _StocktakeScreenState extends State<StocktakeScreen> {
                             final controller = _countControllers[item.id]!;
                             return Semantics(
                               label:
-                                  '${item.name}. Recorded quantity ${item.quantity}. Enter physical count.',
+                                  '${item.name}. Recorded quantity ${item.formattedStockQuantity}. Enter physical count.',
                               child: Card(
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(
@@ -188,7 +193,7 @@ class _StocktakeScreenState extends State<StocktakeScreen> {
                                                     .textTheme
                                                     .titleSmall),
                                             Text(
-                                                '${item.isFinishedItem ? 'Created item' : 'Material'} · Recorded: ${item.quantity}'),
+                                                '${item.isFinishedItem ? 'Created item' : 'Material'} · Recorded: ${item.formattedStockQuantity}'),
                                           ],
                                         ),
                                       ),
@@ -196,7 +201,12 @@ class _StocktakeScreenState extends State<StocktakeScreen> {
                                         width: 96,
                                         child: TextField(
                                           controller: controller,
-                                          keyboardType: TextInputType.number,
+                                          keyboardType: item.isFinishedItem ||
+                                                  !item.usesMeasuredQuantity
+                                              ? TextInputType.number
+                                              : const TextInputType
+                                                  .numberWithOptions(
+                                                  decimal: true),
                                           textAlign: TextAlign.center,
                                           onChanged: (_) => setState(() {}),
                                           decoration: const InputDecoration(

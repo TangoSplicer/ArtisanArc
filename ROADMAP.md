@@ -31,6 +31,7 @@ The current build already provides searchable craft-focused selection controls, 
 | **1.6 — Know the numbers** | Cost, profit and stock insights | Decisions are based on profit and materials, not only revenue | **Delivered in v1.6.0+11; release verification pending** |
 | **1.7 — Everyday polish** | Fast daily use, accessibility and personalisation | Less tapping, fewer errors and better long-term usability | **Delivered in v1.7.0+12; release verification pending** |
 | **1.8 — Trust the count** | Stocktake and archiving foundations | Physical counts can correct the local tally without losing history | **Delivered in v1.8.0+13; release verification pending** |
+| **1.9 — Buy and measure with confidence** | Flexible material units and private procurement | Material costs and stock quantities reflect real purchases and measured use | **Delivered in v1.9.0+14; release verification pending** |
 | **Later, only if needed** | Optional expansion | Controlled scope without weakening the Personal Edition | **Deliberate** |
 
 ---
@@ -201,6 +202,20 @@ Once the core workflow is solid, improve the app’s speed, clarity and accessib
 | Adjustment audit trail | Each variance records prior quantity, physical count, signed change, reason, optional note, and local timestamp. |
 | Archive instead of delete | Discontinued or seasonal inventory can be archived, hidden from daily stock and active sale baskets, then restored without losing historical sales or profit data. |
 | Data safety | Adjustment history is registered with Hive and included in automatic snapshots, portable backup/restore, starter-data replacement, and Settings clear-all. |
+
+---
+
+# 1.9 — Buy and measure with confidence
+
+## Delivery record — v1.9.0+14
+
+| Delivered capability | Implementation outcome |
+|---|---|
+| Measured material stock | New and edited materials can use decimal quantities with unit-aware stock and reorder points, including grams, metres, litres, balls, and pieces. Existing integer records remain compatible. |
+| Unit-aware production | Linked project supplies automatically use a selected material’s stored unit when appropriate. Completed makes deduct exact decimal amounts for compatible measured materials while retaining legacy whole-item behavior. |
+| Private suppliers and purchases | A local Suppliers & Purchases screen stores manual supplier records, purchase quantities, total paid, and calculated unit cost; it updates material stock and the latest material cost without web scraping or an external account. |
+| Measured stocktake audit | Physical counts can record decimal material variances. The adjustment history retains both compatibility values and exact measured before-and-after amounts. |
+| Data safety | Supplier and purchase data are included in automatic snapshots, portable backup/restore, starter-data replacement, and Settings clear-all. |
 
 ---
 

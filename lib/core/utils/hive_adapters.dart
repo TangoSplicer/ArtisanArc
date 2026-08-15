@@ -1,6 +1,8 @@
 import 'package:hive/hive.dart';
 import '../../features/inventory/data/inventory_model.dart';
 import '../../features/inventory/data/stock_adjustment_model.dart';
+import '../../features/inventory/data/supplier_model.dart';
+import '../../features/inventory/data/material_purchase_model.dart';
 import '../../features/business/data/sale_model.dart';
 import '../../features/business/data/stall_session_model.dart';
 import '../../features/compliance/data/compliance_model.dart';
@@ -12,6 +14,8 @@ import '../../features/shopping/data/shopping_list_model.dart';
 void registerHiveAdapters() {
   _registerAdapterIfNotRegistered(InventoryItemAdapter());
   _registerAdapterIfNotRegistered(StockAdjustmentAdapter());
+  _registerAdapterIfNotRegistered(SupplierAdapter());
+  _registerAdapterIfNotRegistered(MaterialPurchaseAdapter());
   _registerAdapterIfNotRegistered(SaleRecordAdapter());
   _registerAdapterIfNotRegistered(StallSessionAdapter());
   _registerAdapterIfNotRegistered(ComplianceEntryAdapter());

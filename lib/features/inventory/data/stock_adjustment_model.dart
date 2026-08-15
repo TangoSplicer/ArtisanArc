@@ -34,6 +34,21 @@ class StockAdjustment extends HiveObject {
   @HiveField(8)
   final String? note;
 
+  /// Optional decimal values for materials tracked in grams, metres, and other
+  /// measured units. Integer fields above preserve compatibility with earlier
+  /// piece-count adjustments.
+  @HiveField(9)
+  final double? previousMeasuredQuantity;
+
+  @HiveField(10)
+  final double? countedMeasuredQuantity;
+
+  @HiveField(11)
+  final double? measuredQuantityChange;
+
+  @HiveField(12)
+  final String? measurementUnit;
+
   StockAdjustment({
     required this.id,
     required this.itemId,
@@ -44,5 +59,9 @@ class StockAdjustment extends HiveObject {
     required this.recordedAt,
     required this.reason,
     this.note,
+    this.previousMeasuredQuantity,
+    this.countedMeasuredQuantity,
+    this.measuredQuantityChange,
+    this.measurementUnit,
   });
 }

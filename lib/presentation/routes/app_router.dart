@@ -24,6 +24,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:artisanarc/core/utils/storage_keys.dart';
 import 'package:artisanarc/features/inventory/presentation/inventory_detail_screen.dart';
 import 'package:artisanarc/features/inventory/presentation/stocktake_screen.dart';
+import 'package:artisanarc/features/inventory/presentation/procurement_screen.dart';
 import 'package:artisanarc/features/business/presentation/revenue_analytics_screen.dart';
 import 'package:artisanarc/features/project/presentation/project_detail_screen.dart';
 import 'package:artisanarc/features/search/presentation/smart_search_screen.dart';
@@ -100,6 +101,11 @@ class AppRouter {
                 const AddInventoryItemScreen(itemType: 'material'),
           ),
         ],
+      ),
+      GoRoute(
+        path: '/procurement',
+        name: 'procurement',
+        builder: (context, state) => const ProcurementScreen(),
       ),
       GoRoute(
         path: '/stocktake',

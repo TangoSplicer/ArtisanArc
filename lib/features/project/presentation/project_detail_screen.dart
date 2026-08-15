@@ -200,12 +200,12 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                           title: Text(status.supplyNeed.itemName),
                           subtitle: Text(
                             status.isLinked
-                                ? '${status.availableQuantity} available · ${status.quantityToReserve} reserved'
+                                ? '${status.formattedAvailableQuantity} ${status.supplyNeed.unit} available · ${status.formattedReservedQuantity} reserved${status.isUnitCompatible ? '' : ' · ${status.issue}'}'
                                 : status.issue,
                           ),
                           trailing: Text(
                             status.supplyNeed.isConsumable
-                                ? 'Use ${status.quantityToConsume}'
+                                ? 'Use ${status.formattedConsumptionQuantity} ${status.supplyNeed.unit}'
                                 : 'Reusable',
                           ),
                         ),
@@ -565,8 +565,8 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                       ? 'Not linked to Materials Stock'
                       : !linked
                           ? 'Linked material was removed'
-                          : '${status.availableQuantity} available · ${status.quantityToReserve} reserved'
-                              '${short ? ' · Short by ${status.quantityToReserve - status.availableQuantity}' : ''}';
+                          : '${status.formattedAvailableQuantity} ${status.supplyNeed.unit} available · ${status.formattedReservedQuantity} reserved'
+                              '${short ? ' · Short by ${status.formattedShortageQuantity}' : ''}';
 
                   return ListTile(
                     leading: IconButton(

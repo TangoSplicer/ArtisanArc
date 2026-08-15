@@ -26,13 +26,17 @@ class StockAdjustmentAdapter extends TypeAdapter<StockAdjustment> {
       recordedAt: fields[6] as DateTime,
       reason: fields[7] as String,
       note: fields[8] as String?,
+      previousMeasuredQuantity: fields[9] as double?,
+      countedMeasuredQuantity: fields[10] as double?,
+      measuredQuantityChange: fields[11] as double?,
+      measurementUnit: fields[12] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, StockAdjustment obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(13)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -50,7 +54,15 @@ class StockAdjustmentAdapter extends TypeAdapter<StockAdjustment> {
       ..writeByte(7)
       ..write(obj.reason)
       ..writeByte(8)
-      ..write(obj.note);
+      ..write(obj.note)
+      ..writeByte(9)
+      ..write(obj.previousMeasuredQuantity)
+      ..writeByte(10)
+      ..write(obj.countedMeasuredQuantity)
+      ..writeByte(11)
+      ..write(obj.measuredQuantityChange)
+      ..writeByte(12)
+      ..write(obj.measurementUnit);
   }
 
   @override

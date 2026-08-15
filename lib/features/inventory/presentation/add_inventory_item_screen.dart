@@ -33,6 +33,7 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
   final _priceController = TextEditingController();
   final _storageLocationController = TextEditingController();
   final _reorderPointController = TextEditingController();
+  String? _measurementUnit;
   List<String> _selectedImagePaths = []; // To store paths of copied images
   final ImagePicker _picker = ImagePicker();
 
@@ -52,11 +53,13 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
 
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
+      final enteredQuantity = double.parse(_quantityController.text);
       final newItem = InventoryItem(
-        id: _uuid.v4(), // Generate a unique ID
+        id: _uuid.v4(), // Generate unique ID
         name: _nameController.text,
         category: _categoryController.text,
-        quantity: int.parse(_quantityController.text),
+        quantity:
+            _isFinishedItem ? enteredQuantity.toInt() : enteredQuantity.ceil(),
         price: double.tryParse(_priceController.text),
         storageLocation: _storageLocationController.text.isNotEmpty
             ? _storageLocationController.text
@@ -64,8 +67,12 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
         imagePaths: _selectedImagePaths, // Pass the stored image paths
         lastUpdated: DateTime.now(),
         itemType: widget.itemType,
-        reorderPoint:
-            _isFinishedItem ? null : int.tryParse(_reorderPointController.text),
+        reorderPoint: _isFinishedItem ? null : null,
+        measuredQuantity: _isFinishedItem ? null : enteredQuantity,
+        measurementUnit: _isFinishedItem ? null : _measurementUnit,
+        measuredReorderPoint: _isFinishedItem
+            ? null
+            : double.tryParse(_reorderPointController.text),
       );
 
       try {
@@ -137,13 +144,30 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
                   labelText: _isFinishedItem
                       ? 'Number created / available*'
                       : 'Amount available to work with*',
+                  helperText: _isFinishedItem
+                      ? null
+                      : 'Use decimals for measured stock, such as 250 g or 1.5 m.',
                   border: const OutlineInputBorder(),
                 ),
-                keyboardType: TextInputType.number,
-                inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.digitsOnly
-                ],
-                validator: Validators.validateQuantity,
+                keyboardType: _isFinishedItem
+                    ? TextInputType.number
+                    : const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: _isFinishedItem
+                    ? <TextInputFormatter>[
+                        FilteringTextInputFormatter.digitsOnly
+                      ]
+                    : <TextInputFormatter>[
+                        FilteringTextInputFormatter.allow(
+                            RegExp(r'^\d*\.?\d{0,2}')),
+                      ],
+                validator: (value) {
+                  final amount = double.tryParse(value ?? '');
+                  if (amount == null || amount <= 0)
+                    return 'Enter an amount greater than zero';
+                  if (_isFinishedItem && amount != amount.roundToDouble())
+                    return 'Finished-item tally must be a whole number';
+                  return null;
+                },
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -164,6 +188,19 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
               ),
               if (!_isFinishedItem) ...[
                 const SizedBox(height: 16),
+                SearchableSelectionField<String>(
+                  options: SelectionOptions.supplyUnits,
+                  value: _measurementUnit,
+                  labelText: 'Stock unit*',
+                  hintText: 'Search grams, metres, balls, pieces, and more',
+                  itemLabel: (unit) => unit,
+                  onChanged: (unit) => setState(() => _measurementUnit = unit),
+                  customValueBuilder: (query) => query,
+                  validator: (unit) => unit == null || unit.trim().isEmpty
+                      ? 'Select a stock unit'
+                      : null,
+                ),
+                const SizedBox(height: 16),
                 TextFormField(
                   controller: _reorderPointController,
                   decoration: const InputDecoration(
@@ -172,9 +209,11 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
                         'Flag this material as low stock at or below this amount.',
                     border: OutlineInputBorder(),
                   ),
-                  keyboardType: TextInputType.number,
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
                   inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly,
+                    FilteringTextInputFormatter.allow(
+                        RegExp(r'^\d*\.?\d{0,2}')),
                   ],
                 ),
               ],

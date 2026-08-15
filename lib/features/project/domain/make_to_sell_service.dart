@@ -15,32 +15,54 @@ class MaterialStockStatus {
     required this.inventoryItem,
     required this.quantityToReserve,
     required this.quantityToConsume,
+    required this.usesMeasuredQuantity,
+    required this.isUnitCompatible,
   });
 
   final SupplyNeed supplyNeed;
   final InventoryItem? inventoryItem;
 
   /// The material amount allocated to the requested project output.
-  final int quantityToReserve;
+  final double quantityToReserve;
 
   /// The amount that will actually be deducted. This remains zero for linked
   /// reusable tools such as hooks and needles.
-  final int quantityToConsume;
+  final double quantityToConsume;
+
+  final bool usesMeasuredQuantity;
+  final bool isUnitCompatible;
 
   bool get isLinked => inventoryItem != null;
 
-  int get availableQuantity => inventoryItem?.quantity ?? 0;
+  double get availableQuantity => inventoryItem?.availableStockQuantity ?? 0;
 
-  bool get hasEnoughStock => isLinked && availableQuantity >= quantityToReserve;
+  bool get hasEnoughStock =>
+      isLinked && isUnitCompatible && availableQuantity >= quantityToReserve;
 
   String get issue {
     if (!isLinked)
       return 'Link this supply to Materials Stock before completing the make.';
+    if (!isUnitCompatible) {
+      return 'This material is tracked in ${inventoryItem?.measurementUnit}; the project requires ${supplyNeed.unit}.';
+    }
     if (!hasEnoughStock) {
-      return 'Short by ${quantityToReserve - availableQuantity} ${supplyNeed.unit}.';
+      return 'Short by ${_format(quantityToReserve - availableQuantity)} ${supplyNeed.unit}.';
     }
     return '';
   }
+
+  String get formattedAvailableQuantity => _format(availableQuantity);
+  String get formattedReservedQuantity => _format(quantityToReserve);
+  String get formattedConsumptionQuantity => _format(quantityToConsume);
+  String get formattedShortageQuantity =>
+      _format(quantityToReserve - availableQuantity);
+
+  static String _format(double value) => value == value.roundToDouble()
+      ? value.toInt().toString()
+      : value
+          .toStringAsFixed(2)
+          .replaceFirst(RegExp(r'0+$'), '')
+          .replaceFirst(RegExp(r'\.$'), '');
 }
 
 /// The stock check used both by the project detail screen and the completion
@@ -110,16 +132,23 @@ class MakeToSellService {
 
     final materials = project.supplyNeeds.map(
       (supply) {
-        final reservedQuantity = _wholeStockQuantity(
-          supply.quantityNeeded * outputQuantity,
-        );
+        final material = supply.inventoryItemId == null
+            ? null
+            : materialById[supply.inventoryItemId];
+        final usesMeasuredQuantity = material?.usesMeasuredQuantity ?? false;
+        final isUnitCompatible = !usesMeasuredQuantity ||
+            _sameUnit(material!.measurementUnit!, supply.unit);
+        final requestedQuantity = supply.quantityNeeded * outputQuantity;
+        final reservedQuantity = usesMeasuredQuantity
+            ? requestedQuantity
+            : _wholeStockQuantity(requestedQuantity).toDouble();
         return MaterialStockStatus(
           supplyNeed: supply,
-          inventoryItem: supply.inventoryItemId == null
-              ? null
-              : materialById[supply.inventoryItemId],
+          inventoryItem: material,
           quantityToReserve: reservedQuantity,
           quantityToConsume: supply.isConsumable ? reservedQuantity : 0,
+          usesMeasuredQuantity: usesMeasuredQuantity,
+          isUnitCompatible: isUnitCompatible,
         );
       },
     ).toList(growable: false);
@@ -152,10 +181,16 @@ class MakeToSellService {
     for (final status in stockPreview.materials
         .where((status) => status.supplyNeed.isConsumable)) {
       final material = status.inventoryItem!;
-      final updated = material.copyWith(
-        quantity: material.quantity - status.quantityToConsume,
-        lastUpdated: now,
-      );
+      final updated = status.usesMeasuredQuantity
+          ? material.copyWith(
+              measuredQuantity:
+                  material.measuredQuantity! - status.quantityToConsume,
+              lastUpdated: now,
+            )
+          : material.copyWith(
+              quantity: material.quantity - status.quantityToConsume.round(),
+              lastUpdated: now,
+            );
       await _inventoryRepository.updateItem(updated);
       updatedMaterials.add(updated);
       final costEach =
@@ -215,4 +250,7 @@ class MakeToSellService {
   }
 
   int _wholeStockQuantity(double quantity) => quantity.ceil();
+
+  bool _sameUnit(String a, String b) =>
+      a.trim().toLowerCase() == b.trim().toLowerCase();
 }

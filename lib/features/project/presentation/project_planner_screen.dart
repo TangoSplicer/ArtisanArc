@@ -632,7 +632,7 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
                       emptyMessage: 'No matching material stock items',
                       itemLabel: (item) => item.name,
                       itemSubtitle: (item) =>
-                          '${item.quantity} available · ${item.category}',
+                          '${item.formattedStockQuantity} available · ${item.category}',
                       searchTerms: (item) =>
                           [item.category, item.storageLocation ?? ''],
                       onChanged: (item) {
@@ -647,6 +647,10 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
                             }
                             if (!isEditingSupply) {
                               isConsumable = !_isReusableTool(item);
+                              if (item.measurementUnit != null &&
+                                  item.measurementUnit!.isNotEmpty) {
+                                selectedUnit = item.measurementUnit!;
+                              }
                             }
                           }
                         });

@@ -44,6 +44,17 @@ class InventoryItem extends HiveObject {
   @HiveField(10, defaultValue: false)
   final bool isArchived;
 
+  /// Optional decimal amount for material stock such as 250 g, 1.5 m, or
+  /// 0.75 L. Finished-item tallies continue to use the integer quantity field.
+  @HiveField(11)
+  final double? measuredQuantity;
+
+  @HiveField(12)
+  final String? measurementUnit;
+
+  @HiveField(13)
+  final double? measuredReorderPoint;
+
   InventoryItem({
     required this.id,
     required this.name,
@@ -56,6 +67,9 @@ class InventoryItem extends HiveObject {
     this.itemType,
     this.reorderPoint,
     this.isArchived = false,
+    this.measuredQuantity,
+    this.measurementUnit,
+    this.measuredReorderPoint,
   });
 
   bool get isFinishedItem =>
@@ -63,6 +77,26 @@ class InventoryItem extends HiveObject {
       (itemType == null && category.startsWith('Finished'));
 
   bool get isMaterialStock => !isFinishedItem;
+
+  bool get usesMeasuredQuantity =>
+      isMaterialStock && measuredQuantity != null && measurementUnit != null;
+
+  double get availableStockQuantity =>
+      usesMeasuredQuantity ? measuredQuantity! : quantity.toDouble();
+
+  double? get activeReorderPoint =>
+      usesMeasuredQuantity ? measuredReorderPoint : reorderPoint?.toDouble();
+
+  String get formattedStockQuantity {
+    final amount = availableStockQuantity;
+    final display = amount == amount.roundToDouble()
+        ? amount.toInt().toString()
+        : amount
+            .toStringAsFixed(2)
+            .replaceFirst(RegExp(r'0+$'), '')
+            .replaceFirst(RegExp(r'\.$'), '');
+    return usesMeasuredQuantity ? '$display $measurementUnit' : display;
+  }
 
   // copyWith method for easy updates
   InventoryItem copyWith({
@@ -77,7 +111,13 @@ class InventoryItem extends HiveObject {
     String? itemType,
     int? reorderPoint,
     bool? isArchived,
+    double? measuredQuantity,
+    String? measurementUnit,
+    double? measuredReorderPoint,
     bool clearReorderPoint = false,
+    bool clearMeasuredQuantity = false,
+    bool clearMeasurementUnit = false,
+    bool clearMeasuredReorderPoint = false,
   }) {
     return InventoryItem(
       id: id ?? this.id,
@@ -92,6 +132,14 @@ class InventoryItem extends HiveObject {
       reorderPoint:
           clearReorderPoint ? null : reorderPoint ?? this.reorderPoint,
       isArchived: isArchived ?? this.isArchived,
+      measuredQuantity: clearMeasuredQuantity
+          ? null
+          : measuredQuantity ?? this.measuredQuantity,
+      measurementUnit:
+          clearMeasurementUnit ? null : measurementUnit ?? this.measurementUnit,
+      measuredReorderPoint: clearMeasuredReorderPoint
+          ? null
+          : measuredReorderPoint ?? this.measuredReorderPoint,
     );
   }
 }

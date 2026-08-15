@@ -33,7 +33,8 @@ class _LowStockWidgetState extends State<LowStockWidget> {
             (item) =>
                 item.isMaterialStock &&
                 !item.isArchived &&
-                item.quantity <= (item.reorderPoint ?? widget.threshold),
+                item.availableStockQuantity <=
+                    (item.activeReorderPoint ?? widget.threshold),
           )
           .toList();
       setState(() => _lowStockItems = lowStock);
@@ -102,11 +103,12 @@ class _LowStockWidgetState extends State<LowStockWidget> {
               itemCount: _lowStockItems.length,
               itemBuilder: (context, index) {
                 final item = _lowStockItems[index];
-                final reorderPoint = item.reorderPoint ?? widget.threshold;
+                final reorderPoint =
+                    item.activeReorderPoint ?? widget.threshold;
                 return Semantics(
                   button: true,
                   label:
-                      '${item.name}, low stock: ${item.quantity} available. Reorder at $reorderPoint.',
+                      '${item.name}, low stock: ${item.formattedStockQuantity} available. Reorder at $reorderPoint ${item.measurementUnit ?? 'units'}.',
                   child: ListTile(
                     dense: true,
                     onTap: () => context.pushNamed(
@@ -115,11 +117,11 @@ class _LowStockWidgetState extends State<LowStockWidget> {
                     ),
                     leading: CircleAvatar(
                       backgroundColor: Colors.orange.withOpacity(0.2),
-                      child: Text(item.quantity.toString()),
+                      child: Text(item.formattedStockQuantity),
                     ),
                     title: Text(item.name),
                     subtitle: Text(
-                      '${item.category} · ${item.quantity} available · Reorder at $reorderPoint',
+                      '${item.category} · ${item.formattedStockQuantity} available · Reorder at $reorderPoint ${item.measurementUnit ?? 'units'}',
                     ),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   ),

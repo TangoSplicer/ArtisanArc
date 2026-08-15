@@ -28,13 +28,16 @@ class InventoryItemAdapter extends TypeAdapter<InventoryItem> {
       itemType: fields[8] as String?,
       reorderPoint: fields[9] as int?,
       isArchived: fields[10] == null ? false : fields[10] as bool,
+      measuredQuantity: fields[11] as double?,
+      measurementUnit: fields[12] as String?,
+      measuredReorderPoint: fields[13] as double?,
     );
   }
 
   @override
   void write(BinaryWriter writer, InventoryItem obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -56,7 +59,13 @@ class InventoryItemAdapter extends TypeAdapter<InventoryItem> {
       ..writeByte(9)
       ..write(obj.reorderPoint)
       ..writeByte(10)
-      ..write(obj.isArchived);
+      ..write(obj.isArchived)
+      ..writeByte(11)
+      ..write(obj.measuredQuantity)
+      ..writeByte(12)
+      ..write(obj.measurementUnit)
+      ..writeByte(13)
+      ..write(obj.measuredReorderPoint);
   }
 
   @override

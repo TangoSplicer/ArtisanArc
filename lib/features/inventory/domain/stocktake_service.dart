@@ -38,7 +38,7 @@ class StocktakeService {
   }
 
   Future<StocktakeResult> applyStocktake({
-    required Map<InventoryItem, int> countedQuantities,
+    required Map<InventoryItem, num> countedQuantities,
     String reason = 'Stocktake',
     String? note,
   }) async {
@@ -57,17 +57,30 @@ class StocktakeService {
     final adjustments = <StockAdjustment>[];
     for (final entry in countedQuantities.entries) {
       final item = entry.key;
-      final counted = entry.value;
-      if (item.quantity == counted) continue;
+      final counted = entry.value.toDouble();
+      final previous = item.availableStockQuantity;
+      if (previous == counted) continue;
 
-      final updated = item.copyWith(quantity: counted, lastUpdated: now);
+      final usesMeasured = item.usesMeasuredQuantity;
+      final updated = usesMeasured
+          ? item.copyWith(
+              quantity: counted.ceil(),
+              measuredQuantity: counted,
+              lastUpdated: now,
+            )
+          : item.copyWith(quantity: counted.round(), lastUpdated: now);
       final adjustment = StockAdjustment(
         id: _uuid.v4(),
         itemId: item.id,
         itemName: item.name,
         previousQuantity: item.quantity,
-        countedQuantity: counted,
-        quantityChange: counted - item.quantity,
+        countedQuantity: usesMeasured ? counted.ceil() : counted.round(),
+        quantityChange:
+            (usesMeasured ? counted.ceil() : counted.round()) - item.quantity,
+        previousMeasuredQuantity: usesMeasured ? previous : null,
+        countedMeasuredQuantity: usesMeasured ? counted : null,
+        measuredQuantityChange: usesMeasured ? counted - previous : null,
+        measurementUnit: usesMeasured ? item.measurementUnit : null,
         recordedAt: now,
         reason: cleanReason,
         note: note?.trim().isEmpty ?? true ? null : note!.trim(),

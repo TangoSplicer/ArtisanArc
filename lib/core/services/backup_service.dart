@@ -54,6 +54,8 @@ class BackupService {
   static const _boxNames = <String>[
     'inventoryBox',
     'stockAdjustmentsBox',
+    'suppliersBox',
+    'materialPurchasesBox',
     'salesBox',
     'stallSessionsBox',
     'complianceBox',

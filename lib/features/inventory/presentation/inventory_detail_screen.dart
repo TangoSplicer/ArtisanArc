@@ -39,6 +39,7 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
   late TextEditingController _priceController;
   late TextEditingController _locationController;
   late TextEditingController _reorderPointController;
+  String? _measurementUnit;
 
   @override
   void initState() {
@@ -68,28 +69,54 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
   void _initializeControllers() {
     _nameController = TextEditingController(text: _item?.name);
     _categoryController = TextEditingController(text: _item?.category);
-    _quantityController =
-        TextEditingController(text: _item?.quantity.toString());
+    _quantityController = TextEditingController(
+      text: _item?.isMaterialStock == true
+          ? _item!.availableStockQuantity.toString()
+          : _item?.quantity.toString(),
+    );
     _priceController =
         TextEditingController(text: _item?.price?.toString() ?? '');
     _locationController =
         TextEditingController(text: _item?.storageLocation ?? '');
-    _reorderPointController =
-        TextEditingController(text: _item?.reorderPoint?.toString() ?? '');
+    _reorderPointController = TextEditingController(
+      text: _item?.activeReorderPoint?.toString() ?? '',
+    );
+    _measurementUnit = _item?.measurementUnit;
   }
 
   Future<void> _saveChanges() async {
     if (_item == null) return;
 
+    final amount = double.tryParse(_quantityController.text);
+    if (amount == null || amount < 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Enter an amount of zero or more.')),
+      );
+      return;
+    }
+    if (_item!.isMaterialStock && (_measurementUnit ?? '').trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Select a stock unit for this material.')),
+      );
+      return;
+    }
+
     final updatedItem = _item!.copyWith(
       name: _nameController.text,
       category: _categoryController.text,
-      quantity: int.tryParse(_quantityController.text) ?? _item!.quantity,
+      quantity: _item!.isFinishedItem ? amount.round() : amount.ceil(),
       price: double.tryParse(_priceController.text),
       storageLocation:
           _locationController.text.isEmpty ? null : _locationController.text,
-      reorderPoint: int.tryParse(_reorderPointController.text),
-      clearReorderPoint: _reorderPointController.text.trim().isEmpty,
+      clearReorderPoint:
+          _item!.isMaterialStock || _reorderPointController.text.trim().isEmpty,
+      measuredQuantity: _item!.isMaterialStock ? amount : null,
+      measurementUnit: _item!.isMaterialStock ? _measurementUnit : null,
+      measuredReorderPoint: _item!.isMaterialStock
+          ? double.tryParse(_reorderPointController.text)
+          : null,
+      clearMeasuredReorderPoint:
+          _item!.isMaterialStock && _reorderPointController.text.trim().isEmpty,
       lastUpdated: DateTime.now(),
     );
 
@@ -225,16 +252,30 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
                         separatorBuilder: (_, __) => const Divider(height: 1),
                         itemBuilder: (context, index) {
                           final adjustment = adjustments[index];
-                          final sign =
-                              adjustment.quantityChange >= 0 ? '+' : '';
+                          final change = adjustment.measuredQuantityChange ??
+                              adjustment.quantityChange.toDouble();
+                          final previous =
+                              adjustment.previousMeasuredQuantity ??
+                                  adjustment.previousQuantity.toDouble();
+                          final counted = adjustment.countedMeasuredQuantity ??
+                              adjustment.countedQuantity.toDouble();
+                          String format(double value) =>
+                              value == value.roundToDouble()
+                                  ? value.toInt().toString()
+                                  : value
+                                      .toStringAsFixed(2)
+                                      .replaceFirst(RegExp(r'0+$'), '')
+                                      .replaceFirst(RegExp(r'\\.$'), '');
+                          final unit = adjustment.measurementUnit ?? '';
+                          final sign = change >= 0 ? '+' : '';
                           return ListTile(
-                            leading: Icon(adjustment.quantityChange >= 0
+                            leading: Icon(change >= 0
                                 ? Icons.add_circle_outline
                                 : Icons.remove_circle_outline),
                             title: Text(
-                                '${sign}${adjustment.quantityChange} · ${adjustment.reason}'),
+                                '$sign${format(change)}${unit.isEmpty ? '' : ' $unit'} · ${adjustment.reason}'),
                             subtitle: Text(
-                                '${adjustment.previousQuantity} recorded → ${adjustment.countedQuantity} counted${adjustment.note == null ? '' : ' · ${adjustment.note}'}'),
+                                '${format(previous)}${unit.isEmpty ? '' : ' $unit'} recorded → ${format(counted)}${unit.isEmpty ? '' : ' $unit'} counted${adjustment.note == null ? '' : ' · ${adjustment.note}'}'),
                           );
                         },
                       ),
@@ -474,10 +515,16 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
               TextField(
                 controller: _quantityController,
                 decoration: InputDecoration(
-                    labelText: _item!.isFinishedItem
-                        ? 'Created / available tally'
-                        : 'Amount available to work with'),
-                keyboardType: TextInputType.number,
+                  labelText: _item!.isFinishedItem
+                      ? 'Created / available tally'
+                      : 'Amount available to work with',
+                  helperText: _item!.isFinishedItem
+                      ? null
+                      : 'Use decimals for measured stock, such as 250 g or 1.5 m.',
+                ),
+                keyboardType: _item!.isFinishedItem
+                    ? TextInputType.number
+                    : const TextInputType.numberWithOptions(decimal: true),
               ),
               const SizedBox(height: 16),
               TextField(
@@ -498,7 +545,18 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
                     helperText:
                         'Show this material as low stock at or below this amount.',
                   ),
-                  keyboardType: TextInputType.number,
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
+                ),
+                const SizedBox(height: 16),
+                SearchableSelectionField<String>(
+                  options: SelectionOptions.supplyUnits,
+                  value: _measurementUnit,
+                  labelText: 'Stock unit',
+                  hintText: 'Search grams, metres, balls, pieces, and more',
+                  itemLabel: (unit) => unit,
+                  onChanged: (unit) => setState(() => _measurementUnit = unit),
+                  customValueBuilder: (query) => query,
                 ),
               ],
               const SizedBox(height: 16),
@@ -526,15 +584,21 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
                   _item!.isFinishedItem
                       ? 'Created / available tally'
                       : 'Amount available',
-                  _item!.quantity.toString()),
+                  _item!.isMaterialStock
+                      ? _item!.formattedStockQuantity
+                      : _item!.quantity.toString()),
               _buildDetailRow(
                   _item!.isFinishedItem ? 'Sale price' : 'Replacement cost',
                   _item!.price != null
                       ? '£${_item!.price!.toStringAsFixed(2)}'
                       : 'Not set'),
               if (_item!.isMaterialStock)
-                _buildDetailRow('Reorder point',
-                    _item!.reorderPoint?.toString() ?? 'Use global threshold'),
+                _buildDetailRow(
+                  'Reorder point',
+                  _item!.activeReorderPoint == null
+                      ? 'Use global threshold'
+                      : '${_item!.activeReorderPoint} ${_item!.measurementUnit ?? 'units'}',
+                ),
               _buildDetailRow(
                   'Storage Location', _item!.storageLocation ?? 'Not set'),
               _buildDetailRow(

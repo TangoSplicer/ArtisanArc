@@ -4,8 +4,11 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 // Inventory
 import '../../features/inventory/data/inventory_repository.dart';
 import '../../features/inventory/data/stock_adjustment_repository.dart';
+import '../../features/inventory/data/supplier_repository.dart';
+import '../../features/inventory/data/material_purchase_repository.dart';
 import '../../features/inventory/domain/inventory_service.dart';
 import '../../features/inventory/domain/stocktake_service.dart';
+import '../../features/inventory/domain/procurement_service.dart';
 
 // Business
 import '../../features/business/data/business_repository.dart';
@@ -61,9 +64,18 @@ Future<void> configureDependencies() async {
       () => InventoryServiceImpl(getIt<InventoryRepository>()));
   getIt.registerLazySingleton<StockAdjustmentRepository>(
       () => StockAdjustmentRepositoryImpl());
+  getIt.registerLazySingleton<SupplierRepository>(
+      () => SupplierRepositoryImpl());
+  getIt.registerLazySingleton<MaterialPurchaseRepository>(
+      () => MaterialPurchaseRepositoryImpl());
   getIt.registerLazySingleton<StocktakeService>(() => StocktakeService(
         getIt<InventoryRepository>(),
         getIt<StockAdjustmentRepository>(),
+      ));
+  getIt.registerLazySingleton<ProcurementService>(() => ProcurementService(
+        getIt<InventoryRepository>(),
+        getIt<SupplierRepository>(),
+        getIt<MaterialPurchaseRepository>(),
       ));
 
   // Business Feature
