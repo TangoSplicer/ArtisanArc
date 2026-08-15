@@ -34,7 +34,7 @@ The current build already provides searchable craft-focused selection controls, 
 | **1.9 — Buy and measure with confidence** | Flexible material units and private procurement | Material costs and stock quantities reflect real purchases and measured use | **Delivered in v1.9.0+14; signed APK verified** |
 | **2.0 — Price with clarity, fulfil locally** | Project cost previews and customer commissions | Makers can price work transparently and track private orders without a server | **Delivered in v2.0.0+15; signed APK verified** |
 | **2.1 — Label, scan and bring data safely** | QR labels, scan-to-sell and CSV workflow | Physical labels and reusable CSV files accelerate routine stock and sale work offline | **Delivered in v2.1.0+16; signed APK verified** |
-| **2.2 — Run the maker week** | Operations dashboard and seasonal workflows | A maker can prioritise local stock, orders, projects, sales and event work in one view | **Delivered in v2.2.0+17; release verification pending** |
+| **2.2 — Run the maker week** | Operations dashboard and seasonal workflows | A maker can prioritise local stock, orders, projects, sales and event work in one view | **Delivered in v2.2.0+17; signed APK verified** |
 | **Later, only if needed** | Optional expansion | Controlled scope without weakening the Personal Edition | **Deliberate** |
 
 ---
