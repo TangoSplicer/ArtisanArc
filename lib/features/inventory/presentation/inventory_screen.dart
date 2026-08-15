@@ -31,9 +31,12 @@ class _InventoryScreenState extends State<InventoryScreen> {
   final InventoryService _service = GetIt.I<InventoryService>();
   List<InventoryItem> _items = [];
 
-  bool get _isFinishedView => widget.viewMode == InventoryViewMode.finishedItems;
-  String get _title => _isFinishedView ? 'Inventory · Created Items' : 'Materials Stock';
-  String get _emptyTitle => _isFinishedView ? 'No Created Items Yet' : 'No Materials Stock Yet';
+  bool get _isFinishedView =>
+      widget.viewMode == InventoryViewMode.finishedItems;
+  String get _title =>
+      _isFinishedView ? 'Inventory · Created Items' : 'Materials Stock';
+  String get _emptyTitle =>
+      _isFinishedView ? 'No Created Items Yet' : 'No Materials Stock Yet';
   String get _emptySubtitle => _isFinishedView
       ? 'Add the pieces you have made to keep a clear tally of what is ready.'
       : 'Add yarn, hooks, notions, and supplies so you can see what is available to work with.';
@@ -42,26 +45,34 @@ class _InventoryScreenState extends State<InventoryScreen> {
   void initState() {
     super.initState();
     _loadItems();
-    AnalyticsService.trackFeatureUsage(_isFinishedView ? 'created_items_view' : 'materials_stock_view');
+    AnalyticsService.trackFeatureUsage(
+        _isFinishedView ? 'created_items_view' : 'materials_stock_view');
   }
 
   Future<void> _loadItems() async {
     final allItems = await _service.fetchItems();
-    final filtered = allItems.where((item) => _isFinishedView ? item.isFinishedItem : item.isMaterialStock).toList()
+    final filtered = allItems
+        .where((item) => !item.isArchived)
+        .where((item) =>
+            _isFinishedView ? item.isFinishedItem : item.isMaterialStock)
+        .toList()
       ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
     if (mounted) setState(() => _items = filtered);
   }
 
   Future<void> _navigateToAddItemForm() async {
-    final result = await context.push(_isFinishedView ? '/inventory/add' : '/stock/add');
+    final result =
+        await context.push(_isFinishedView ? '/inventory/add' : '/stock/add');
     if (result == true) _loadItems();
   }
 
   @override
   Widget build(BuildContext context) {
     final color = Theme.of(context).colorScheme;
-    final totalQuantity = _items.fold<int>(0, (sum, item) => sum + item.quantity);
-    final finishedValue = _items.fold<double>(0, (sum, item) => sum + item.quantity * (item.price ?? 0));
+    final totalQuantity =
+        _items.fold<int>(0, (sum, item) => sum + item.quantity);
+    final finishedValue = _items.fold<double>(
+        0, (sum, item) => sum + item.quantity * (item.price ?? 0));
 
     return Scaffold(
       appBar: PersonalAppBar(
@@ -69,6 +80,14 @@ class _InventoryScreenState extends State<InventoryScreen> {
         backgroundColor: color.primary,
         foregroundColor: color.onPrimary,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.fact_check_outlined),
+            tooltip: 'Run stocktake',
+            onPressed: () async {
+              await context.pushNamed('stocktake');
+              _loadItems();
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.qr_code_scanner),
             tooltip: 'Scan item QR code',
@@ -88,17 +107,24 @@ class _InventoryScreenState extends State<InventoryScreen> {
       body: Container(
         decoration: BoxDecoration(
           gradient: RadialGradient(
-            colors: [color.surface, color.background, color.primary.withOpacity(0.05)],
+            colors: [
+              color.surface,
+              color.background,
+              color.primary.withOpacity(0.05)
+            ],
             radius: 1.3,
             center: Alignment.topRight,
           ),
         ),
         child: _items.isEmpty
             ? EmptyStateWidget(
-                icon: _isFinishedView ? Icons.inventory_2_outlined : Icons.yard_outlined,
+                icon: _isFinishedView
+                    ? Icons.inventory_2_outlined
+                    : Icons.yard_outlined,
                 title: _emptyTitle,
                 subtitle: _emptySubtitle,
-                actionText: _isFinishedView ? 'Add created item' : 'Add material',
+                actionText:
+                    _isFinishedView ? 'Add created item' : 'Add material',
                 onAction: _navigateToAddItemForm,
               )
             : ListView.builder(
@@ -110,10 +136,18 @@ class _InventoryScreenState extends State<InventoryScreen> {
                       color: color.primaryContainer,
                       margin: const EdgeInsets.only(bottom: 16),
                       child: ListTile(
-                        leading: Icon(_isFinishedView ? Icons.widgets_outlined : Icons.yard_outlined, color: color.onPrimaryContainer),
+                        leading: Icon(
+                            _isFinishedView
+                                ? Icons.widgets_outlined
+                                : Icons.yard_outlined,
+                            color: color.onPrimaryContainer),
                         title: Text(
-                          _isFinishedView ? '$totalQuantity item${totalQuantity == 1 ? '' : 's'} currently tallied' : '$totalQuantity units available to work with',
-                          style: TextStyle(color: color.onPrimaryContainer, fontWeight: FontWeight.w700),
+                          _isFinishedView
+                              ? '$totalQuantity item${totalQuantity == 1 ? '' : 's'} currently tallied'
+                              : '$totalQuantity units available to work with',
+                          style: TextStyle(
+                              color: color.onPrimaryContainer,
+                              fontWeight: FontWeight.w700),
                         ),
                         subtitle: Text(
                           _isFinishedView
@@ -128,11 +162,13 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   final item = _items[index - 1];
                   return Card(
                     elevation: 4,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)),
                     margin: const EdgeInsets.only(bottom: 16),
                     child: ListTile(
                       leading: _buildItemLeadingWidget(item, color),
-                      title: Text(item.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      title: Text(item.name,
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
                       subtitle: Text(
                         _isFinishedView
                             ? 'Tally: ${item.quantity} made / available · ${item.category}\nSale price: ${item.price != null ? '£${item.price!.toStringAsFixed(2)}' : 'Not set'} · Location: ${item.storageLocation ?? 'Not set'}'
@@ -144,7 +180,9 @@ class _InventoryScreenState extends State<InventoryScreen> {
                         onPressed: () => _showQrCode(item),
                       ),
                       isThreeLine: true,
-                      onTap: () => context.push('/inventory/detail/${item.id}').then((_) => _loadItems()),
+                      onTap: () => context
+                          .push('/inventory/detail/${item.id}')
+                          .then((_) => _loadItems()),
                     ),
                   );
                 },
@@ -161,15 +199,23 @@ class _InventoryScreenState extends State<InventoryScreen> {
         content: SingleChildScrollView(
           child: ListBody(
             children: [
-              Text('Type: ${item.isFinishedItem ? 'Created item' : 'Material stock'}'),
+              Text(
+                  'Type: ${item.isFinishedItem ? 'Created item' : 'Material stock'}'),
               Text('Category: ${item.category}'),
-              Text(item.isFinishedItem ? 'Tally: ${item.quantity}' : 'Available: ${item.quantity}'),
-              Text('Price: ${item.price != null ? '£${item.price!.toStringAsFixed(2)}' : 'Not set'}'),
+              Text(item.isFinishedItem
+                  ? 'Tally: ${item.quantity}'
+                  : 'Available: ${item.quantity}'),
+              Text(
+                  'Price: ${item.price != null ? '£${item.price!.toStringAsFixed(2)}' : 'Not set'}'),
               Text('Location: ${item.storageLocation ?? 'Not set'}'),
             ],
           ),
         ),
-        actions: [TextButton(onPressed: () => Navigator.of(dialogContext).pop(), child: const Text('OK'))],
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('OK'))
+        ],
       ),
     );
   }
@@ -179,8 +225,13 @@ class _InventoryScreenState extends State<InventoryScreen> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text('${item.name} QR Code'),
-        content: SizedBox(width: 250, height: 250, child: QRGeneratorWidget(data: item.id)),
-        actions: [TextButton(onPressed: () => Navigator.of(dialogContext).pop(), child: const Text('Close'))],
+        content: SizedBox(
+            width: 250, height: 250, child: QRGeneratorWidget(data: item.id)),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Close'))
+        ],
       ),
     );
   }
@@ -188,21 +239,27 @@ class _InventoryScreenState extends State<InventoryScreen> {
   Widget _buildItemLeadingWidget(InventoryItem item, ColorScheme colorScheme) {
     if (item.imagePaths != null && item.imagePaths!.isNotEmpty) {
       return FutureBuilder<String>(
-        future: getApplicationDocumentsDirectory().then((dir) => p.join(dir.path, 'inventory_images', item.imagePaths!.first)),
+        future: getApplicationDocumentsDirectory().then((dir) =>
+            p.join(dir.path, 'inventory_images', item.imagePaths!.first)),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.done &&
+              snapshot.hasData) {
             final imageFile = File(snapshot.data!);
             if (imageFile.existsSync()) {
               return SizedBox(
                 width: 50,
                 height: 50,
-                child: ClipRRect(borderRadius: BorderRadius.circular(8), child: Image.file(imageFile, fit: BoxFit.cover)),
+                child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.file(imageFile, fit: BoxFit.cover)),
               );
             }
           }
           return CircleAvatar(
             backgroundColor: colorScheme.secondaryContainer,
-            child: Icon(item.isFinishedItem ? Icons.inventory_2_outlined : Icons.yard_outlined),
+            child: Icon(item.isFinishedItem
+                ? Icons.inventory_2_outlined
+                : Icons.yard_outlined),
           );
         },
       );

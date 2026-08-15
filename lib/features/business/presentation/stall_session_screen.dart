@@ -70,7 +70,10 @@ class _StallSessionScreenState extends State<StallSessionScreen> {
 
   List<InventoryItem> get _saleableItems => _items
       .where((item) =>
-          item.isFinishedItem && item.quantity > 0 && item.price != null)
+          item.isFinishedItem &&
+          !item.isArchived &&
+          item.quantity > 0 &&
+          item.price != null)
       .toList();
 
   int get _basketItemCount =>

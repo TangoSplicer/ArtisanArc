@@ -53,6 +53,7 @@ class AutomaticSnapshotInfo {
 class BackupService {
   static const _boxNames = <String>[
     'inventoryBox',
+    'stockAdjustmentsBox',
     'salesBox',
     'stallSessionsBox',
     'complianceBox',

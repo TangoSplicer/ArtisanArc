@@ -32,6 +32,7 @@ class _LowStockWidgetState extends State<LowStockWidget> {
           .where(
             (item) =>
                 item.isMaterialStock &&
+                !item.isArchived &&
                 item.quantity <= (item.reorderPoint ?? widget.threshold),
           )
           .toList();

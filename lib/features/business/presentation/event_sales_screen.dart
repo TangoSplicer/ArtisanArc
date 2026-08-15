@@ -46,17 +46,25 @@ class _EventSalesScreenState extends State<EventSalesScreen> {
     final items = await _inventoryService.fetchItems();
     if (!mounted) return;
     setState(() {
-      _items = [...items]..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+      _items = [...items]
+        ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
       _isLoading = false;
     });
   }
 
   List<InventoryItem> get _visibleItems {
-    final saleable = _items.where((item) => item.isFinishedItem && item.quantity > 0 && item.price != null).toList();
+    final saleable = _items
+        .where((item) =>
+            item.isFinishedItem &&
+            !item.isArchived &&
+            item.quantity > 0 &&
+            item.price != null)
+        .toList();
     return saleable;
   }
 
-  int get _totalItemsSold => _soldQuantities.values.fold(0, (sum, quantity) => sum + quantity);
+  int get _totalItemsSold =>
+      _soldQuantities.values.fold(0, (sum, quantity) => sum + quantity);
 
   double get _totalRevenue => _items.fold(0.0, (sum, item) {
         final quantity = _soldQuantities[item.id] ?? 0;
@@ -78,9 +86,14 @@ class _EventSalesScreenState extends State<EventSalesScreen> {
   Future<void> _recordSales() async {
     if (_soldQuantities.isEmpty || _isSaving) return;
 
-    final eventName = _eventController.text.trim().isEmpty ? 'On-the-day sales' : _eventController.text.trim();
-    final eventLocation = _locationController.text.trim().isEmpty ? null : _locationController.text.trim();
-    final soldItems = _items.where((item) => (_soldQuantities[item.id] ?? 0) > 0).toList();
+    final eventName = _eventController.text.trim().isEmpty
+        ? 'On-the-day sales'
+        : _eventController.text.trim();
+    final eventLocation = _locationController.text.trim().isEmpty
+        ? null
+        : _locationController.text.trim();
+    final soldItems =
+        _items.where((item) => (_soldQuantities[item.id] ?? 0) > 0).toList();
 
     setState(() => _isSaving = true);
     try {
@@ -108,12 +121,15 @@ class _EventSalesScreenState extends State<EventSalesScreen> {
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Recorded $_totalItemsSold item${_totalItemsSold == 1 ? '' : 's'} · £${_totalRevenue.toStringAsFixed(2)}')),
+        SnackBar(
+            content: Text(
+                'Recorded $_totalItemsSold item${_totalItemsSold == 1 ? '' : 's'} · £${_totalRevenue.toStringAsFixed(2)}')),
       );
       Navigator.of(context).pop(true);
     } catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not record sales: $error')));
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Could not record sales: $error')));
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -191,28 +207,39 @@ class _EventSalesScreenState extends State<EventSalesScreen> {
                           final stockRemaining = item.quantity - sold;
                           return Card(
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
                               child: Row(
                                 children: [
                                   Expanded(
                                     child: ListTile(
-                                      contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              horizontal: 8),
                                       title: Text(item.name),
-                                      subtitle: Text('${item.category} · £${item.price!.toStringAsFixed(2)} · $stockRemaining available'),
+                                      subtitle: Text(
+                                          '${item.category} · £${item.price!.toStringAsFixed(2)} · $stockRemaining available'),
                                     ),
                                   ),
                                   IconButton(
                                     tooltip: 'Remove one ${item.name}',
-                                    onPressed: sold == 0 ? null : () => _adjustQuantity(item, -1),
-                                    icon: const Icon(Icons.remove_circle_outline),
+                                    onPressed: sold == 0
+                                        ? null
+                                        : () => _adjustQuantity(item, -1),
+                                    icon:
+                                        const Icon(Icons.remove_circle_outline),
                                   ),
                                   SizedBox(
                                     width: 24,
-                                    child: Text('$sold', textAlign: TextAlign.center, style: theme.textTheme.titleMedium),
+                                    child: Text('$sold',
+                                        textAlign: TextAlign.center,
+                                        style: theme.textTheme.titleMedium),
                                   ),
                                   IconButton(
                                     tooltip: 'Record one ${item.name} sold',
-                                    onPressed: stockRemaining == 0 ? null : () => _adjustQuantity(item, 1),
+                                    onPressed: stockRemaining == 0
+                                        ? null
+                                        : () => _adjustQuantity(item, 1),
                                     icon: const Icon(Icons.add_circle),
                                     color: theme.colorScheme.primary,
                                   ),
@@ -230,12 +257,16 @@ class _EventSalesScreenState extends State<EventSalesScreen> {
         child: ElevatedButton.icon(
           onPressed: _soldQuantities.isEmpty || _isSaving ? null : _recordSales,
           icon: _isSaving
-              ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2))
               : const Icon(Icons.check_circle_outline),
           label: Text(_soldQuantities.isEmpty
               ? 'Tap + to record sales'
               : 'Save $_totalItemsSold item${_totalItemsSold == 1 ? '' : 's'} · £${_totalRevenue.toStringAsFixed(2)}'),
-          style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
+          style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 16)),
         ),
       ),
     );

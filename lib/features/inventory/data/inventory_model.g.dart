@@ -27,13 +27,14 @@ class InventoryItemAdapter extends TypeAdapter<InventoryItem> {
       lastUpdated: fields[7] as DateTime,
       itemType: fields[8] as String?,
       reorderPoint: fields[9] as int?,
+      isArchived: fields[10] == null ? false : fields[10] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, InventoryItem obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -53,7 +54,9 @@ class InventoryItemAdapter extends TypeAdapter<InventoryItem> {
       ..writeByte(8)
       ..write(obj.itemType)
       ..writeByte(9)
-      ..write(obj.reorderPoint);
+      ..write(obj.reorderPoint)
+      ..writeByte(10)
+      ..write(obj.isArchived);
   }
 
   @override

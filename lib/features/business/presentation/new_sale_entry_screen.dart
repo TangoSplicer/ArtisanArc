@@ -42,7 +42,9 @@ class _NewSaleEntryScreenState extends State<NewSaleEntryScreen> {
     final items = await _inventoryService.fetchItems();
     if (!mounted) return;
     setState(() {
-      _items = items.where((item) => item.isFinishedItem).toList()
+      _items = items
+          .where((item) => item.isFinishedItem && !item.isArchived)
+          .toList()
         ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
     });
   }
@@ -53,7 +55,9 @@ class _NewSaleEntryScreenState extends State<NewSaleEntryScreen> {
     final quantity = int.parse(_quantityController.text);
     if (quantity > _selectedItem!.quantity) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Only ${_selectedItem!.quantity} ${_selectedItem!.name} available in the created-item tally.')),
+        SnackBar(
+            content: Text(
+                'Only ${_selectedItem!.quantity} ${_selectedItem!.name} available in the created-item tally.')),
       );
       return;
     }
@@ -94,24 +98,35 @@ class _NewSaleEntryScreenState extends State<NewSaleEntryScreen> {
                 hintText: 'Search created items ready to sell',
                 emptyMessage: 'No created items available to sell',
                 itemLabel: (item) => item.name,
-                itemSubtitle: (item) => '${item.category} · ${item.quantity} available${item.storageLocation == null || item.storageLocation!.isEmpty ? '' : ' · ${item.storageLocation}'}',
-                searchTerms: (item) => [item.name, item.category, item.storageLocation ?? ''],
+                itemSubtitle: (item) =>
+                    '${item.category} · ${item.quantity} available${item.storageLocation == null || item.storageLocation!.isEmpty ? '' : ' · ${item.storageLocation}'}',
+                searchTerms: (item) =>
+                    [item.name, item.category, item.storageLocation ?? ''],
                 onChanged: (item) => setState(() => _selectedItem = item),
-                validator: (item) => item == null ? 'Select an inventory item' : null,
+                validator: (item) =>
+                    item == null ? 'Select an inventory item' : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _quantityController,
-                decoration: const InputDecoration(labelText: 'Quantity sold', border: OutlineInputBorder()),
+                decoration: const InputDecoration(
+                    labelText: 'Quantity sold', border: OutlineInputBorder()),
                 keyboardType: TextInputType.number,
-                validator: (value) => (int.tryParse(value ?? '') ?? 0) > 0 ? null : 'Enter a quantity greater than zero',
+                validator: (value) => (int.tryParse(value ?? '') ?? 0) > 0
+                    ? null
+                    : 'Enter a quantity greater than zero',
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _priceController,
-                decoration: const InputDecoration(labelText: 'Price per unit (£)', border: OutlineInputBorder()),
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                validator: (value) => (double.tryParse(value ?? '') ?? -1) >= 0 ? null : 'Enter a valid price',
+                decoration: const InputDecoration(
+                    labelText: 'Price per unit (£)',
+                    border: OutlineInputBorder()),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                validator: (value) => (double.tryParse(value ?? '') ?? -1) >= 0
+                    ? null
+                    : 'Enter a valid price',
               ),
               const SizedBox(height: 24),
               ElevatedButton.icon(

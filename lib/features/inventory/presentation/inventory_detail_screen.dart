@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 import '../data/inventory_model.dart';
 import '../domain/inventory_service.dart';
+import '../domain/stocktake_service.dart';
 import '../../qr/presentation/qr_generator_widget.dart';
 import '../../../core/constants/selection_options.dart';
 import '../../../core/widgets/searchable_selection_field.dart';
@@ -24,6 +25,7 @@ class InventoryDetailScreen extends StatefulWidget {
 
 class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
   final InventoryService _service = GetIt.I<InventoryService>();
+  final StocktakeService _stocktakeService = GetIt.I<StocktakeService>();
   final ImagePicker _picker = ImagePicker();
   final Uuid _uuid = const Uuid();
 
@@ -151,6 +153,99 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
     }
   }
 
+  Future<void> _toggleArchive() async {
+    if (_item == null) return;
+    final shouldArchive = !_item!.isArchived;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(shouldArchive ? 'Archive item' : 'Restore item'),
+        content: Text(
+          shouldArchive
+              ? 'Archive "${_item!.name}"? It will be hidden from everyday inventory and sales, but its history will remain.'
+              : 'Restore "${_item!.name}" to everyday inventory?',
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('Cancel')),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(shouldArchive ? 'Archive' : 'Restore'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || _item == null) return;
+    try {
+      final updated =
+          await _stocktakeService.setArchived(_item!, shouldArchive);
+      if (!mounted) return;
+      setState(() => _item = updated);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(shouldArchive
+                ? 'Item archived.'
+                : 'Item restored to inventory.')),
+      );
+      if (shouldArchive) context.pop(true);
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Could not update archive state: $error')));
+      }
+    }
+  }
+
+  Future<void> _showAdjustmentHistory() async {
+    if (_item == null) return;
+    final adjustments =
+        await _stocktakeService.getAdjustmentHistory(itemId: _item!.id);
+    if (!mounted) return;
+    await showModalBottomSheet<void>(
+      context: context,
+      builder: (sheetContext) => SafeArea(
+        child: SizedBox(
+          height: MediaQuery.sizeOf(sheetContext).height * 0.65,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text('Stock adjustments',
+                    style: Theme.of(sheetContext).textTheme.titleLarge),
+              ),
+              const Divider(height: 1),
+              Expanded(
+                child: adjustments.isEmpty
+                    ? const Center(
+                        child: Text(
+                            'No stocktake adjustments recorded for this item.'))
+                    : ListView.separated(
+                        itemCount: adjustments.length,
+                        separatorBuilder: (_, __) => const Divider(height: 1),
+                        itemBuilder: (context, index) {
+                          final adjustment = adjustments[index];
+                          final sign =
+                              adjustment.quantityChange >= 0 ? '+' : '';
+                          return ListTile(
+                            leading: Icon(adjustment.quantityChange >= 0
+                                ? Icons.add_circle_outline
+                                : Icons.remove_circle_outline),
+                            title: Text(
+                                '${sign}${adjustment.quantityChange} · ${adjustment.reason}'),
+                            subtitle: Text(
+                                '${adjustment.previousQuantity} recorded → ${adjustment.countedQuantity} counted${adjustment.note == null ? '' : ' · ${adjustment.note}'}'),
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Future<void> _deleteItem() async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -227,8 +322,27 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
             PopupMenuButton<String>(
               onSelected: (value) {
                 if (value == 'delete') _deleteItem();
+                if (value == 'archive') _toggleArchive();
+                if (value == 'history') _showAdjustmentHistory();
               },
               itemBuilder: (context) => [
+                const PopupMenuItem(
+                  value: 'history',
+                  child: ListTile(
+                    leading: Icon(Icons.history_outlined),
+                    title: Text('Stock adjustment history'),
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'archive',
+                  child: ListTile(
+                    leading: Icon(_item!.isArchived
+                        ? Icons.unarchive_outlined
+                        : Icons.archive_outlined),
+                    title: Text(
+                        _item!.isArchived ? 'Restore item' : 'Archive item'),
+                  ),
+                ),
                 const PopupMenuItem(
                   value: 'delete',
                   child: ListTile(
@@ -405,6 +519,8 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
               _buildDetailRow('Name', _item!.name),
               _buildDetailRow('Type',
                   _item!.isFinishedItem ? 'Created item' : 'Material stock'),
+              _buildDetailRow(
+                  'Status', _item!.isArchived ? 'Archived' : 'Active'),
               _buildDetailRow('Category', _item!.category),
               _buildDetailRow(
                   _item!.isFinishedItem

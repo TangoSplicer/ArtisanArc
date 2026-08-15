@@ -10,6 +10,7 @@ import '../../features/shopping/data/shopping_list_model.dart';
 /// It is only created when the user asks for it and can be removed in Settings.
 class SampleDataService {
   static const _inventoryBox = 'inventoryBox';
+  static const _stockAdjustmentsBox = 'stockAdjustmentsBox';
   static const _salesBox = 'salesBox';
   static const _stallSessionsBox = 'stallSessionsBox';
   static const _projectsBox = 'projectsBox';
@@ -19,12 +20,14 @@ class SampleDataService {
 
   static Future<bool> hasCraftData() async {
     final inventory = await Hive.openBox<InventoryItem>(_inventoryBox);
+    final stockAdjustments = await Hive.openBox(_stockAdjustmentsBox);
     final sales = await Hive.openBox<SaleRecord>(_salesBox);
     final sessions = await Hive.openBox(_stallSessionsBox);
     final projects = await Hive.openBox<Project>(_projectsBox);
     final productionRuns = await Hive.openBox(_productionRunsBox);
     final shopping = await Hive.openBox<ShoppingList>(_shoppingListsBox);
     return inventory.isNotEmpty ||
+        stockAdjustments.isNotEmpty ||
         sales.isNotEmpty ||
         sessions.isNotEmpty ||
         projects.isNotEmpty ||
@@ -39,6 +42,7 @@ class SampleDataService {
     }
 
     final inventory = await Hive.openBox<InventoryItem>(_inventoryBox);
+    final stockAdjustments = await Hive.openBox(_stockAdjustmentsBox);
     final sales = await Hive.openBox<SaleRecord>(_salesBox);
     final sessions = await Hive.openBox(_stallSessionsBox);
     final projects = await Hive.openBox<Project>(_projectsBox);
@@ -48,6 +52,7 @@ class SampleDataService {
     if (replaceExisting) {
       await Future.wait([
         inventory.clear(),
+        stockAdjustments.clear(),
         sales.clear(),
         sessions.clear(),
         projects.clear(),
@@ -258,6 +263,7 @@ class SampleDataService {
 
   static Future<void> clearCraftData() async {
     final inventory = await Hive.openBox<InventoryItem>(_inventoryBox);
+    final stockAdjustments = await Hive.openBox(_stockAdjustmentsBox);
     final sales = await Hive.openBox<SaleRecord>(_salesBox);
     final sessions = await Hive.openBox(_stallSessionsBox);
     final projects = await Hive.openBox<Project>(_projectsBox);

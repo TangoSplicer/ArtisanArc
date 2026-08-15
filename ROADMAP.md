@@ -30,6 +30,7 @@ The current build already provides searchable craft-focused selection controls, 
 | **1.5 — Better stall days** | Event selling and reconciliation | A maker can run a whole table/stall session offline | **Delivered in v1.5.0+10; release verification pending** |
 | **1.6 — Know the numbers** | Cost, profit and stock insights | Decisions are based on profit and materials, not only revenue | **Delivered in v1.6.0+11; release verification pending** |
 | **1.7 — Everyday polish** | Fast daily use, accessibility and personalisation | Less tapping, fewer errors and better long-term usability | **Delivered in v1.7.0+12; release verification pending** |
+| **1.8 — Trust the count** | Stocktake and archiving foundations | Physical counts can correct the local tally without losing history | **Delivered in v1.8.0+13; release verification pending** |
 | **Later, only if needed** | Optional expansion | Controlled scope without weakening the Personal Edition | **Deliberate** |
 
 ---
@@ -187,6 +188,19 @@ Once the core workflow is solid, improve the app’s speed, clarity and accessib
 | Smart offline search | A dedicated search screen finds local created items, materials, projects, and sale records without a server, account, or internet connection. Results use existing detail and history routes. |
 | Actionable low-stock alerts | The Home low-material card now states the available and reorder quantities in text, gives screen readers a meaningful status label, and opens the relevant stock record on tap. |
 | Accessibility-oriented interaction | Quick actions use 64-pixel targets, tooltips, standard Material controls, explicit search labels, and text alongside colour/status icons. |
+
+---
+
+# 1.8 — Trust the count
+
+## Delivery record — v1.8.0+13
+
+| Delivered capability | Implementation outcome |
+|---|---|
+| Guided stocktake | Makers can count all, created, or material records against the recorded tally; only changed lines are saved. |
+| Adjustment audit trail | Each variance records prior quantity, physical count, signed change, reason, optional note, and local timestamp. |
+| Archive instead of delete | Discontinued or seasonal inventory can be archived, hidden from daily stock and active sale baskets, then restored without losing historical sales or profit data. |
+| Data safety | Adjustment history is registered with Hive and included in automatic snapshots, portable backup/restore, starter-data replacement, and Settings clear-all. |
 
 ---
 

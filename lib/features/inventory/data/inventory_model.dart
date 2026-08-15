@@ -39,6 +39,11 @@ class InventoryItem extends HiveObject {
   @HiveField(9)
   final int? reorderPoint;
 
+  /// Archived records remain in local history and reports but are hidden from
+  /// everyday inventory and sales views until explicitly restored.
+  @HiveField(10, defaultValue: false)
+  final bool isArchived;
+
   InventoryItem({
     required this.id,
     required this.name,
@@ -50,6 +55,7 @@ class InventoryItem extends HiveObject {
     required this.lastUpdated, // Added lastUpdated
     this.itemType,
     this.reorderPoint,
+    this.isArchived = false,
   });
 
   bool get isFinishedItem =>
@@ -70,6 +76,7 @@ class InventoryItem extends HiveObject {
     DateTime? lastUpdated,
     String? itemType,
     int? reorderPoint,
+    bool? isArchived,
     bool clearReorderPoint = false,
   }) {
     return InventoryItem(
@@ -84,6 +91,7 @@ class InventoryItem extends HiveObject {
       itemType: itemType ?? this.itemType,
       reorderPoint:
           clearReorderPoint ? null : reorderPoint ?? this.reorderPoint,
+      isArchived: isArchived ?? this.isArchived,
     );
   }
 }
