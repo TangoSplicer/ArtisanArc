@@ -33,7 +33,8 @@ The current build already provides searchable craft-focused selection controls, 
 | **1.8 — Trust the count** | Stocktake and archiving foundations | Physical counts can correct the local tally without losing history | **Delivered in v1.8.0+13; release verification pending** |
 | **1.9 — Buy and measure with confidence** | Flexible material units and private procurement | Material costs and stock quantities reflect real purchases and measured use | **Delivered in v1.9.0+14; signed APK verified** |
 | **2.0 — Price with clarity, fulfil locally** | Project cost previews and customer commissions | Makers can price work transparently and track private orders without a server | **Delivered in v2.0.0+15; signed APK verified** |
-| **2.1 — Label, scan and bring data safely** | QR labels, scan-to-sell and CSV workflow | Physical labels and reusable CSV files accelerate routine stock and sale work offline | **Delivered in v2.1.0+16; release verification pending** |
+| **2.1 — Label, scan and bring data safely** | QR labels, scan-to-sell and CSV workflow | Physical labels and reusable CSV files accelerate routine stock and sale work offline | **Delivered in v2.1.0+16; signed APK verified** |
+| **2.2 — Run the maker week** | Operations dashboard and seasonal workflows | A maker can prioritise local stock, orders, projects, sales and event work in one view | **Delivered in v2.2.0+17; release verification pending** |
 | **Later, only if needed** | Optional expansion | Controlled scope without weakening the Personal Edition | **Deliberate** |
 
 ---
@@ -249,6 +250,20 @@ Once the core workflow is solid, improve the app’s speed, clarity and accessib
 | CSV import preview | A user-chosen local CSV is parsed before any write. Name, Type and Quantity are required; Category, Price, Location, Unit and Reorder Point are supported. Row-level invalid and duplicate feedback is shown before confirmation. |
 | Add-only data safety | Import adds only new name/type combinations and never overwrites existing records. Measured material quantities, units and reorder points round-trip through the improved inventory CSV export format. |
 | Regression coverage | Automated tests cover valid and invalid CSV rows, duplicate protection, measured-material parsing, export/import round trips, plus all prior local workflows. |
+
+---
+
+# 2.2 — Run the maker week
+
+## Delivery record — v2.2.0+17
+
+| Delivered capability | Implementation outcome |
+|---|---|
+| Maker Operations dashboard | A new Home hub route combines read-only local material alerts, project end dates, commission deadlines, past-seven-day sales and active stall context. Source records remain in their existing feature areas. |
+| Actionable work queues | Overdue commissions, overdue projects and low materials are separated from the next 14 days of commission and project work. Every listed record opens its existing local detail route. |
+| One-tap maker actions | The dashboard provides direct routes to add a commission, open or resume a stall session, run a stocktake and print labels. |
+| Seasonal workflow views | Five focused local planning views—All-year rhythm, Spring markets, Summer fairs, Autumn launch and Winter gifting—offer concise production, ordering, labelling and event-day checklists without accounts, notifications, external calendars or remote data. |
+| Regression coverage | Automated aggregation tests verify active low-stock detection, project and commission deadline queues, seven-day sales totals and active-stall visibility using in-memory local data. |
 
 ---
 

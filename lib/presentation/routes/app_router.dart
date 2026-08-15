@@ -32,6 +32,7 @@ import 'package:artisanarc/features/search/presentation/smart_search_screen.dart
 import 'package:artisanarc/features/commissions/presentation/commissions_screen.dart';
 import 'package:artisanarc/features/commissions/presentation/commission_detail_screen.dart';
 import 'package:artisanarc/features/commissions/presentation/commission_editor_screen.dart';
+import 'package:artisanarc/features/operations/presentation/maker_operations_dashboard_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -191,6 +192,11 @@ class AppRouter {
             },
           ),
         ],
+      ),
+      GoRoute(
+        path: '/operations',
+        name: 'makerOperations',
+        builder: (context, state) => const MakerOperationsDashboardScreen(),
       ),
       GoRoute(
         path: '/commissions',

@@ -38,6 +38,9 @@ import '../../features/project/domain/project_costing_service.dart';
 import '../../features/commissions/data/commission_repository.dart';
 import '../../features/commissions/domain/commission_service.dart';
 
+// Maker operations
+import '../../features/operations/domain/maker_operations_service.dart';
+
 // AI
 import '../../features/ai/domain/craft_hint_service.dart';
 
@@ -141,6 +144,16 @@ Future<void> configureDependencies() async {
       () => CommissionRepositoryImpl());
   getIt.registerLazySingleton<CommissionService>(
       () => CommissionService(getIt<CommissionRepository>()));
+
+  getIt.registerLazySingleton<MakerOperationsService>(
+    () => MakerOperationsService(
+      getIt<InventoryService>(),
+      getIt<ProjectService>(),
+      getIt<CommissionService>(),
+      getIt<BusinessService>(),
+      getIt<StallSessionService>(),
+    ),
+  );
 
   // Register Project Use Cases
   getIt.registerLazySingleton<CreateProject>(

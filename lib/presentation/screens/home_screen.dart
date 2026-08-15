@@ -89,6 +89,16 @@ class HomeScreen extends StatelessWidget {
             ),
             _buildNavCard(
               context,
+              title: 'Maker Operations',
+              subtitle:
+                  'See local stock, orders, projects, stall context and seasonal work in one place',
+              icon: Icons.dashboard_customize_outlined,
+              route: '/operations',
+              color: Colors.deepPurple,
+              onTap: () => _trackNavigation('maker_operations'),
+            ),
+            _buildNavCard(
+              context,
               title: 'Commissions & Orders',
               subtitle:
                   'Keep private customer orders, deposits, due dates and linked projects together',
