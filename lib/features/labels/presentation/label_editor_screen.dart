@@ -19,10 +19,12 @@ class LabelEditorScreen extends StatefulWidget {
 class _LabelEditorScreenState extends State<LabelEditorScreen> {
   LabelTemplate _selectedTemplate = predefinedTemplates.first;
   final _textController = TextEditingController(text: 'Label Text');
+  final _labelCountController = TextEditingController(text: '1');
   final InventoryService _inventoryService = GetIt.I<InventoryService>();
   List<InventoryItem> _inventoryItems = [];
   InventoryItem? _selectedItem;
   bool _useInventoryItem = false;
+  bool _includeQr = true;
 
   @override
   void initState() {
@@ -33,6 +35,7 @@ class _LabelEditorScreenState extends State<LabelEditorScreen> {
   @override
   void dispose() {
     _textController.dispose();
+    _labelCountController.dispose();
     super.dispose();
   }
 
@@ -40,15 +43,30 @@ class _LabelEditorScreenState extends State<LabelEditorScreen> {
     final items = await _inventoryService.fetchItems();
     if (!mounted) return;
     setState(() {
-      _inventoryItems = [...items]..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+      _inventoryItems = [...items]
+        ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
     });
   }
 
   Future<void> _generatePdf() async {
+    final labelCount = int.tryParse(_labelCountController.text.trim()) ?? 0;
+    if (labelCount < 1 || labelCount > 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Choose between 1 and 200 labels.')),
+      );
+      return;
+    }
+
+    final item = _useInventoryItem ? _selectedItem : null;
+    final text = item != null
+        ? [
+            item.name,
+            item.category,
+            if (item.price != null) '£${item.price!.toStringAsFixed(2)}',
+          ].join('\n')
+        : _textController.text.trim();
+    final includeQr = _includeQr && item != null;
     final pdf = pw.Document();
-    final text = _useInventoryItem && _selectedItem != null
-        ? '${_selectedItem!.name}\n${_selectedItem!.category}\n£${_selectedItem!.price?.toStringAsFixed(2) ?? 'N/A'}'
-        : _textController.text;
 
     pdf.addPage(
       pw.MultiPage(
@@ -56,13 +74,36 @@ class _LabelEditorScreenState extends State<LabelEditorScreen> {
         build: (pw.Context context) => [
           pw.GridView(
             crossAxisCount: _selectedTemplate.columns,
-            childAspectRatio: _selectedTemplate.width / _selectedTemplate.height,
+            childAspectRatio:
+                _selectedTemplate.width / _selectedTemplate.height,
             children: List.generate(
-              _selectedTemplate.columns * _selectedTemplate.rows,
+              labelCount,
               (_) => pw.Container(
                 margin: const pw.EdgeInsets.all(4),
-                decoration: pw.BoxDecoration(border: pw.Border.all(color: PdfColors.grey)),
-                child: pw.Center(child: pw.Text(text, textAlign: pw.TextAlign.center)),
+                padding: const pw.EdgeInsets.all(6),
+                decoration: pw.BoxDecoration(
+                  border: pw.Border.all(color: PdfColors.grey),
+                ),
+                child: pw.Column(
+                  mainAxisAlignment: pw.MainAxisAlignment.center,
+                  crossAxisAlignment: pw.CrossAxisAlignment.center,
+                  children: [
+                    pw.Text(
+                      text,
+                      textAlign: pw.TextAlign.center,
+                      style: const pw.TextStyle(fontSize: 9),
+                    ),
+                    if (includeQr) ...[
+                      pw.SizedBox(height: 4),
+                      pw.BarcodeWidget(
+                        barcode: pw.Barcode.qrCode(),
+                        data: 'artisanarc:item:${item.id}',
+                        width: 48,
+                        height: 48,
+                      ),
+                    ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -86,16 +127,24 @@ class _LabelEditorScreenState extends State<LabelEditorScreen> {
             labelText: 'Label template',
             hintText: 'Search format, brand, or dimensions',
             itemLabel: (template) => template.name,
-            itemSubtitle: (template) => '${template.columns * template.rows} labels per A4 sheet',
-            searchTerms: (template) => [template.id, template.name, '${template.width}', '${template.height}'],
+            itemSubtitle: (template) =>
+                '${template.columns * template.rows} labels per A4 sheet',
+            searchTerms: (template) => [
+              template.id,
+              template.name,
+              '${template.width}',
+              '${template.height}'
+            ],
             onChanged: (template) {
-              if (template != null) setState(() => _selectedTemplate = template);
+              if (template != null)
+                setState(() => _selectedTemplate = template);
             },
           ),
           const SizedBox(height: 16),
           SwitchListTile(
             title: const Text('Use inventory item details'),
-            subtitle: const Text('Search your saved stock and print its name, category, and price.'),
+            subtitle: const Text(
+                'Search your saved stock and print its name, category, and price.'),
             value: _useInventoryItem,
             onChanged: (value) => setState(() => _useInventoryItem = value),
           ),
@@ -108,16 +157,44 @@ class _LabelEditorScreenState extends State<LabelEditorScreen> {
               hintText: 'Search by item, category, or location',
               emptyMessage: 'No matching inventory items',
               itemLabel: (item) => item.name,
-              itemSubtitle: (item) => '${item.category}${item.storageLocation == null || item.storageLocation!.isEmpty ? '' : ' · ${item.storageLocation}'}',
-              searchTerms: (item) => [item.name, item.category, item.storageLocation ?? ''],
+              itemSubtitle: (item) =>
+                  '${item.category}${item.storageLocation == null || item.storageLocation!.isEmpty ? '' : ' · ${item.storageLocation}'}',
+              searchTerms: (item) =>
+                  [item.name, item.category, item.storageLocation ?? ''],
               onChanged: (item) => setState(() => _selectedItem = item),
             )
           else
             TextField(
               controller: _textController,
-              decoration: const InputDecoration(labelText: 'Label text', border: OutlineInputBorder()),
+              decoration: const InputDecoration(
+                  labelText: 'Label text', border: OutlineInputBorder()),
               maxLines: 3,
             ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _labelCountController,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              labelText: 'Number of labels',
+              helperText: '1–200 labels; sheets continue automatically.',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          if (_useInventoryItem) ...[
+            const SizedBox(height: 8),
+            SwitchListTile(
+              title: const Text('Include QR code'),
+              subtitle: Text(
+                _selectedItem?.isFinishedItem == true
+                    ? 'Scans directly into the local sale form.'
+                    : 'Stores a local item code. Only active created-item labels can be used to sell.',
+              ),
+              value: _includeQr,
+              onChanged: _selectedItem == null
+                  ? null
+                  : (value) => setState(() => _includeQr = value),
+            ),
+          ],
           const SizedBox(height: 24),
           ElevatedButton.icon(
             icon: const Icon(Icons.print),
@@ -125,7 +202,8 @@ class _LabelEditorScreenState extends State<LabelEditorScreen> {
             onPressed: _useInventoryItem && _selectedItem == null
                 ? null
                 : _generatePdf,
-            style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
+            style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16)),
           ),
         ],
       ),

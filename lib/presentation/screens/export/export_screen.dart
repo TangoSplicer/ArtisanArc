@@ -37,8 +37,19 @@ class ExportScreen extends StatelessWidget {
             onTap: () async {
               final items = await inventoryService.fetchItems();
               final csv = ExportHelper.generateCsvFromInventory(items);
-              await Printing.sharePdf(bytes: Uint8List.fromList(csv.codeUnits), filename: 'inventory.csv');
+              await Printing.sharePdf(
+                  bytes: Uint8List.fromList(csv.codeUnits),
+                  filename: 'inventory.csv');
             },
+          ),
+          _buildExportOption(
+            context,
+            title: 'Import Inventory from CSV',
+            subtitle:
+                'Preview local rows, then add only new created items or materials',
+            icon: Icons.upload_file_outlined,
+            color: Colors.teal,
+            onTap: () => context.pushNamed('inventoryCsvImport'),
           ),
           _buildExportOption(
             context,
@@ -49,9 +60,14 @@ class ExportScreen extends StatelessWidget {
             onTap: () async {
               final sales = await businessService.fetchSales();
               final inventory = await inventoryService.fetchItems();
-              final itemNames = {for (final item in inventory) item.id: item.name};
-              final csv = ExportHelper.generateCsvFromSales(sales, itemNames: itemNames);
-              await Printing.sharePdf(bytes: Uint8List.fromList(csv.codeUnits), filename: 'sales.csv');
+              final itemNames = {
+                for (final item in inventory) item.id: item.name
+              };
+              final csv = ExportHelper.generateCsvFromSales(sales,
+                  itemNames: itemNames);
+              await Printing.sharePdf(
+                  bytes: Uint8List.fromList(csv.codeUnits),
+                  filename: 'sales.csv');
             },
           ),
           _buildExportOption(

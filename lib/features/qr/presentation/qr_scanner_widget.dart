@@ -13,6 +13,7 @@ class QRScannerWidget extends StatefulWidget {
 class _QRScannerWidgetState extends State<QRScannerWidget> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   QRViewController? controller;
+  bool _hasScanned = false;
 
   @override
   void reassemble() {
@@ -39,10 +40,12 @@ class _QRScannerWidgetState extends State<QRScannerWidget> {
 
   void _onQRViewCreated(QRViewController ctrl) {
     controller = ctrl;
-    controller?.scannedDataStream.listen((scanData) {
-      widget.onScan(scanData.code ?? '');
-      controller?.dispose();
-      Navigator.pop(context);
+    controller?.scannedDataStream.listen((scanData) async {
+      final code = scanData.code?.trim() ?? '';
+      if (_hasScanned || code.isEmpty) return;
+      _hasScanned = true;
+      await controller?.pauseCamera();
+      if (mounted) widget.onScan(code);
     });
   }
 }

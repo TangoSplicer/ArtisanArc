@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:uuid/uuid.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/widgets/personal_app_bar.dart';
 import '../../../core/widgets/searchable_selection_field.dart';
 import '../../inventory/domain/inventory_service.dart';
@@ -49,6 +50,32 @@ class _NewSaleEntryScreenState extends State<NewSaleEntryScreen> {
     });
   }
 
+  Future<void> _scanForItem() async {
+    final scannedItem = await context.pushNamed<InventoryItem>('scanQrCode');
+    if (!mounted || scannedItem == null) return;
+    final activeItem = _items
+        .where((item) => item.id == scannedItem.id)
+        .cast<InventoryItem?>()
+        .firstOrNull;
+    if (activeItem == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('This created item is no longer available to sell.'),
+        ),
+      );
+      await _loadItems();
+      return;
+    }
+    setState(() {
+      _selectedItem = activeItem;
+      if (_quantityController.text.trim().isEmpty)
+        _quantityController.text = '1';
+      if (_priceController.text.trim().isEmpty && activeItem.price != null) {
+        _priceController.text = activeItem.price!.toStringAsFixed(2);
+      }
+    });
+  }
+
   Future<void> _submitSale() async {
     if (!_formKey.currentState!.validate() || _selectedItem == null) return;
 
@@ -84,7 +111,16 @@ class _NewSaleEntryScreenState extends State<NewSaleEntryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const PersonalAppBar(title: Text('New Sale')),
+      appBar: PersonalAppBar(
+        title: const Text('New Sale'),
+        actions: [
+          IconButton(
+            tooltip: 'Scan QR to sell',
+            icon: const Icon(Icons.qr_code_scanner),
+            onPressed: _scanForItem,
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Form(
@@ -95,7 +131,7 @@ class _NewSaleEntryScreenState extends State<NewSaleEntryScreen> {
                 options: _items,
                 value: _selectedItem,
                 labelText: 'Created item',
-                hintText: 'Search created items ready to sell',
+                hintText: 'Search created items, or use the QR scanner',
                 emptyMessage: 'No created items available to sell',
                 itemLabel: (item) => item.name,
                 itemSubtitle: (item) =>

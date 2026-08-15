@@ -25,6 +25,7 @@ import 'package:artisanarc/core/utils/storage_keys.dart';
 import 'package:artisanarc/features/inventory/presentation/inventory_detail_screen.dart';
 import 'package:artisanarc/features/inventory/presentation/stocktake_screen.dart';
 import 'package:artisanarc/features/inventory/presentation/procurement_screen.dart';
+import 'package:artisanarc/features/inventory/presentation/inventory_csv_import_screen.dart';
 import 'package:artisanarc/features/business/presentation/revenue_analytics_screen.dart';
 import 'package:artisanarc/features/project/presentation/project_detail_screen.dart';
 import 'package:artisanarc/features/search/presentation/smart_search_screen.dart';
@@ -114,6 +115,11 @@ class AppRouter {
         path: '/stocktake',
         name: 'stocktake',
         builder: (context, state) => const StocktakeScreen(),
+      ),
+      GoRoute(
+        path: '/import-inventory',
+        name: 'inventoryCsvImport',
+        builder: (context, state) => const InventoryCsvImportScreen(),
       ),
       GoRoute(
         path: '/search',

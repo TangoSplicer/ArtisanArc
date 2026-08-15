@@ -32,7 +32,8 @@ The current build already provides searchable craft-focused selection controls, 
 | **1.7 — Everyday polish** | Fast daily use, accessibility and personalisation | Less tapping, fewer errors and better long-term usability | **Delivered in v1.7.0+12; release verification pending** |
 | **1.8 — Trust the count** | Stocktake and archiving foundations | Physical counts can correct the local tally without losing history | **Delivered in v1.8.0+13; release verification pending** |
 | **1.9 — Buy and measure with confidence** | Flexible material units and private procurement | Material costs and stock quantities reflect real purchases and measured use | **Delivered in v1.9.0+14; signed APK verified** |
-| **2.0 — Price with clarity, fulfil locally** | Project cost previews and customer commissions | Makers can price work transparently and track private orders without a server | **Delivered in v2.0.0+15; release verification pending** |
+| **2.0 — Price with clarity, fulfil locally** | Project cost previews and customer commissions | Makers can price work transparently and track private orders without a server | **Delivered in v2.0.0+15; signed APK verified** |
+| **2.1 — Label, scan and bring data safely** | QR labels, scan-to-sell and CSV workflow | Physical labels and reusable CSV files accelerate routine stock and sale work offline | **Delivered in v2.1.0+16; release verification pending** |
 | **Later, only if needed** | Optional expansion | Controlled scope without weakening the Personal Edition | **Deliberate** |
 
 ---
@@ -236,13 +237,27 @@ Once the core workflow is solid, improve the app’s speed, clarity and accessib
 
 ---
 
+# 2.1 — Label, scan and bring data safely
+
+## Delivery record — v2.1.0+16
+
+| Delivered capability | Implementation outcome |
+|---|---|
+| Printable QR inventory labels | Label sheets can now print a chosen quantity of labels with item name, category, optional price and a stable local QR payload. Sheet generation continues automatically across pages. |
+| Safe QR scanner lifecycle | The camera scanner pauses after one detection and lets its owning screen decide navigation. This removes the prior double-pop risk and supports clear retry feedback for invalid codes. |
+| Scan-to-sell | The standard New Sale screen has a QR action that resolves an active finished item, preselects it, defaults quantity to one, and fills its stored price when available. Archived items, material-stock labels and unknown codes are rejected instead of being sold. |
+| CSV import preview | A user-chosen local CSV is parsed before any write. Name, Type and Quantity are required; Category, Price, Location, Unit and Reorder Point are supported. Row-level invalid and duplicate feedback is shown before confirmation. |
+| Add-only data safety | Import adds only new name/type combinations and never overwrites existing records. Measured material quantities, units and reorder points round-trip through the improved inventory CSV export format. |
+| Regression coverage | Automated tests cover valid and invalid CSV rows, duplicate protection, measured-material parsing, export/import round trips, plus all prior local workflows. |
+
+---
+
 # Later, only if it earns its place
 
 These ideas are reasonable, but they should not be started until the prior iterations are stable and regularly used.
 
 | Optional idea | When it becomes worthwhile | Caution |
 |---|---|---|
-| Barcode/QR labels with scan-to-sell | When there are many repeated product lines at events | Keep a manual path for handmade one-offs |
 | Photo-first catalogue | When created makes need stronger visual browsing | Images add storage and backup considerations |
 | Pattern library | When project notes become numerous | Respect copyright; store references and user-authored notes, not copied commercial patterns |
 | Optional encrypted cloud backup | Only when a second-device recovery need outweighs offline simplicity | Must be opt-in, transparent and separate from normal app use |

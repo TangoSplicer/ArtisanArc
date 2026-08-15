@@ -3,8 +3,7 @@ import 'package:artisanarc/core/widgets/personal_app_bar.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:artisanarc/features/inventory/domain/inventory_service.dart';
-import 'package:artisanarc/features/inventory/data/inventory_model.dart';
-import 'package:artisanarc/features/qr/presentation/qr_scanner_widget.dart'; // Assuming this is the correct path
+import 'package:artisanarc/features/qr/presentation/qr_scanner_widget.dart';
 
 class QRScannerPage extends StatefulWidget {
   const QRScannerPage({super.key});
@@ -16,39 +15,45 @@ class QRScannerPage extends StatefulWidget {
 class _QRScannerPageState extends State<QRScannerPage> {
   final InventoryService _inventoryService = GetIt.I<InventoryService>();
   bool _isProcessing = false;
+  int _scanAttempt = 0;
 
-  void _handleScanResult(String? itemId) async {
-    if (_isProcessing || itemId == null || itemId.isEmpty) {
-      return;
-    }
+  Future<void> _handleScanResult(String payload) async {
+    if (_isProcessing || payload.trim().isEmpty) return;
     setState(() => _isProcessing = true);
 
     try {
-      final InventoryItem? item = await _inventoryService.getItemById(itemId); // Assuming service has getItemById
-
-      if (mounted) {
-        if (item != null) {
-          // Pop the scanner page and pass the found item back as a result.
-          context.pop(item);
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Item not found for the scanned QR code.')),
-          );
-          // Restart scanning or allow user to retry
-          setState(() => _isProcessing = false);
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error fetching item: $e')),
+      final itemId = _itemIdFromPayload(payload);
+      final item = await _inventoryService.getItemById(itemId);
+      if (!mounted) return;
+      if (item == null) {
+        _showRetryMessage('Item not found for this QR code.');
+      } else if (!item.isFinishedItem || item.isArchived) {
+        _showRetryMessage(
+          'This code is not an active created item available to sell.',
         );
-        setState(() => _isProcessing = false);
+      } else {
+        context.pop(item);
       }
+    } catch (error) {
+      if (mounted) _showRetryMessage('Could not read this QR code: $error');
     }
-    // If item found, we already popped. If not found or error, and want to allow rescan,
-    // ensure QRScannerWidget can be "restarted" or continues scanning.
-    // For this example, if not found, _isProcessing is reset, which might re-enable the scanner widget.
+  }
+
+  String _itemIdFromPayload(String payload) {
+    const prefix = 'artisanarc:item:';
+    final clean = payload.trim();
+    return clean.toLowerCase().startsWith(prefix)
+        ? clean.substring(prefix.length).trim()
+        : clean;
+  }
+
+  void _showRetryMessage(String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+    setState(() {
+      _isProcessing = false;
+      _scanAttempt++;
+    });
   }
 
   @override
@@ -60,7 +65,8 @@ class _QRScannerPageState extends State<QRScannerPage> {
       body: Center(
         child: _isProcessing
             ? const CircularProgressIndicator()
-            : QRScannerWidget( // Assuming QRScannerWidget is designed to be embedded
+            : QRScannerWidget(
+                key: ValueKey(_scanAttempt),
                 onScan: _handleScanResult,
               ),
       ),

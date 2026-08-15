@@ -51,14 +51,25 @@ class ExportHelper {
 
   static String generateCsvFromInventory(List<InventoryItem> items) {
     final List<List<dynamic>> rows = [
-      ['Name', 'Type', 'Category', 'Quantity', 'Price', 'Location'],
+      [
+        'Name',
+        'Type',
+        'Category',
+        'Quantity',
+        'Price',
+        'Location',
+        'Unit',
+        'Reorder Point',
+      ],
       ...items.map((item) => [
             item.name,
             item.isFinishedItem ? 'Created Item' : 'Material Stock',
             item.category,
-            item.quantity,
-            item.price.toString,
+            item.availableStockQuantity,
+            item.price ?? '',
             item.storageLocation ?? '',
+            item.measurementUnit ?? '',
+            item.activeReorderPoint ?? '',
           ]),
     ];
     return const ListToCsvConverter().convert(rows);

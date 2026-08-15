@@ -9,6 +9,7 @@ import '../../features/inventory/data/material_purchase_repository.dart';
 import '../../features/inventory/domain/inventory_service.dart';
 import '../../features/inventory/domain/stocktake_service.dart';
 import '../../features/inventory/domain/procurement_service.dart';
+import '../../features/inventory/domain/inventory_csv_import_service.dart';
 
 // Business
 import '../../features/business/data/business_repository.dart';
@@ -82,6 +83,8 @@ Future<void> configureDependencies() async {
         getIt<SupplierRepository>(),
         getIt<MaterialPurchaseRepository>(),
       ));
+  getIt.registerLazySingleton<InventoryCsvImportService>(
+      () => InventoryCsvImportService(getIt<InventoryRepository>()));
 
   // Business Feature
   getIt.registerLazySingleton<BusinessRepository>(
