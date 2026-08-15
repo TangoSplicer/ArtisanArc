@@ -25,6 +25,7 @@ import 'package:artisanarc/core/utils/storage_keys.dart';
 import 'package:artisanarc/features/inventory/presentation/inventory_detail_screen.dart';
 import 'package:artisanarc/features/business/presentation/revenue_analytics_screen.dart';
 import 'package:artisanarc/features/project/presentation/project_detail_screen.dart';
+import 'package:artisanarc/features/search/presentation/smart_search_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -98,6 +99,11 @@ class AppRouter {
                 const AddInventoryItemScreen(itemType: 'material'),
           ),
         ],
+      ),
+      GoRoute(
+        path: '/search',
+        name: 'smartSearch',
+        builder: (context, state) => const SmartSearchScreen(),
       ),
       GoRoute(
         path: '/settings',

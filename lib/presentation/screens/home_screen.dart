@@ -20,6 +20,13 @@ class HomeScreen extends StatelessWidget {
         title: const Text('ArtisanArc Personal'),
         backgroundColor: color.primary,
         foregroundColor: color.onPrimary,
+        actions: [
+          IconButton(
+            tooltip: 'Search items, projects and sales',
+            onPressed: () => context.pushNamed('smartSearch'),
+            icon: const Icon(Icons.search),
+          ),
+        ],
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -38,6 +45,11 @@ class HomeScreen extends StatelessWidget {
           children: [
             const LowStockWidget(),
             const SizedBox(height: 20),
+            Text('Quick actions',
+                style: Theme.of(context).textTheme.titleLarge),
+            const SizedBox(height: 10),
+            _buildQuickActions(context, color),
+            const SizedBox(height: 20),
             _buildNavCard(
               context,
               title: 'Inventory · Created Items',
@@ -50,7 +62,8 @@ class HomeScreen extends StatelessWidget {
             _buildNavCard(
               context,
               title: 'Materials Stock',
-              subtitle: 'See yarn, hooks, notions, and supplies available to work with',
+              subtitle:
+                  'See yarn, hooks, notions, and supplies available to work with',
               icon: Icons.yard_outlined,
               route: '/stock',
               color: color.tertiary,
@@ -74,7 +87,8 @@ class HomeScreen extends StatelessWidget {
               color: color.tertiary,
               onTap: () => _trackNavigation('projects'),
             ),
-            _buildNavCard( // Added Compliance Tracker card
+            _buildNavCard(
+              // Added Compliance Tracker card
               context,
               title: 'Compliance Tracker',
               subtitle: 'Manage safety certs, track standards',
@@ -83,7 +97,8 @@ class HomeScreen extends StatelessWidget {
               color: Colors.teal, // Example Color
               onTap: () => _trackNavigation('compliance'),
             ),
-             _buildNavCard( // Added Smart Shopping card
+            _buildNavCard(
+              // Added Smart Shopping card
               context,
               title: 'Smart Shopping',
               subtitle: 'Create supply lists and track what still needs buying',
@@ -125,6 +140,78 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildQuickActions(BuildContext context, ColorScheme color) {
+    return Semantics(
+      label: 'Quick actions',
+      container: true,
+      child: Wrap(
+        spacing: 10,
+        runSpacing: 10,
+        children: [
+          _buildQuickAction(
+            context,
+            label: 'Add created item',
+            icon: Icons.add_box_outlined,
+            color: color.primary,
+            routeName: 'addInventoryItem',
+            usageKey: 'quick_add_finished',
+          ),
+          _buildQuickAction(
+            context,
+            label: 'Add material',
+            icon: Icons.yard_outlined,
+            color: color.tertiary,
+            routeName: 'addMaterialStock',
+            usageKey: 'quick_add_material',
+          ),
+          _buildQuickAction(
+            context,
+            label: 'Start stall',
+            icon: Icons.storefront_outlined,
+            color: color.secondary,
+            routeName: 'eventSales',
+            usageKey: 'quick_stall_session',
+          ),
+          _buildQuickAction(
+            context,
+            label: 'Plan project',
+            icon: Icons.add_task_outlined,
+            color: color.primary,
+            routeName: 'addProject',
+            usageKey: 'quick_add_project',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickAction(
+    BuildContext context, {
+    required String label,
+    required IconData icon,
+    required Color color,
+    required String routeName,
+    required String usageKey,
+  }) {
+    final width = (MediaQuery.sizeOf(context).width - 50) / 2;
+    return SizedBox(
+      width: width,
+      height: 64,
+      child: OutlinedButton.icon(
+        onPressed: () {
+          _trackNavigation(usageKey);
+          context.pushNamed(routeName);
+        },
+        icon: Icon(icon, color: color),
+        label: Text(label, textAlign: TextAlign.center),
+        style: OutlinedButton.styleFrom(
+          alignment: Alignment.centerLeft,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+        ),
+      ),
+    );
+  }
+
   Widget _buildNavCard(
     BuildContext context, {
     required String title,
@@ -135,49 +222,49 @@ class HomeScreen extends StatelessWidget {
     VoidCallback? onTap,
   }) {
     return Card(
-        elevation: 6,
-        margin: const EdgeInsets.only(bottom: 20),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        shadowColor: color.withOpacity(0.4),
-        child: InkWell(
-          onTap: () {
-            onTap?.call();
-            context.push(route);
-          },
-          borderRadius: BorderRadius.circular(20),
-          child: Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: color.withOpacity(0.08),
-            ),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  backgroundColor: color.withOpacity(0.2),
-                  child: Icon(icon, color: color),
+      elevation: 6,
+      margin: const EdgeInsets.only(bottom: 20),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shadowColor: color.withOpacity(0.4),
+      child: InkWell(
+        onTap: () {
+          onTap?.call();
+          context.push(route);
+        },
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: color.withOpacity(0.08),
+          ),
+          child: Row(
+            children: [
+              CircleAvatar(
+                backgroundColor: color.withOpacity(0.2),
+                child: Icon(icon, color: color),
+              ),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title,
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleLarge
+                            ?.copyWith(fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 4),
+                    Text(subtitle,
+                        style: Theme.of(context).textTheme.bodyMedium),
+                  ],
                 ),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(title,
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleLarge
-                              ?.copyWith(fontWeight: FontWeight.w600)),
-                      const SizedBox(height: 4),
-                      Text(subtitle,
-                          style: Theme.of(context).textTheme.bodyMedium),
-                    ],
-                  ),
-                ),
-                const Icon(Icons.chevron_right),
-              ],
-            ),
+              ),
+              const Icon(Icons.chevron_right),
+            ],
           ),
         ),
-      );
+      ),
+    );
   }
 }

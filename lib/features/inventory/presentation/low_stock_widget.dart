@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import '../domain/inventory_service.dart';
 import '../data/inventory_model.dart';
 
@@ -100,17 +101,27 @@ class _LowStockWidgetState extends State<LowStockWidget> {
               itemCount: _lowStockItems.length,
               itemBuilder: (context, index) {
                 final item = _lowStockItems[index];
-                return ListTile(
-                  dense: true,
-                  leading: CircleAvatar(
-                    backgroundColor: Colors.orange.withOpacity(0.2),
-                    child: Text(item.quantity.toString()),
+                final reorderPoint = item.reorderPoint ?? widget.threshold;
+                return Semantics(
+                  button: true,
+                  label:
+                      '${item.name}, low stock: ${item.quantity} available. Reorder at $reorderPoint.',
+                  child: ListTile(
+                    dense: true,
+                    onTap: () => context.pushNamed(
+                      'inventoryDetail',
+                      pathParameters: {'itemId': item.id},
+                    ),
+                    leading: CircleAvatar(
+                      backgroundColor: Colors.orange.withOpacity(0.2),
+                      child: Text(item.quantity.toString()),
+                    ),
+                    title: Text(item.name),
+                    subtitle: Text(
+                      '${item.category} · ${item.quantity} available · Reorder at $reorderPoint',
+                    ),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   ),
-                  title: Text(item.name),
-                  subtitle: Text(
-                    '${item.category} · Reorder at ${item.reorderPoint ?? widget.threshold}',
-                  ),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                 );
               },
             ),
