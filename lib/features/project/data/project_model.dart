@@ -51,6 +51,18 @@ class Project extends HiveObject {
   @HiveField(11)
   List<String> productionNotes;
 
+  /// Optional planning input used only by the Cost & Price preview.
+  @HiveField(12)
+  int? estimatedLabourMinutes;
+
+  /// Optional hourly maker rate used only by the Cost & Price preview.
+  @HiveField(13)
+  double? labourRatePerHour;
+
+  /// Optional target profit margin expressed as a percentage of sale price.
+  @HiveField(14)
+  double? targetMarginPercent;
+
   Project({
     required this.id,
     required this.name,
@@ -62,6 +74,9 @@ class Project extends HiveObject {
     List<SupplyNeed>? supplyNeeds,
     List<String>? finishedItemIds,
     List<String>? productionNotes,
+    this.estimatedLabourMinutes,
+    this.labourRatePerHour,
+    this.targetMarginPercent,
     required this.createdAt,
     this.lastUpdatedAt,
   })  : milestones = milestones ?? [],
@@ -80,6 +95,12 @@ class Project extends HiveObject {
     List<SupplyNeed>? supplyNeeds,
     List<String>? finishedItemIds,
     List<String>? productionNotes,
+    int? estimatedLabourMinutes,
+    bool clearEstimatedLabourMinutes = false,
+    double? labourRatePerHour,
+    bool clearLabourRatePerHour = false,
+    double? targetMarginPercent,
+    bool clearTargetMarginPercent = false,
     DateTime? createdAt,
     DateTime? lastUpdatedAt,
   }) {
@@ -100,6 +121,15 @@ class Project extends HiveObject {
           finishedItemIds ?? List<String>.from(this.finishedItemIds),
       productionNotes:
           productionNotes ?? List<String>.from(this.productionNotes),
+      estimatedLabourMinutes: clearEstimatedLabourMinutes
+          ? null
+          : estimatedLabourMinutes ?? this.estimatedLabourMinutes,
+      labourRatePerHour: clearLabourRatePerHour
+          ? null
+          : labourRatePerHour ?? this.labourRatePerHour,
+      targetMarginPercent: clearTargetMarginPercent
+          ? null
+          : targetMarginPercent ?? this.targetMarginPercent,
       createdAt: createdAt ?? this.createdAt,
       lastUpdatedAt: lastUpdatedAt ?? this.lastUpdatedAt,
     );

@@ -10,6 +10,7 @@ import '../../features/project/data/project_model.dart';
 import '../../features/project/data/production_run_model.dart';
 import '../../features/project/domain/entities/supply_need.dart';
 import '../../features/shopping/data/shopping_list_model.dart';
+import '../../features/commissions/data/commission_model.dart';
 
 void registerHiveAdapters() {
   _registerAdapterIfNotRegistered(InventoryItemAdapter());
@@ -25,6 +26,8 @@ void registerHiveAdapters() {
   _registerAdapterIfNotRegistered(SupplyNeedAdapter());
   _registerAdapterIfNotRegistered(ShoppingListAdapter());
   _registerAdapterIfNotRegistered(ShoppingListItemAdapter());
+  _registerAdapterIfNotRegistered(CommissionAdapter());
+  _registerAdapterIfNotRegistered(CommissionStatusAdapter());
 }
 
 void _registerAdapterIfNotRegistered<T>(TypeAdapter<T> adapter) {

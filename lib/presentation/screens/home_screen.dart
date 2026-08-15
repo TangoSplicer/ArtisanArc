@@ -88,6 +88,16 @@ class HomeScreen extends StatelessWidget {
               onTap: () => _trackNavigation('projects'),
             ),
             _buildNavCard(
+              context,
+              title: 'Commissions & Orders',
+              subtitle:
+                  'Keep private customer orders, deposits, due dates and linked projects together',
+              icon: Icons.assignment_ind_outlined,
+              route: '/commissions',
+              color: Colors.indigo,
+              onTap: () => _trackNavigation('commissions'),
+            ),
+            _buildNavCard(
               // Added Compliance Tracker card
               context,
               title: 'Compliance Tracker',

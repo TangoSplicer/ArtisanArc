@@ -5,6 +5,7 @@ import '../../features/inventory/data/inventory_model.dart';
 import '../../features/project/data/project_model.dart';
 import '../../features/project/domain/entities/supply_need.dart';
 import '../../features/shopping/data/shopping_list_model.dart';
+import '../../features/commissions/data/commission_model.dart';
 
 /// Provides optional, clearly fictional starter content for first-time users.
 /// It is only created when the user asks for it and can be removed in Settings.
@@ -17,6 +18,7 @@ class SampleDataService {
   static const _stallSessionsBox = 'stallSessionsBox';
   static const _projectsBox = 'projectsBox';
   static const _productionRunsBox = 'productionRunsBox';
+  static const _commissionsBox = 'commissionsBox';
   static const _shoppingListsBox = 'shoppingListsBox';
   static const _complianceBox = 'complianceBox';
 
@@ -29,6 +31,7 @@ class SampleDataService {
     final sessions = await Hive.openBox(_stallSessionsBox);
     final projects = await Hive.openBox<Project>(_projectsBox);
     final productionRuns = await Hive.openBox(_productionRunsBox);
+    final commissions = await Hive.openBox<Commission>(_commissionsBox);
     final shopping = await Hive.openBox<ShoppingList>(_shoppingListsBox);
     return inventory.isNotEmpty ||
         stockAdjustments.isNotEmpty ||
@@ -38,6 +41,7 @@ class SampleDataService {
         sessions.isNotEmpty ||
         projects.isNotEmpty ||
         productionRuns.isNotEmpty ||
+        commissions.isNotEmpty ||
         shopping.isNotEmpty;
   }
 
@@ -55,6 +59,7 @@ class SampleDataService {
     final sessions = await Hive.openBox(_stallSessionsBox);
     final projects = await Hive.openBox<Project>(_projectsBox);
     final productionRuns = await Hive.openBox(_productionRunsBox);
+    final commissions = await Hive.openBox<Commission>(_commissionsBox);
     final shopping = await Hive.openBox<ShoppingList>(_shoppingListsBox);
 
     if (replaceExisting) {
@@ -67,6 +72,7 @@ class SampleDataService {
         sessions.clear(),
         projects.clear(),
         productionRuns.clear(),
+        commissions.clear(),
         shopping.clear()
       ]);
     }
@@ -183,6 +189,9 @@ class SampleDataService {
             name: 'Assemble, line and finish',
             dueDate: now.add(const Duration(days: 11))),
       ],
+      estimatedLabourMinutes: 210,
+      labourRatePerHour: 15.00,
+      targetMarginPercent: 50,
       supplyNeeds: [
         SupplyNeed(
           id: 'sample-supply-cotton',
@@ -237,6 +246,34 @@ class SampleDataService {
           eventLocation: eventLocation),
     ];
 
+    final sampleCommissions = <Commission>[
+      Commission(
+        id: 'sample-commission-tote',
+        customerName: 'Alex Taylor',
+        contactNote: 'Collection message preferred',
+        totalAmount: 42.00,
+        depositAmount: 15.00,
+        dueDate: now.add(const Duration(days: 11)),
+        linkedProjectId: sampleProject.id,
+        linkedProjectName: sampleProject.name,
+        status: CommissionStatus.inProgress,
+        notes: 'Sage, cream and coral colour palette.',
+        createdAt: now.subtract(const Duration(days: 2)),
+        updatedAt: now,
+      ),
+      Commission(
+        id: 'sample-commission-cozy',
+        customerName: 'Morgan Lee',
+        totalAmount: 18.00,
+        depositAmount: 0,
+        dueDate: now.add(const Duration(days: 18)),
+        status: CommissionStatus.enquiry,
+        notes: 'Discuss mug colour before confirming.',
+        createdAt: now.subtract(const Duration(days: 1)),
+        updatedAt: now.subtract(const Duration(days: 1)),
+      ),
+    ];
+
     final sampleShoppingList = ShoppingList(
       id: 'sample-shopping-yarn',
       name: 'Yarn & Notions Refill',
@@ -267,6 +304,7 @@ class SampleDataService {
       inventory.putAll({for (final item in inventoryItems) item.id: item}),
       sales.putAll({for (final sale in sampleSales) sale.id: sale}),
       projects.put(sampleProject.id, sampleProject),
+      commissions.putAll({for (final item in sampleCommissions) item.id: item}),
       shopping.put(sampleShoppingList.id, sampleShoppingList),
     ]);
   }
@@ -280,14 +318,19 @@ class SampleDataService {
     final sessions = await Hive.openBox(_stallSessionsBox);
     final projects = await Hive.openBox<Project>(_projectsBox);
     final productionRuns = await Hive.openBox(_productionRunsBox);
+    final commissions = await Hive.openBox<Commission>(_commissionsBox);
     final shopping = await Hive.openBox<ShoppingList>(_shoppingListsBox);
     final compliance = await Hive.openBox(_complianceBox);
     await Future.wait([
       inventory.clear(),
+      stockAdjustments.clear(),
+      suppliers.clear(),
+      purchases.clear(),
       sales.clear(),
       sessions.clear(),
       projects.clear(),
       productionRuns.clear(),
+      commissions.clear(),
       shopping.clear(),
       compliance.clear(),
     ]);

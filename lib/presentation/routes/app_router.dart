@@ -28,6 +28,9 @@ import 'package:artisanarc/features/inventory/presentation/procurement_screen.da
 import 'package:artisanarc/features/business/presentation/revenue_analytics_screen.dart';
 import 'package:artisanarc/features/project/presentation/project_detail_screen.dart';
 import 'package:artisanarc/features/search/presentation/smart_search_screen.dart';
+import 'package:artisanarc/features/commissions/presentation/commissions_screen.dart';
+import 'package:artisanarc/features/commissions/presentation/commission_detail_screen.dart';
+import 'package:artisanarc/features/commissions/presentation/commission_editor_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -179,6 +182,40 @@ class AppRouter {
                 return const ErrorScreen(error: 'Project ID is missing');
               }
               return ProjectDetailScreen(projectId: projectId);
+            },
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/commissions',
+        name: 'commissions',
+        builder: (context, state) => const CommissionsScreen(),
+        routes: [
+          GoRoute(
+            path: 'add',
+            name: 'addCommission',
+            builder: (context, state) => const CommissionEditorScreen(),
+          ),
+          GoRoute(
+            path: 'detail/:id',
+            name: 'commissionDetail',
+            builder: (context, state) {
+              final commissionId = state.pathParameters['id'];
+              if (commissionId == null) {
+                return const ErrorScreen(error: 'Commission ID is missing');
+              }
+              return CommissionDetailScreen(commissionId: commissionId);
+            },
+          ),
+          GoRoute(
+            path: 'edit/:id',
+            name: 'editCommission',
+            builder: (context, state) {
+              final commissionId = state.pathParameters['id'];
+              if (commissionId == null) {
+                return const ErrorScreen(error: 'Commission ID is missing');
+              }
+              return CommissionEditorScreen(commissionId: commissionId);
             },
           ),
         ],

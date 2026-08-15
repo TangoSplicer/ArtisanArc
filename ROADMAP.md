@@ -31,7 +31,8 @@ The current build already provides searchable craft-focused selection controls, 
 | **1.6 — Know the numbers** | Cost, profit and stock insights | Decisions are based on profit and materials, not only revenue | **Delivered in v1.6.0+11; release verification pending** |
 | **1.7 — Everyday polish** | Fast daily use, accessibility and personalisation | Less tapping, fewer errors and better long-term usability | **Delivered in v1.7.0+12; release verification pending** |
 | **1.8 — Trust the count** | Stocktake and archiving foundations | Physical counts can correct the local tally without losing history | **Delivered in v1.8.0+13; release verification pending** |
-| **1.9 — Buy and measure with confidence** | Flexible material units and private procurement | Material costs and stock quantities reflect real purchases and measured use | **Delivered in v1.9.0+14; release verification pending** |
+| **1.9 — Buy and measure with confidence** | Flexible material units and private procurement | Material costs and stock quantities reflect real purchases and measured use | **Delivered in v1.9.0+14; signed APK verified** |
+| **2.0 — Price with clarity, fulfil locally** | Project cost previews and customer commissions | Makers can price work transparently and track private orders without a server | **Delivered in v2.0.0+15; release verification pending** |
 | **Later, only if needed** | Optional expansion | Controlled scope without weakening the Personal Edition | **Deliberate** |
 
 ---
@@ -216,6 +217,22 @@ Once the core workflow is solid, improve the app’s speed, clarity and accessib
 | Private suppliers and purchases | A local Suppliers & Purchases screen stores manual supplier records, purchase quantities, total paid, and calculated unit cost; it updates material stock and the latest material cost without web scraping or an external account. |
 | Measured stocktake audit | Physical counts can record decimal material variances. The adjustment history retains both compatibility values and exact measured before-and-after amounts. |
 | Data safety | Supplier and purchase data are included in automatic snapshots, portable backup/restore, starter-data replacement, and Settings clear-all. |
+
+---
+
+# 2.0 — Price with clarity, fulfil locally
+
+## Delivery record — v2.0.0+15
+
+| Delivered capability | Implementation outcome |
+|---|---|
+| Transparent project Cost & Price preview | Project details show an explicitly labelled planning estimate for materials, optional labour, direct cost, target margin and suggested sale price. Planner-supplied unit estimates take precedence; otherwise, compatible latest local purchase unit costs are used. Missing or mismatched units are stated rather than guessed. |
+| Historical costs remain separate | Completed-make production records continue to show the actual material cost captured at the time of production, separately from changing planning estimates and replacement prices. |
+| Private local commissions | A dedicated Commissions & Orders workflow stores the customer name, optional local contact note, project link, due date, total, deposit, balance, status and notes entirely in local Hive data. No account, cloud service or payment processing is involved. |
+| Guarded order lifecycle | Orders progress through enquiry, confirmed, in progress, ready, delivered or cancelled states. Invalid status jumps and deposits greater than the total are rejected. |
+| Searchable project links and share-by-choice | The order editor uses the existing searchable project selection control. Makers can share a plain-text order summary only through an explicit action, retaining local-first control over customer information. |
+| Data safety | Commission records are registered with Hive and included in automatic snapshots, portable backup/restore validation, starter-data replacement and Settings clear-all. |
+| Regression coverage | Automated tests cover project-cost source priority, labour/margin price calculation, historic cost separation, commission balance calculation and lifecycle transitions. |
 
 ---
 

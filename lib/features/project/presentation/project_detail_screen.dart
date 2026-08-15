@@ -7,6 +7,7 @@ import '../domain/usecases/update_project.dart';
 import '../data/project_model.dart';
 import '../domain/entities/supply_need.dart';
 import '../domain/make_to_sell_service.dart';
+import 'project_costing_card.dart';
 import '../../../core/utils/date_helpers.dart';
 
 class ProjectDetailScreen extends StatefulWidget {
@@ -361,6 +362,13 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
             _buildProjectOverview(theme),
             const SizedBox(height: 16),
             _buildProgressCard(theme),
+            const SizedBox(height: 16),
+            ProjectCostingCard(
+              project: _project!,
+              onProjectUpdated: (updated) {
+                if (mounted) setState(() => _project = updated);
+              },
+            ),
             const SizedBox(height: 16),
             _buildMilestonesCard(theme),
             const SizedBox(height: 16),

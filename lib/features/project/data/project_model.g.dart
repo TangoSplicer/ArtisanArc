@@ -27,6 +27,9 @@ class ProjectAdapter extends TypeAdapter<Project> {
       supplyNeeds: (fields[9] as List?)?.cast<SupplyNeed>(),
       finishedItemIds: (fields[10] as List?)?.cast<String>(),
       productionNotes: (fields[11] as List?)?.cast<String>(),
+      estimatedLabourMinutes: fields[12] as int?,
+      labourRatePerHour: fields[13] as double?,
+      targetMarginPercent: fields[14] as double?,
       createdAt: fields[7] as DateTime,
       lastUpdatedAt: fields[8] as DateTime?,
     );
@@ -35,7 +38,7 @@ class ProjectAdapter extends TypeAdapter<Project> {
   @override
   void write(BinaryWriter writer, Project obj) {
     writer
-      ..writeByte(12)
+      ..writeByte(15)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -59,7 +62,13 @@ class ProjectAdapter extends TypeAdapter<Project> {
       ..writeByte(10)
       ..write(obj.finishedItemIds)
       ..writeByte(11)
-      ..write(obj.productionNotes);
+      ..write(obj.productionNotes)
+      ..writeByte(12)
+      ..write(obj.estimatedLabourMinutes)
+      ..writeByte(13)
+      ..write(obj.labourRatePerHour)
+      ..writeByte(14)
+      ..write(obj.targetMarginPercent);
   }
 
   @override

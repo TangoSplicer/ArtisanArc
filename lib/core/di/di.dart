@@ -31,6 +31,11 @@ import '../../features/project/data/project_repository.dart';
 import '../../features/project/data/production_run_repository.dart';
 import '../../features/project/domain/project_service.dart';
 import '../../features/project/domain/make_to_sell_service.dart';
+import '../../features/project/domain/project_costing_service.dart';
+
+// Commissions
+import '../../features/commissions/data/commission_repository.dart';
+import '../../features/commissions/domain/commission_service.dart';
 
 // AI
 import '../../features/ai/domain/craft_hint_service.dart';
@@ -121,6 +126,18 @@ Future<void> configureDependencies() async {
         getIt<ProjectRepository>(),
         getIt<ProductionRunRepository>(),
       ));
+  getIt.registerLazySingleton<ProjectCostingService>(
+    () => ProjectCostingService(
+      getIt<ProcurementService>(),
+      getIt<ProductionRunRepository>(),
+    ),
+  );
+
+  // Local-only commissions
+  getIt.registerLazySingleton<CommissionRepository>(
+      () => CommissionRepositoryImpl());
+  getIt.registerLazySingleton<CommissionService>(
+      () => CommissionService(getIt<CommissionRepository>()));
 
   // Register Project Use Cases
   getIt.registerLazySingleton<CreateProject>(
