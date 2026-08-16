@@ -8,6 +8,13 @@ import '../../features/shopping/data/shopping_list_model.dart';
 import '../../features/commissions/data/commission_model.dart';
 import '../../features/recipes/data/make_recipe_model.dart';
 import '../../features/collections/data/maker_collection_model.dart';
+import '../../features/inventory/data/stock_adjustment_model.dart';
+import '../../features/inventory/data/supplier_model.dart';
+import '../../features/inventory/data/material_purchase_model.dart';
+import '../../features/business/data/stall_session_model.dart';
+import '../../features/compliance/data/compliance_model.dart';
+import '../../features/project/data/production_run_model.dart';
+import '../../features/wholesale/data/wholesale_model.dart';
 
 /// Provides optional, clearly fictional starter content for first-time users.
 /// It is only created when the user asks for it and can be removed in Settings.
@@ -30,19 +37,19 @@ class SampleDataService {
 
   static Future<bool> hasCraftData() async {
     final inventory = await Hive.openBox<InventoryItem>(_inventoryBox);
-    final stockAdjustments = await Hive.openBox(_stockAdjustmentsBox);
-    final suppliers = await Hive.openBox(_suppliersBox);
-    final purchases = await Hive.openBox(_materialPurchasesBox);
+    final stockAdjustments = await Hive.openBox<StockAdjustment>(_stockAdjustmentsBox);
+    final suppliers = await Hive.openBox<Supplier>(_suppliersBox);
+    final purchases = await Hive.openBox<MaterialPurchase>(_materialPurchasesBox);
     final sales = await Hive.openBox<SaleRecord>(_salesBox);
-    final sessions = await Hive.openBox(_stallSessionsBox);
+    final sessions = await Hive.openBox<StallSession>(_stallSessionsBox);
     final projects = await Hive.openBox<Project>(_projectsBox);
-    final productionRuns = await Hive.openBox(_productionRunsBox);
+    final productionRuns = await Hive.openBox<ProductionRun>(_productionRunsBox);
     final commissions = await Hive.openBox<Commission>(_commissionsBox);
     final recipes = await Hive.openBox<MakeRecipe>(_makeRecipesBox);
-    final collections = await Hive.openBox(_makerCollectionsBox);
+    final collections = await Hive.openBox<MakerCollection>(_makerCollectionsBox);
     final shopping = await Hive.openBox<ShoppingList>(_shoppingListsBox);
-    final wholesalePartners = await Hive.openBox(_wholesalePartnersBox);
-    final wholesaleBatches = await Hive.openBox(_wholesaleBatchesBox);
+    final wholesalePartners = await Hive.openBox<WholesalePartner>(_wholesalePartnersBox);
+    final wholesaleBatches = await Hive.openBox<WholesaleBatch>(_wholesaleBatchesBox);
     return inventory.isNotEmpty ||
         stockAdjustments.isNotEmpty ||
         suppliers.isNotEmpty ||
@@ -66,19 +73,19 @@ class SampleDataService {
     }
 
     final inventory = await Hive.openBox<InventoryItem>(_inventoryBox);
-    final stockAdjustments = await Hive.openBox(_stockAdjustmentsBox);
-    final suppliers = await Hive.openBox(_suppliersBox);
-    final purchases = await Hive.openBox(_materialPurchasesBox);
+    final stockAdjustments = await Hive.openBox<StockAdjustment>(_stockAdjustmentsBox);
+    final suppliers = await Hive.openBox<Supplier>(_suppliersBox);
+    final purchases = await Hive.openBox<MaterialPurchase>(_materialPurchasesBox);
     final sales = await Hive.openBox<SaleRecord>(_salesBox);
-    final sessions = await Hive.openBox(_stallSessionsBox);
+    final sessions = await Hive.openBox<StallSession>(_stallSessionsBox);
     final projects = await Hive.openBox<Project>(_projectsBox);
-    final productionRuns = await Hive.openBox(_productionRunsBox);
+    final productionRuns = await Hive.openBox<ProductionRun>(_productionRunsBox);
     final commissions = await Hive.openBox<Commission>(_commissionsBox);
     final recipes = await Hive.openBox<MakeRecipe>(_makeRecipesBox);
-    final collections = await Hive.openBox(_makerCollectionsBox);
+    final collections = await Hive.openBox<MakerCollection>(_makerCollectionsBox);
     final shopping = await Hive.openBox<ShoppingList>(_shoppingListsBox);
-    final wholesalePartners = await Hive.openBox(_wholesalePartnersBox);
-    final wholesaleBatches = await Hive.openBox(_wholesaleBatchesBox);
+    final wholesalePartners = await Hive.openBox<WholesalePartner>(_wholesalePartnersBox);
+    final wholesaleBatches = await Hive.openBox<WholesaleBatch>(_wholesaleBatchesBox);
 
     if (replaceExisting) {
       await Future.wait([
@@ -403,20 +410,20 @@ class SampleDataService {
 
   static Future<void> clearCraftData() async {
     final inventory = await Hive.openBox<InventoryItem>(_inventoryBox);
-    final stockAdjustments = await Hive.openBox(_stockAdjustmentsBox);
-    final suppliers = await Hive.openBox(_suppliersBox);
-    final purchases = await Hive.openBox(_materialPurchasesBox);
+    final stockAdjustments = await Hive.openBox<StockAdjustment>(_stockAdjustmentsBox);
+    final suppliers = await Hive.openBox<Supplier>(_suppliersBox);
+    final purchases = await Hive.openBox<MaterialPurchase>(_materialPurchasesBox);
     final sales = await Hive.openBox<SaleRecord>(_salesBox);
-    final sessions = await Hive.openBox(_stallSessionsBox);
+    final sessions = await Hive.openBox<StallSession>(_stallSessionsBox);
     final projects = await Hive.openBox<Project>(_projectsBox);
-    final productionRuns = await Hive.openBox(_productionRunsBox);
+    final productionRuns = await Hive.openBox<ProductionRun>(_productionRunsBox);
     final commissions = await Hive.openBox<Commission>(_commissionsBox);
     final recipes = await Hive.openBox<MakeRecipe>(_makeRecipesBox);
-    final collections = await Hive.openBox(_makerCollectionsBox);
+    final collections = await Hive.openBox<MakerCollection>(_makerCollectionsBox);
     final shopping = await Hive.openBox<ShoppingList>(_shoppingListsBox);
-    final compliance = await Hive.openBox(_complianceBox);
-    final wholesalePartners = await Hive.openBox(_wholesalePartnersBox);
-    final wholesaleBatches = await Hive.openBox(_wholesaleBatchesBox);
+    final compliance = await Hive.openBox<ComplianceEntry>(_complianceBox);
+    final wholesalePartners = await Hive.openBox<WholesalePartner>(_wholesalePartnersBox);
+    final wholesaleBatches = await Hive.openBox<WholesaleBatch>(_wholesaleBatchesBox);
     await Future.wait([
       inventory.clear(),
       stockAdjustments.clear(),

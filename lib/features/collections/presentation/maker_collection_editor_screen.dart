@@ -103,10 +103,16 @@ class _MakerCollectionEditorScreenState
 
   void _addTarget() {
     if (_availableRecipes.isEmpty) return;
+    // Find first available recipe not already targeted
+    final usedRecipeIds = _editableTargets.map((t) => t.recipeId).toSet();
+    final nextRecipe = _availableRecipes.firstWhere(
+      (r) => !usedRecipeIds.contains(r.id),
+      orElse: () => _availableRecipes.first,
+    );
     setState(() {
       _editableTargets.add(_EditableRecipeTarget(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
-        recipeId: _availableRecipes.first.id,
+        recipeId: nextRecipe.id,
         targetQuantity: 5,
       ));
     });
@@ -142,6 +148,16 @@ class _MakerCollectionEditorScreenState
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
             content: Text('Add at least one recipe target to the collection.')),
+      );
+      return;
+    }
+
+    // Check for duplicate recipes
+    final recipeIds = _editableTargets.map((t) => t.recipeId).toSet();
+    if (recipeIds.length != _editableTargets.length) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Each recipe target in a collection must be unique. Please remove duplicate recipe selections.')),
       );
       return;
     }
