@@ -8,7 +8,7 @@ part of 'make_recipe_model.dart';
 
 class MakeRecipeAdapter extends TypeAdapter<MakeRecipe> {
   @override
-  final int typeId = 14;
+  final int typeId = 25;
 
   @override
   MakeRecipe read(BinaryReader reader) {
@@ -84,7 +84,7 @@ class MakeRecipeAdapter extends TypeAdapter<MakeRecipe> {
 
 class RecipeVariantAdapter extends TypeAdapter<RecipeVariant> {
   @override
-  final int typeId = 15;
+  final int typeId = 26;
 
   @override
   RecipeVariant read(BinaryReader reader) {

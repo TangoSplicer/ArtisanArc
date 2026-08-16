@@ -6,7 +6,7 @@ part 'make_recipe_model.g.dart';
 
 /// A reusable, maker-authored product plan. Pattern references are intentionally
 /// descriptive only: the app does not store or reproduce commercial patterns.
-@HiveType(typeId: 14)
+@HiveType(typeId: 25)
 class MakeRecipe extends HiveObject {
   MakeRecipe({
     required this.id,
@@ -124,7 +124,7 @@ class MakeRecipe extends HiveObject {
       );
 }
 
-@HiveType(typeId: 15)
+@HiveType(typeId: 26)
 class RecipeVariant extends HiveObject {
   RecipeVariant({
     required this.id,
