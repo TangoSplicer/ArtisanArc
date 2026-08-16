@@ -28,10 +28,10 @@ void main() {
         applicableCraft: 'Jewelry',
         dateCertified: DateTime.now(),
       );
-      
+
       final entries = [entry1, entry2];
       final filtered = entries.where((e) => e.certification == 'UKCA').toList();
-      
+
       expect(filtered.length, 1);
       expect(filtered.first.id, 'c1');
     });

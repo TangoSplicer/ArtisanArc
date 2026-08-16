@@ -16,7 +16,10 @@ class CraftAIWidget extends StatelessWidget {
     final mistakes = service.getMistakes(craft);
     final materials = service.getMaterials(craft);
 
-    bool noDataAvailable = tips.isEmpty && mistakes.isEmpty && materials.isEmpty && craft.isNotEmpty;
+    bool noDataAvailable = tips.isEmpty &&
+        mistakes.isEmpty &&
+        materials.isEmpty &&
+        craft.isNotEmpty;
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -31,15 +34,17 @@ class CraftAIWidget extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.search_off, size: 80, color: theme.colorScheme.secondary),
+                    Icon(Icons.search_off,
+                        size: 80, color: theme.colorScheme.secondary),
                     const SizedBox(height: 20),
                     Text(
                       'Sorry, no AI hints are currently available for "$craft".',
                       textAlign: TextAlign.center,
-                      style: theme.textTheme.titleMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                      style: theme.textTheme.titleMedium
+                          ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                     ),
                     const SizedBox(height: 8),
-                     Text(
+                    Text(
                       'Our AI is constantly learning. Please check back later or try a different craft term.',
                       textAlign: TextAlign.center,
                       style: theme.textTheme.bodySmall,
@@ -50,21 +55,39 @@ class CraftAIWidget extends StatelessWidget {
             : ListView(
                 children: [
                   if (tips.isNotEmpty) ...[
-                    Text('💡 Smart Tips', style: theme.textTheme.titleLarge?.copyWith(color: theme.colorScheme.primary)),
+                    Text('💡 Smart Tips',
+                        style: theme.textTheme.titleLarge
+                            ?.copyWith(color: theme.colorScheme.primary)),
                     const SizedBox(height: 8),
-                    ...tips.map((e) => Card(margin: const EdgeInsets.symmetric(vertical: 4), child: ListTile(leading: const Icon(Icons.lightbulb_outline), title: Text(e)))),
+                    ...tips.map((e) => Card(
+                        margin: const EdgeInsets.symmetric(vertical: 4),
+                        child: ListTile(
+                            leading: const Icon(Icons.lightbulb_outline),
+                            title: Text(e)))),
                     const SizedBox(height: 16),
                   ],
                   if (mistakes.isNotEmpty) ...[
-                    Text('⚠️ Common Pitfalls', style: theme.textTheme.titleLarge?.copyWith(color: theme.colorScheme.error)),
+                    Text('⚠️ Common Pitfalls',
+                        style: theme.textTheme.titleLarge
+                            ?.copyWith(color: theme.colorScheme.error)),
                     const SizedBox(height: 8),
-                    ...mistakes.map((e) => Card(margin: const EdgeInsets.symmetric(vertical: 4), child: ListTile(leading: const Icon(Icons.warning_amber_outlined), title: Text(e)))),
+                    ...mistakes.map((e) => Card(
+                        margin: const EdgeInsets.symmetric(vertical: 4),
+                        child: ListTile(
+                            leading: const Icon(Icons.warning_amber_outlined),
+                            title: Text(e)))),
                     const SizedBox(height: 16),
                   ],
                   if (materials.isNotEmpty) ...[
-                    Text('🛠️ Suggested Materials', style: theme.textTheme.titleLarge?.copyWith(color: theme.colorScheme.tertiary)),
+                    Text('🛠️ Suggested Materials',
+                        style: theme.textTheme.titleLarge
+                            ?.copyWith(color: theme.colorScheme.tertiary)),
                     const SizedBox(height: 8),
-                    ...materials.map((e) => Card(margin: const EdgeInsets.symmetric(vertical: 4), child: ListTile(leading: const Icon(Icons.construction_outlined), title: Text(e)))),
+                    ...materials.map((e) => Card(
+                        margin: const EdgeInsets.symmetric(vertical: 4),
+                        child: ListTile(
+                            leading: const Icon(Icons.construction_outlined),
+                            title: Text(e)))),
                   ],
                 ],
               ),

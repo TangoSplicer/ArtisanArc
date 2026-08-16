@@ -65,10 +65,15 @@ void main() {
       );
 
       // Mark item1 as purchased
-      shoppingList.items.firstWhere((it) => it.id == 'item1').isPurchased = true;
+      shoppingList.items.firstWhere((it) => it.id == 'item1').isPurchased =
+          true;
 
-      expect(shoppingList.items.firstWhere((it) => it.id == 'item1').isPurchased, isTrue);
-      expect(shoppingList.items.firstWhere((it) => it.id == 'item2').isPurchased, isFalse);
+      expect(
+          shoppingList.items.firstWhere((it) => it.id == 'item1').isPurchased,
+          isTrue);
+      expect(
+          shoppingList.items.firstWhere((it) => it.id == 'item2').isPurchased,
+          isFalse);
     });
   });
 }

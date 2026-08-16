@@ -21,6 +21,7 @@ class SampleDataService {
   static const _productionRunsBox = 'productionRunsBox';
   static const _commissionsBox = 'commissionsBox';
   static const _makeRecipesBox = 'makeRecipesBox';
+  static const _makerCollectionsBox = 'makerCollectionsBox';
   static const _shoppingListsBox = 'shoppingListsBox';
   static const _complianceBox = 'complianceBox';
 
@@ -35,6 +36,7 @@ class SampleDataService {
     final productionRuns = await Hive.openBox(_productionRunsBox);
     final commissions = await Hive.openBox<Commission>(_commissionsBox);
     final recipes = await Hive.openBox<MakeRecipe>(_makeRecipesBox);
+    final collections = await Hive.openBox(_makerCollectionsBox);
     final shopping = await Hive.openBox<ShoppingList>(_shoppingListsBox);
     return inventory.isNotEmpty ||
         stockAdjustments.isNotEmpty ||
@@ -46,6 +48,7 @@ class SampleDataService {
         productionRuns.isNotEmpty ||
         commissions.isNotEmpty ||
         recipes.isNotEmpty ||
+        collections.isNotEmpty ||
         shopping.isNotEmpty;
   }
 
@@ -65,6 +68,7 @@ class SampleDataService {
     final productionRuns = await Hive.openBox(_productionRunsBox);
     final commissions = await Hive.openBox<Commission>(_commissionsBox);
     final recipes = await Hive.openBox<MakeRecipe>(_makeRecipesBox);
+    final collections = await Hive.openBox(_makerCollectionsBox);
     final shopping = await Hive.openBox<ShoppingList>(_shoppingListsBox);
 
     if (replaceExisting) {
@@ -79,6 +83,7 @@ class SampleDataService {
         productionRuns.clear(),
         commissions.clear(),
         recipes.clear(),
+        collections.clear(),
         shopping.clear()
       ]);
     }
@@ -356,11 +361,30 @@ class SampleDataService {
       ],
     );
 
+    final sampleCollection = MakerCollection(
+      id: 'sample-collection-spring',
+      name: 'Spring Market Range 2026',
+      description: 'Core handmade crochet pieces for spring craft fairs.',
+      season: 'Spring Market',
+      targetDate: now.add(const Duration(days: 45)),
+      weeklyCapacityMinutes: 240,
+      recipeTargets: [
+        CollectionRecipeTarget(
+          id: 'target-bee-keyring',
+          recipeId: sampleRecipe.id,
+          targetQuantity: 10,
+        ),
+      ],
+      createdAt: now,
+      updatedAt: now,
+    );
+
     await Future.wait([
       inventory.putAll({for (final item in inventoryItems) item.id: item}),
       sales.putAll({for (final sale in sampleSales) sale.id: sale}),
       projects.put(sampleProject.id, sampleProject),
       recipes.put(sampleRecipe.id, sampleRecipe),
+      collections.put(sampleCollection.id, sampleCollection),
       commissions.putAll({for (final item in sampleCommissions) item.id: item}),
       shopping.put(sampleShoppingList.id, sampleShoppingList),
     ]);
@@ -377,6 +401,7 @@ class SampleDataService {
     final productionRuns = await Hive.openBox(_productionRunsBox);
     final commissions = await Hive.openBox<Commission>(_commissionsBox);
     final recipes = await Hive.openBox<MakeRecipe>(_makeRecipesBox);
+    final collections = await Hive.openBox(_makerCollectionsBox);
     final shopping = await Hive.openBox<ShoppingList>(_shoppingListsBox);
     final compliance = await Hive.openBox(_complianceBox);
     await Future.wait([
@@ -390,6 +415,7 @@ class SampleDataService {
       productionRuns.clear(),
       commissions.clear(),
       recipes.clear(),
+      collections.clear(),
       shopping.clear(),
       compliance.clear(),
     ]);

@@ -56,17 +56,20 @@ class AppTheme {
   static final ThemeData lightTheme = ThemeData(
     colorScheme: _lightScheme,
     scaffoldBackgroundColor: _lightScheme.background,
-    textTheme: ThemeData.light().textTheme.apply(
-      bodyColor: _lightScheme.onSurface,
-      displayColor: _lightScheme.onSurface,
-    ).copyWith(
-      headlineMedium: TextStyle(
-        fontFamily: 'serif',
-        fontSize: 22,
-        fontWeight: FontWeight.bold,
-        color: _lightScheme.onSurface,
-      ),
-    ),
+    textTheme: ThemeData.light()
+        .textTheme
+        .apply(
+          bodyColor: _lightScheme.onSurface,
+          displayColor: _lightScheme.onSurface,
+        )
+        .copyWith(
+          headlineMedium: TextStyle(
+            fontFamily: 'serif',
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: _lightScheme.onSurface,
+          ),
+        ),
     appBarTheme: const AppBarTheme(
       backgroundColor: Color(0xFF5C4DB1),
       foregroundColor: Colors.white,
@@ -88,17 +91,20 @@ class AppTheme {
   static final ThemeData darkTheme = ThemeData(
     colorScheme: _darkScheme,
     scaffoldBackgroundColor: _darkScheme.background,
-    textTheme: ThemeData.dark().textTheme.apply(
-      bodyColor: _darkScheme.onSurface,
-      displayColor: _darkScheme.onSurface,
-    ).copyWith(
-      headlineMedium: TextStyle(
-        fontFamily: 'serif',
-        fontSize: 22,
-        fontWeight: FontWeight.bold,
-        color: _darkScheme.onSurface,
-      ),
-    ),
+    textTheme: ThemeData.dark()
+        .textTheme
+        .apply(
+          bodyColor: _darkScheme.onSurface,
+          displayColor: _darkScheme.onSurface,
+        )
+        .copyWith(
+          headlineMedium: TextStyle(
+            fontFamily: 'serif',
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: _darkScheme.onSurface,
+          ),
+        ),
     appBarTheme: AppBarTheme(
       backgroundColor: _darkScheme.surface,
       foregroundColor: _darkScheme.onSurface,

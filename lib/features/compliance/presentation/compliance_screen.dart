@@ -71,10 +71,14 @@ class _ComplianceScreenState extends State<ComplianceScreen> {
       try {
         if (_editingEntryId != null) {
           await _service.updateCertification(entry);
-          if(mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Certification updated!')));
+          if (mounted)
+            ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Certification updated!')));
         } else {
           await _service.recordCertification(entry);
-           if(mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Certification added!')));
+          if (mounted)
+            ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Certification added!')));
         }
         _resetForm();
         _loadCertifications();
@@ -91,7 +95,9 @@ class _ComplianceScreenState extends State<ComplianceScreen> {
   void _handleEdit(ComplianceEntry entry) {
     setState(() {
       _editingEntryId = entry.id;
-      _selectedTag = predefinedComplianceTags.firstWhere((tag) => tag.name == entry.certification, orElse: () => predefinedComplianceTags.first);
+      _selectedTag = predefinedComplianceTags.firstWhere(
+          (tag) => tag.name == entry.certification,
+          orElse: () => predefinedComplianceTags.first);
       _craftController.text = entry.applicableCraft;
       _dateCertified = entry.dateCertified;
       _notesController.text = entry.notes ?? '';
@@ -99,14 +105,21 @@ class _ComplianceScreenState extends State<ComplianceScreen> {
   }
 
   void _handleDelete(String entryId) async {
-     final confirm = await showDialog<bool>(
+    final confirm = await showDialog<bool>(
       context: context,
       builder: (BuildContext dialogContext) => AlertDialog(
         title: const Text('Confirm Delete'),
-        content: const Text('Are you sure you want to delete this certification entry?'),
+        content: const Text(
+            'Are you sure you want to delete this certification entry?'),
         actions: [
-          TextButton(child: const Text('Cancel'), onPressed: () => Navigator.of(dialogContext).pop(false)),
-          TextButton(child: const Text('Delete'), style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error), onPressed: () => Navigator.of(dialogContext).pop(true)),
+          TextButton(
+              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(dialogContext).pop(false)),
+          TextButton(
+              child: const Text('Delete'),
+              style: TextButton.styleFrom(
+                  foregroundColor: Theme.of(context).colorScheme.error),
+              onPressed: () => Navigator.of(dialogContext).pop(true)),
         ],
       ),
     );
@@ -114,15 +127,19 @@ class _ComplianceScreenState extends State<ComplianceScreen> {
     if (confirm == true) {
       try {
         await _service.deleteCertification(entryId);
-        if(mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Certification deleted.')));
+        if (mounted)
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Certification deleted.')));
         _loadCertifications();
-         if (_editingEntryId == entryId) { // If the deleted item was being edited, reset form
+        if (_editingEntryId == entryId) {
+          // If the deleted item was being edited, reset form
           _resetForm();
         }
       } catch (e) {
-         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error deleting: $e')));
-         }
+        if (mounted) {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text('Error deleting: $e')));
+        }
       }
     }
   }
@@ -132,7 +149,8 @@ class _ComplianceScreenState extends State<ComplianceScreen> {
       context: context,
       initialDate: _dateCertified,
       firstDate: DateTime(2000),
-      lastDate: DateTime.now().add(const Duration(days: 365 * 5)), // Allow future dates for upcoming certs
+      lastDate: DateTime.now().add(const Duration(
+          days: 365 * 5)), // Allow future dates for upcoming certs
     );
     if (picked != null && picked != _dateCertified) {
       setState(() {
@@ -146,7 +164,9 @@ class _ComplianceScreenState extends State<ComplianceScreen> {
     final theme = Theme.of(context);
     return Scaffold(
       appBar: PersonalAppBar(
-        title: Text(_editingEntryId != null ? 'Edit Compliance Entry' : 'Compliance Tracker'),
+        title: Text(_editingEntryId != null
+            ? 'Edit Compliance Entry'
+            : 'Compliance Tracker'),
         backgroundColor: theme.colorScheme.primaryContainer,
       ),
       body: Padding(
@@ -178,34 +198,46 @@ class _ComplianceScreenState extends State<ComplianceScreen> {
             hintText: 'Search record, region, or craft',
             emptyMessage: 'No matching records',
             itemLabel: (tag) => tag.name,
-            itemSubtitle: (tag) => '${tag.country} · ${tag.applicableCraft.join(', ')}',
-            searchTerms: (tag) => [tag.name, tag.country, ...tag.applicableCraft],
+            itemSubtitle: (tag) =>
+                '${tag.country} · ${tag.applicableCraft.join(', ')}',
+            searchTerms: (tag) =>
+                [tag.name, tag.country, ...tag.applicableCraft],
             onChanged: (newValue) {
               setState(() {
                 _selectedTag = newValue;
-                _craftController.text = newValue?.applicableCraft.join(', ') ?? '';
+                _craftController.text =
+                    newValue?.applicableCraft.join(', ') ?? '';
               });
             },
-            validator: (value) => value == null ? 'Please select a record' : null,
+            validator: (value) =>
+                value == null ? 'Please select a record' : null,
           ),
           const SizedBox(height: 12),
           TextFormField(
             controller: _craftController,
-            decoration: const InputDecoration(labelText: 'Applicable Craft(s)*', border: OutlineInputBorder()),
-            validator: (value) => (value == null || value.isEmpty) ? 'Please enter applicable craft(s)' : null,
+            decoration: const InputDecoration(
+                labelText: 'Applicable Craft(s)*',
+                border: OutlineInputBorder()),
+            validator: (value) => (value == null || value.isEmpty)
+                ? 'Please enter applicable craft(s)'
+                : null,
           ),
           const SizedBox(height: 12),
-           ListTile(
+          ListTile(
             contentPadding: EdgeInsets.zero,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0), side: BorderSide(color: theme.colorScheme.outline)),
-            title: Text('Date Certified: ${DateFormat.yMMMd().format(_dateCertified)}'),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4.0),
+                side: BorderSide(color: theme.colorScheme.outline)),
+            title: Text(
+                'Date Certified: ${DateFormat.yMMMd().format(_dateCertified)}'),
             trailing: const Icon(Icons.calendar_today),
             onTap: _pickDate,
           ),
           const SizedBox(height: 12),
           TextFormField(
             controller: _notesController,
-            decoration: const InputDecoration(labelText: 'Notes (Optional)', border: OutlineInputBorder()),
+            decoration: const InputDecoration(
+                labelText: 'Notes (Optional)', border: OutlineInputBorder()),
             maxLines: 2,
           ),
           const SizedBox(height: 16),
@@ -219,10 +251,16 @@ class _ComplianceScreenState extends State<ComplianceScreen> {
                 ),
               const SizedBox(width: 8),
               ElevatedButton.icon(
-                icon: Icon(_editingEntryId != null ? Icons.save_as : Icons.add_circle_outline),
-                label: Text(_editingEntryId != null ? 'Update Certification' : 'Add Certification'),
+                icon: Icon(_editingEntryId != null
+                    ? Icons.save_as
+                    : Icons.add_circle_outline),
+                label: Text(_editingEntryId != null
+                    ? 'Update Certification'
+                    : 'Add Certification'),
                 onPressed: _handleSubmit,
-                style: ElevatedButton.styleFrom(backgroundColor: theme.colorScheme.primary, foregroundColor: theme.colorScheme.onPrimary),
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.colorScheme.primary,
+                    foregroundColor: theme.colorScheme.onPrimary),
               ),
             ],
           ),
@@ -251,7 +289,9 @@ class _ComplianceScreenState extends State<ComplianceScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
-                      child: Text(entry.certification, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                      child: Text(entry.certification,
+                          style: theme.textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold)),
                     ),
                     PopupMenuButton<String>(
                       icon: const Icon(Icons.more_vert),
@@ -260,18 +300,29 @@ class _ComplianceScreenState extends State<ComplianceScreen> {
                         if (value == 'delete') _handleDelete(entry.id);
                       },
                       itemBuilder: (BuildContext context) => [
-                        const PopupMenuItem(value: 'edit', child: ListTile(leading: Icon(Icons.edit), title: Text('Edit'))),
-                        const PopupMenuItem(value: 'delete', child: ListTile(leading: Icon(Icons.delete), title: Text('Delete'))),
+                        const PopupMenuItem(
+                            value: 'edit',
+                            child: ListTile(
+                                leading: Icon(Icons.edit),
+                                title: Text('Edit'))),
+                        const PopupMenuItem(
+                            value: 'delete',
+                            child: ListTile(
+                                leading: Icon(Icons.delete),
+                                title: Text('Delete'))),
                       ],
                     ),
                   ],
                 ),
-                Text('Craft(s): ${entry.applicableCraft}', style: theme.textTheme.bodyMedium),
-                Text('Date: ${DateFormat.yMMMd().format(entry.dateCertified)}', style: theme.textTheme.bodyMedium),
+                Text('Craft(s): ${entry.applicableCraft}',
+                    style: theme.textTheme.bodyMedium),
+                Text('Date: ${DateFormat.yMMMd().format(entry.dateCertified)}',
+                    style: theme.textTheme.bodyMedium),
                 if (entry.notes != null && entry.notes!.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(top: 4.0),
-                    child: Text('Notes: ${entry.notes}', style: theme.textTheme.bodySmall),
+                    child: Text('Notes: ${entry.notes}',
+                        style: theme.textTheme.bodySmall),
                   ),
               ],
             ),

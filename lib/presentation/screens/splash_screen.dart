@@ -10,7 +10,8 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
 
@@ -21,19 +22,22 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       duration: const Duration(seconds: 2),
       vsync: this,
     );
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
-    
+    _fadeAnimation =
+        Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
+
     _animationController.forward();
     _checkOnboardingStatus();
   }
 
   Future<void> _checkOnboardingStatus() async {
-    await Future.delayed(const Duration(seconds: 3)); // Show splash for 3 seconds
-    
+    await Future.delayed(
+        const Duration(seconds: 3)); // Show splash for 3 seconds
+
     if (mounted) {
       const storage = FlutterSecureStorage();
-      final seenOnboarding = await storage.read(key: StorageKeys.onboardingComplete) == 'true';
-      
+      final seenOnboarding =
+          await storage.read(key: StorageKeys.onboardingComplete) == 'true';
+
       if (seenOnboarding) {
         context.go('/home');
       } else {
@@ -51,7 +55,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       backgroundColor: theme.colorScheme.primary,
       body: Center(
@@ -100,7 +104,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 width: 40,
                 height: 40,
                 child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.onPrimary),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                      theme.colorScheme.onPrimary),
                   strokeWidth: 3,
                 ),
               ),

@@ -17,7 +17,7 @@ import 'presentation/onboarding/onboarding_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize Hive
   await Hive.initFlutter();
   registerHiveAdapters();
@@ -28,17 +28,18 @@ void main() async {
   } catch (error) {
     debugPrint('Automatic backup snapshot skipped: $error');
   }
-  
+
   // Configure dependencies
   await configureDependencies();
-  
+
   // Initialize notifications
   await NotificationService.initialize();
-  
+
   final themeService = getIt.get<ThemeService>();
   await themeService.loadThemeMode();
   final storage = getIt.get<FlutterSecureStorage>();
-  final seenOnboarding = await storage.read(key: StorageKeys.onboardingComplete) == 'true';
+  final seenOnboarding =
+      await storage.read(key: StorageKeys.onboardingComplete) == 'true';
 
   runApp(ArtisanArcApp(
     themeService: themeService,

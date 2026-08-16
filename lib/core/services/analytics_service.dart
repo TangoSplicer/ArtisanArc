@@ -9,10 +9,10 @@ class AnalyticsService {
     try {
       final currentData = await _getUsageData();
       final today = DateTime.now().toIso8601String().split('T')[0];
-      
+
       currentData[feature] ??= {};
       currentData[feature][today] = (currentData[feature][today] ?? 0) + 1;
-      
+
       await _storage.write(key: _usageKey, value: jsonEncode(currentData));
     } catch (e) {
       // Silently fail in tests or when secure storage is unavailable
@@ -26,7 +26,7 @@ class AnalyticsService {
   static Future<Map<String, dynamic>> _getUsageData() async {
     final data = await _storage.read(key: _usageKey);
     if (data == null) return {};
-    
+
     try {
       return jsonDecode(data) as Map<String, dynamic>;
     } catch (e) {

@@ -51,14 +51,16 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
     // Navigate to ProjectPlannerScreen for adding a new project.
     // ProjectPlannerScreen will handle creation and pop.
     // We expect a boolean result: true if a project was added/modified.
-    final result = await context.push('/projects/add'); // Assuming '/projects/add' will be the route for ProjectPlannerScreen
+    final result = await context.push(
+        '/projects/add'); // Assuming '/projects/add' will be the route for ProjectPlannerScreen
     if (result == true) {
       _loadProjects(); // Refresh list if a project was added
     }
   }
 
   void _navigateToEditProject(Project project) async {
-    final result = await context.push('/projects/edit/${project.id}'); // Route for editing
+    final result =
+        await context.push('/projects/edit/${project.id}'); // Route for editing
     if (result == true) {
       _loadProjects(); // Refresh list
     }
@@ -70,7 +72,8 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
       builder: (BuildContext dialogContext) {
         return AlertDialog(
           title: const Text('Delete Project'),
-          content: Text('Are you sure you want to delete "${project.name}"? This action cannot be undone.'),
+          content: Text(
+              'Are you sure you want to delete "${project.name}"? This action cannot be undone.'),
           actions: <Widget>[
             TextButton(
               child: const Text('Cancel'),
@@ -78,7 +81,8 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
             ),
             TextButton(
               child: const Text('Delete'),
-              style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
+              style: TextButton.styleFrom(
+                  foregroundColor: Theme.of(context).colorScheme.error),
               onPressed: () => Navigator.of(dialogContext).pop(true),
             ),
           ],
@@ -105,7 +109,6 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -118,7 +121,8 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
               ? EmptyStateWidget(
                   icon: Icons.timeline,
                   title: 'No Projects Yet',
-                  subtitle: 'Create your first project to start organizing your craft work',
+                  subtitle:
+                      'Create your first project to start organizing your craft work',
                   actionText: 'Create Project',
                   onAction: _navigateToAddProject,
                 )
@@ -127,14 +131,19 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                   itemCount: _projects.length,
                   itemBuilder: (context, index) {
                     final project = _projects[index];
-                    final completedMilestones = project.milestones.where((m) => m.isCompleted).length;
+                    final completedMilestones =
+                        project.milestones.where((m) => m.isCompleted).length;
                     final totalMilestones = project.milestones.length;
-                    final progress = totalMilestones > 0 ? completedMilestones / totalMilestones : 0.0;
-                    
+                    final progress = totalMilestones > 0
+                        ? completedMilestones / totalMilestones
+                        : 0.0;
+
                     return Card(
                       margin: const EdgeInsets.symmetric(vertical: 8.0),
                       child: ListTile(
-                        title: Text(project.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                        title: Text(project.name,
+                            style:
+                                const TextStyle(fontWeight: FontWeight.bold)),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -147,8 +156,10 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                             const SizedBox(height: 8),
                             LinearProgressIndicator(
                               value: progress,
-                              backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
-                              valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.surfaceVariant,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  Theme.of(context).colorScheme.primary),
                             ),
                             const SizedBox(height: 4),
                             Text(
@@ -165,19 +176,26 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                               _confirmDeleteProject(project);
                             }
                           },
-                          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                          itemBuilder: (BuildContext context) =>
+                              <PopupMenuEntry<String>>[
                             const PopupMenuItem<String>(
                               value: 'edit',
-                              child: ListTile(leading: Icon(Icons.edit), title: Text('Edit')),
+                              child: ListTile(
+                                  leading: Icon(Icons.edit),
+                                  title: Text('Edit')),
                             ),
                             const PopupMenuItem<String>(
                               value: 'delete',
-                              child: ListTile(leading: Icon(Icons.delete), title: Text('Delete')),
+                              child: ListTile(
+                                  leading: Icon(Icons.delete),
+                                  title: Text('Delete')),
                             ),
                           ],
                         ),
                         onTap: () {
-                          context.push('/projects/detail/${project.id}').then((_) => _loadProjects());
+                          context
+                              .push('/projects/detail/${project.id}')
+                              .then((_) => _loadProjects());
                         },
                       ),
                     );

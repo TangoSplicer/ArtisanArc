@@ -342,3 +342,16 @@ After **1.4**, use the app for a few real makes. If creating a finished item fro
 ## References
 
 [1]: https://github.com/TangoSplicer/ArtisanArc/actions "ArtisanArc GitHub Actions build history"
+
+---
+
+# 2.5 — Plan the range
+
+## Delivery record — v2.5.0+20
+
+| Delivered capability | Implementation outcome |
+|---|---|
+| Maker Collections & Capacity Planning | Seasonal collections group Make Recipes into target quantities for ranges, market stalls, or gifting runs. The app calculates estimated making hours against weekly capacity and checks material readiness across current stock. |
+| Actionable material readiness & project startup | Collections show readiness per recipe target (shortages highlighted) and allow immediate project creation for batched production runs. |
+| Persistent local storage and safety | Maker collections are stored in local Hive data (TypeIds 16, 17) and fully integrated with automatic snapshots, portable backup/restore validation, sample data loading, and Settings clear-all. |
+| Regression coverage | Automated test suites verify capacity snapshots, target tracking, and material readiness calculations. |

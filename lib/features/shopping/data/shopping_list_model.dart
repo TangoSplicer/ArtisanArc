@@ -34,7 +34,9 @@ class ShoppingList extends HiveObject {
       id: id ?? this.id,
       name: name ?? this.name,
       createdAt: createdAt ?? this.createdAt,
-      items: items ?? List<ShoppingListItem>.from(this.items.map((item) => item.copyWith())), // Deep copy
+      items: items ??
+          List<ShoppingListItem>.from(
+              this.items.map((item) => item.copyWith())), // Deep copy
     );
   }
 }
@@ -42,7 +44,8 @@ class ShoppingList extends HiveObject {
 @HiveType(typeId: 7) // New unique typeId
 class ShoppingListItem extends HiveObject {
   @HiveField(0)
-  String id; // Globally unique ID for simplicity if items might move or be referenced elsewhere
+  String
+      id; // Globally unique ID for simplicity if items might move or be referenced elsewhere
 
   @HiveField(1)
   String itemName;
@@ -80,6 +83,7 @@ class ShoppingListItem extends HiveObject {
     );
   }
 }
+
 // Helper to generate UUIDs if needed elsewhere for these items
 String generateShoppingItemId() => Uuid().v4();
 String generateShoppingListId() => Uuid().v4();

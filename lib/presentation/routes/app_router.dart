@@ -36,6 +36,9 @@ import 'package:artisanarc/features/operations/presentation/maker_operations_das
 import 'package:artisanarc/features/recipes/presentation/make_recipe_list_screen.dart';
 import 'package:artisanarc/features/recipes/presentation/make_recipe_detail_screen.dart';
 import 'package:artisanarc/features/recipes/presentation/make_recipe_editor_screen.dart';
+import 'package:artisanarc/features/collections/presentation/maker_collections_screen.dart';
+import 'package:artisanarc/features/collections/presentation/maker_collection_detail_screen.dart';
+import 'package:artisanarc/features/collections/presentation/maker_collection_editor_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -234,6 +237,40 @@ class AppRouter {
         path: '/operations',
         name: 'makerOperations',
         builder: (context, state) => const MakerOperationsDashboardScreen(),
+      ),
+      GoRoute(
+        path: '/collections',
+        name: 'collections',
+        builder: (context, state) => const MakerCollectionsScreen(),
+        routes: [
+          GoRoute(
+            path: 'new',
+            name: 'addCollection',
+            builder: (context, state) => const MakerCollectionEditorScreen(),
+          ),
+          GoRoute(
+            path: 'detail/:id',
+            name: 'collectionDetail',
+            builder: (context, state) {
+              final collectionId = state.pathParameters['id'];
+              if (collectionId == null) {
+                return const ErrorScreen(error: 'Collection ID is missing');
+              }
+              return MakerCollectionDetailScreen(collectionId: collectionId);
+            },
+          ),
+          GoRoute(
+            path: 'edit/:id',
+            name: 'editCollection',
+            builder: (context, state) {
+              final collectionId = state.pathParameters['id'];
+              if (collectionId == null) {
+                return const ErrorScreen(error: 'Collection ID is missing');
+              }
+              return MakerCollectionEditorScreen(collectionId: collectionId);
+            },
+          ),
+        ],
       ),
       GoRoute(
         path: '/commissions',

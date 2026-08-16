@@ -88,6 +88,10 @@ class Project extends HiveObject {
   @HiveField(20)
   String? finishedItemCategory;
 
+  /// Optional local collection that this project contributes towards.
+  @HiveField(21)
+  String? collectionId;
+
   Project({
     required this.id,
     required this.name,
@@ -108,6 +112,7 @@ class Project extends HiveObject {
     this.recipeName,
     this.plannedOutputQuantity = 1,
     this.finishedItemCategory,
+    this.collectionId,
     required this.createdAt,
     this.lastUpdatedAt,
   })  : milestones = milestones ?? [],
@@ -142,6 +147,8 @@ class Project extends HiveObject {
     int? plannedOutputQuantity,
     String? finishedItemCategory,
     bool clearFinishedItemCategory = false,
+    String? collectionId,
+    bool clearCollectionId = false,
     DateTime? createdAt,
     DateTime? lastUpdatedAt,
   }) {
@@ -182,6 +189,8 @@ class Project extends HiveObject {
       finishedItemCategory: clearFinishedItemCategory
           ? null
           : finishedItemCategory ?? this.finishedItemCategory,
+      collectionId:
+          clearCollectionId ? null : collectionId ?? this.collectionId,
       createdAt: createdAt ?? this.createdAt,
       lastUpdatedAt: lastUpdatedAt ?? this.lastUpdatedAt,
     );

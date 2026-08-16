@@ -17,8 +17,11 @@ final get_it.GetIt getIt = get_it.GetIt.instance;
 @injectable.InjectableInit()
 void init() {
   getIt
-    ..registerLazySingleton<InventoryRepository>(() => InventoryRepositoryImpl())
-    ..registerLazySingleton<InventoryService>(() => InventoryServiceImpl(getIt()))
+    ..registerLazySingleton<InventoryRepository>(
+        () => InventoryRepositoryImpl())
+    ..registerLazySingleton<InventoryService>(
+        () => InventoryServiceImpl(getIt()))
     ..registerLazySingleton<SettingsRepository>(() => SettingsRepositoryImpl())
-    ..registerLazySingleton<SettingsService>(() => SettingsServiceImpl(getIt()));
+    ..registerLazySingleton<SettingsService>(
+        () => SettingsServiceImpl(getIt()));
 }

@@ -11,7 +11,8 @@ abstract class ShoppingService {
 
   Future<void> addItemToList(String listId, ShoppingListItem item);
   Future<void> removeItemFromList(String listId, String itemId);
-  Future<void> toggleItemPurchased(String listId, String itemId, bool isPurchased);
+  Future<void> toggleItemPurchased(
+      String listId, String itemId, bool isPurchased);
   Future<void> updateListItem(String listId, ShoppingListItem item);
 }
 
@@ -74,7 +75,8 @@ class ShoppingServiceImpl implements ShoppingService {
   }
 
   @override
-  Future<void> toggleItemPurchased(String listId, String itemId, bool isPurchased) async {
+  Future<void> toggleItemPurchased(
+      String listId, String itemId, bool isPurchased) async {
     final list = await getShoppingListById(listId);
     if (list != null) {
       final itemIndex = list.items.indexWhere((item) => item.id == itemId);
@@ -90,10 +92,12 @@ class ShoppingServiceImpl implements ShoppingService {
   }
 
   @override
-  Future<void> updateListItem(String listId, ShoppingListItem updatedItem) async {
+  Future<void> updateListItem(
+      String listId, ShoppingListItem updatedItem) async {
     final list = await getShoppingListById(listId);
     if (list != null) {
-      final itemIndex = list.items.indexWhere((item) => item.id == updatedItem.id);
+      final itemIndex =
+          list.items.indexWhere((item) => item.id == updatedItem.id);
       if (itemIndex != -1) {
         list.items[itemIndex] = updatedItem;
         await _repository.saveList(list);

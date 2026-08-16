@@ -39,7 +39,8 @@ class SettingsRepositoryImpl implements SettingsRepository {
 
   @override
   Future<void> setVATRegistered(bool isRegistered) async {
-    await _storage.write(key: _vatRegisteredKey, value: isRegistered.toString());
+    await _storage.write(
+        key: _vatRegisteredKey, value: isRegistered.toString());
   }
 
   @override

@@ -23,13 +23,15 @@ class SettingsServiceImpl implements SettingsService {
   Future<String?> getCurrentLocale() => _repo.getLocale();
 
   @override
-  Future<void> updateVATStatus(bool registered) => _repo.setVATRegistered(registered);
+  Future<void> updateVATStatus(bool registered) =>
+      _repo.setVATRegistered(registered);
 
   @override
   Future<bool> isVATRegistered() => _repo.getVATRegistered();
 
   @override
-  Future<void> setThreshold(double threshold) => _repo.setVATThreshold(threshold);
+  Future<void> setThreshold(double threshold) =>
+      _repo.setVATThreshold(threshold);
 
   @override
   Future<double?> getThreshold() => _repo.getVATThreshold();

@@ -11,10 +11,12 @@ class ShoppingListOverviewScreen extends StatefulWidget {
   const ShoppingListOverviewScreen({super.key});
 
   @override
-  State<ShoppingListOverviewScreen> createState() => _ShoppingListOverviewScreenState();
+  State<ShoppingListOverviewScreen> createState() =>
+      _ShoppingListOverviewScreenState();
 }
 
-class _ShoppingListOverviewScreenState extends State<ShoppingListOverviewScreen> {
+class _ShoppingListOverviewScreenState
+    extends State<ShoppingListOverviewScreen> {
   final ShoppingService _shoppingService = GetIt.I<ShoppingService>();
   List<ShoppingList> _shoppingLists = [];
   bool _isLoading = true;
@@ -112,12 +114,16 @@ class _ShoppingListOverviewScreenState extends State<ShoppingListOverviewScreen>
       builder: (BuildContext dialogContext) {
         return AlertDialog(
           title: const Text('Delete Shopping List'),
-          content: Text('Are you sure you want to delete the list "$listName"?'),
+          content:
+              Text('Are you sure you want to delete the list "$listName"?'),
           actions: <Widget>[
-            TextButton(onPressed: () => Navigator.of(dialogContext).pop(false), child: const Text('Cancel')),
+            TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(false),
+                child: const Text('Cancel')),
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
+              style: TextButton.styleFrom(
+                  foregroundColor: Theme.of(context).colorScheme.error),
               child: const Text('Delete'),
             ),
           ],
@@ -130,16 +136,17 @@ class _ShoppingListOverviewScreenState extends State<ShoppingListOverviewScreen>
         await _shoppingService.deleteShoppingList(listId);
         _loadShoppingLists();
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('List "$listName" deleted.')));
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('List "$listName" deleted.')));
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error deleting list: $e')));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text('Error deleting list: $e')));
         }
       }
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -162,12 +169,15 @@ class _ShoppingListOverviewScreenState extends State<ShoppingListOverviewScreen>
                   itemCount: _shoppingLists.length,
                   itemBuilder: (context, index) {
                     final list = _shoppingLists[index];
-                    final unpurchasedItems = list.items.where((item) => !item.isPurchased).length;
+                    final unpurchasedItems =
+                        list.items.where((item) => !item.isPurchased).length;
                     return Card(
                       margin: const EdgeInsets.symmetric(vertical: 8.0),
                       elevation: 2.0,
                       child: ListTile(
-                        title: Text(list.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                        title: Text(list.name,
+                            style:
+                                const TextStyle(fontWeight: FontWeight.bold)),
                         subtitle: Text(
                           'Created: ${DateFormat.yMMMd().format(list.createdAt)}\n'
                           '$unpurchasedItems item(s) pending',
@@ -181,7 +191,11 @@ class _ShoppingListOverviewScreenState extends State<ShoppingListOverviewScreen>
                             // Edit name could be added here
                           },
                           itemBuilder: (BuildContext context) => [
-                            const PopupMenuItem(value: 'delete', child: ListTile(leading: Icon(Icons.delete), title: Text('Delete List'))),
+                            const PopupMenuItem(
+                                value: 'delete',
+                                child: ListTile(
+                                    leading: Icon(Icons.delete),
+                                    title: Text('Delete List'))),
                           ],
                         ),
                         onTap: () => _navigateToDetailScreen(list.id),

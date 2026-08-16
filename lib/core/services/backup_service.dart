@@ -63,6 +63,7 @@ class BackupService {
     'productionRunsBox',
     'commissionsBox',
     'makeRecipesBox',
+    'makerCollectionsBox',
     'shoppingListsBox',
   ];
   static const _manifestName = 'artisanarc-backup-manifest.json';

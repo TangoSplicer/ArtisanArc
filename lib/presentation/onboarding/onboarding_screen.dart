@@ -21,32 +21,38 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   static const _pages = [
     _OnboardingContent(
       title: 'Welcome to ArtisanArc Personal',
-      description: 'A private, offline workspace for crochet, knitting, and the rest of your making life.',
+      description:
+          'A private, offline workspace for crochet, knitting, and the rest of your making life.',
       icon: Icons.auto_awesome,
     ),
     _OnboardingContent(
       title: '1. Tally what you have created',
-      description: 'Use Inventory for finished makes. Add each piece you have made, its sale price, and how many are ready. This is the tally used by sales.',
+      description:
+          'Use Inventory for finished makes. Add each piece you have made, its sale price, and how many are ready. This is the tally used by sales.',
       icon: Icons.inventory_2,
     ),
     _OnboardingContent(
       title: '2. Check materials before you make',
-      description: 'Use Materials Stock for yarn, hooks, needles, notions, and other supplies. It shows what is available to work with and highlights low materials.',
+      description:
+          'Use Materials Stock for yarn, hooks, needles, notions, and other supplies. It shows what is available to work with and highlights low materials.',
       icon: Icons.yard_outlined,
     ),
     _OnboardingContent(
       title: '3. Plan and sell with confidence',
-      description: 'Use Projects to plan a make with materials. At a table or stall, open Business Tools and choose On-the-day Sales. Tap + as each finished item sells; its tally reduces while materials stock stays visible for future work.',
+      description:
+          'Use Projects to plan a make with materials. At a table or stall, open Business Tools and choose On-the-day Sales. Tap + as each finished item sells; its tally reduces while materials stock stays visible for future work.',
       icon: Icons.storefront,
     ),
     _OnboardingContent(
       title: '4. Review, export, and move around',
-      description: 'Reports and exports use the sales you record. The app Back arrow and your device Back button return to the previous screen; Home always returns to your main dashboard.',
+      description:
+          'Reports and exports use the sales you record. The app Back arrow and your device Back button return to the previous screen; Home always returns to your main dashboard.',
       icon: Icons.insights,
     ),
     _OnboardingContent(
       title: 'Choose your starting point',
-      description: 'You can begin with an empty app, or load fictional crochet and knitting examples to see the complete workflow straight away. Starter data can be cleared from Settings at any time.',
+      description:
+          'You can begin with an empty app, or load fictional crochet and knitting examples to see the complete workflow straight away. Starter data can be cleared from Settings at any time.',
       icon: Icons.playlist_add_check,
       showsStarterDataChoice: true,
     ),
@@ -71,18 +77,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       if (mounted) context.go('/home');
     } catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not complete setup: $error')));
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Could not complete setup: $error')));
         setState(() => _isCompleting = false);
       }
     }
   }
 
   void _nextPage() {
-    _pageController.nextPage(duration: const Duration(milliseconds: 260), curve: Curves.easeOutCubic);
+    _pageController.nextPage(
+        duration: const Duration(milliseconds: 260),
+        curve: Curves.easeOutCubic);
   }
 
   void _previousPage() {
-    _pageController.previousPage(duration: const Duration(milliseconds: 260), curve: Curves.easeOutCubic);
+    _pageController.previousPage(
+        duration: const Duration(milliseconds: 260),
+        curve: Curves.easeOutCubic);
   }
 
   @override
@@ -102,7 +113,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 itemBuilder: (context, index) => _OnboardingPage(
                   content: _pages[index],
                   loadStarterData: _loadStarterData,
-                  onStarterDataChanged: (value) => setState(() => _loadStarterData = value),
+                  onStarterDataChanged: (value) =>
+                      setState(() => _loadStarterData = value),
                 ),
               ),
             ),
@@ -118,7 +130,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     height: 8,
                     margin: const EdgeInsets.symmetric(horizontal: 3),
                     decoration: BoxDecoration(
-                      color: index == _currentPage ? theme.colorScheme.primary : theme.colorScheme.outlineVariant,
+                      color: index == _currentPage
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.outlineVariant,
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
@@ -142,11 +156,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               const SizedBox(width: 80),
             const Spacer(),
             FilledButton.icon(
-              onPressed: _isCompleting ? null : (isFinalPage ? _completeOnboarding : _nextPage),
+              onPressed: _isCompleting
+                  ? null
+                  : (isFinalPage ? _completeOnboarding : _nextPage),
               icon: _isCompleting
-                  ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2))
                   : Icon(isFinalPage ? Icons.check : Icons.arrow_forward),
-              label: Text(isFinalPage ? (_loadStarterData ? 'Start with sample data' : 'Start empty') : 'Next'),
+              label: Text(isFinalPage
+                  ? (_loadStarterData
+                      ? 'Start with sample data'
+                      : 'Start empty')
+                  : 'Next'),
             ),
           ],
         ),
@@ -192,12 +215,16 @@ class _OnboardingPage extends StatelessWidget {
             CircleAvatar(
               radius: 56,
               backgroundColor: theme.colorScheme.primaryContainer,
-              child: Icon(content.icon, size: 56, color: theme.colorScheme.onPrimaryContainer),
+              child: Icon(content.icon,
+                  size: 56, color: theme.colorScheme.onPrimaryContainer),
             ),
             const SizedBox(height: 36),
-            Text(content.title, style: theme.textTheme.headlineMedium, textAlign: TextAlign.center),
+            Text(content.title,
+                style: theme.textTheme.headlineMedium,
+                textAlign: TextAlign.center),
             const SizedBox(height: 16),
-            Text(content.description, style: theme.textTheme.bodyLarge, textAlign: TextAlign.center),
+            Text(content.description,
+                style: theme.textTheme.bodyLarge, textAlign: TextAlign.center),
             if (content.showsStarterDataChoice) ...[
               const SizedBox(height: 28),
               Card(
@@ -205,7 +232,8 @@ class _OnboardingPage extends StatelessWidget {
                   value: loadStarterData,
                   onChanged: (value) => onStarterDataChanged(value ?? false),
                   title: const Text('Load starter sample data'),
-                  subtitle: const Text('Includes fictional yarn, finished makes, a crochet project, shopping list, and makers-market sales.'),
+                  subtitle: const Text(
+                      'Includes fictional yarn, finished makes, a crochet project, shopping list, and makers-market sales.'),
                   controlAffinity: ListTileControlAffinity.leading,
                 ),
               ),

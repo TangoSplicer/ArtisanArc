@@ -12,6 +12,7 @@ import '../../features/project/domain/entities/supply_need.dart';
 import '../../features/shopping/data/shopping_list_model.dart';
 import '../../features/commissions/data/commission_model.dart';
 import '../../features/recipes/data/make_recipe_model.dart';
+import '../../features/collections/data/maker_collection_model.dart';
 
 void registerHiveAdapters() {
   _registerAdapterIfNotRegistered(InventoryItemAdapter());
@@ -31,6 +32,8 @@ void registerHiveAdapters() {
   _registerAdapterIfNotRegistered(CommissionStatusAdapter());
   _registerAdapterIfNotRegistered(MakeRecipeAdapter());
   _registerAdapterIfNotRegistered(RecipeVariantAdapter());
+  _registerAdapterIfNotRegistered(MakerCollectionAdapter());
+  _registerAdapterIfNotRegistered(CollectionRecipeTargetAdapter());
 }
 
 void _registerAdapterIfNotRegistered<T>(TypeAdapter<T> adapter) {

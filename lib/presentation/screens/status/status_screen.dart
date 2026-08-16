@@ -31,11 +31,13 @@ class _StatusScreenState extends State<StatusScreen> {
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
                   children: [
-                    Icon(Icons.verified_user, size: 60, color: theme.colorScheme.primary),
+                    Icon(Icons.verified_user,
+                        size: 60, color: theme.colorScheme.primary),
                     const SizedBox(height: 16.0),
                     Text(
                       'Personal Edition',
-                      style: theme.textTheme.headlineSmall?.copyWith(color: theme.colorScheme.primary),
+                      style: theme.textTheme.headlineSmall
+                          ?.copyWith(color: theme.colorScheme.primary),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 8.0),
@@ -72,7 +74,8 @@ class _StatusScreenState extends State<StatusScreen> {
       children: [
         Text(
           'Unlocked Features:',
-          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+          style:
+              theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 16.0),
         ListView.builder(
@@ -84,7 +87,8 @@ class _StatusScreenState extends State<StatusScreen> {
               elevation: 2.0,
               margin: const EdgeInsets.symmetric(vertical: 4.0),
               child: ListTile(
-                leading: Icon(Icons.check_circle, color: theme.colorScheme.primary),
+                leading:
+                    Icon(Icons.check_circle, color: theme.colorScheme.primary),
                 title: Text(benefits[index], style: theme.textTheme.bodyLarge),
               ),
             );

@@ -48,7 +48,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final vat = await _service.isVATRegistered();
     // Theme is now managed by ThemeService and Provider, initial load happens in main.dart
     // We can still get the current theme for initial UI state if needed, but updates are reactive.
-    if (mounted) { // Check if the widget is still in the tree
+    if (mounted) {
+      // Check if the widget is still in the tree
       setState(() {
         _selectedLocale = locale ?? 'en_GB';
         _isVATRegistered = vat;
@@ -57,7 +58,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  void _updateTheme(ThemeMode? mode) { // Changed to accept ThemeMode? for RadioListTile
+  void _updateTheme(ThemeMode? mode) {
+    // Changed to accept ThemeMode? for RadioListTile
     if (mode != null) {
       // Use Provider to access ThemeService and update the theme
       Provider.of<ThemeService>(context, listen: false).setThemeMode(mode);
@@ -75,7 +77,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     final color = Theme.of(context).colorScheme;
     // Get the current theme mode from the provider for the RadioListTile groupValue
-    final currentThemeMode = Provider.of<ThemeService>(context).currentThemeMode;
+    final currentThemeMode =
+        Provider.of<ThemeService>(context).currentThemeMode;
 
     return Scaffold(
       appBar: PersonalAppBar(
@@ -86,7 +89,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: Container(
         decoration: BoxDecoration(
           gradient: RadialGradient(
-            colors: [color.surface, color.background, color.primary.withOpacity(0.06)],
+            colors: [
+              color.surface,
+              color.background,
+              color.primary.withOpacity(0.06)
+            ],
             center: Alignment.center,
             radius: 1.2,
           ),
@@ -95,23 +102,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
           padding: const EdgeInsets.all(16),
           children: [
             Card(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
               elevation: 5,
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Language & Region', style: TextStyle(fontWeight: FontWeight.bold)),
+                    const Text('Language & Region',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 10),
                     SearchableSelectionField<String>(
                       options: const ['en_GB', 'en_US'],
                       value: _selectedLocale,
                       labelText: 'Language and region',
                       hintText: 'Search language or region',
-                      itemLabel: (locale) => locale == 'en_GB' ? 'English (UK)' : 'English (US)',
-                      itemSubtitle: (locale) => locale == 'en_GB' ? 'Pound sterling and UK date formats' : 'US date formats',
-                      searchTerms: (locale) => [locale, 'English', locale == 'en_GB' ? 'United Kingdom Britain UK' : 'United States America US'],
+                      itemLabel: (locale) =>
+                          locale == 'en_GB' ? 'English (UK)' : 'English (US)',
+                      itemSubtitle: (locale) => locale == 'en_GB'
+                          ? 'Pound sterling and UK date formats'
+                          : 'US date formats',
+                      searchTerms: (locale) => [
+                        locale,
+                        'English',
+                        locale == 'en_GB'
+                            ? 'United Kingdom Britain UK'
+                            : 'United States America US'
+                      ],
                       onChanged: (value) {
                         if (value != null) {
                           setState(() => _selectedLocale = value);
@@ -125,7 +144,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 16),
             Card(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
               elevation: 5,
               child: SwitchListTile(
                 title: const Text('VAT Registered?'),
@@ -138,7 +158,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 16),
             Card(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
               elevation: 5,
               child: Column(
                 children: [
@@ -155,13 +176,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   RadioListTile<ThemeMode>(
                     title: const Text('Light'),
                     value: ThemeMode.light,
-                    groupValue: currentThemeMode, // Corrected to use currentThemeMode
+                    groupValue:
+                        currentThemeMode, // Corrected to use currentThemeMode
                     onChanged: _updateTheme,
                   ),
                   RadioListTile<ThemeMode>(
                     title: const Text('Dark'),
                     value: ThemeMode.dark,
-                    groupValue: currentThemeMode, // Corrected to use currentThemeMode
+                    groupValue:
+                        currentThemeMode, // Corrected to use currentThemeMode
                     onChanged: _updateTheme,
                   ),
                 ],
@@ -169,7 +192,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 16),
             Card(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
               elevation: 5,
               child: Column(
                 children: [
@@ -191,14 +215,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ListTile(
                     leading: const Icon(Icons.ios_share_outlined),
                     title: const Text('Export Portable Backup'),
-                    subtitle: const Text('Create a shareable protected copy of your craft data.'),
+                    subtitle: const Text(
+                        'Create a shareable protected copy of your craft data.'),
                     onTap: _exportBackup,
                   ),
                   const Divider(height: 1),
                   ListTile(
                     leading: const Icon(Icons.restore),
                     title: const Text('Restore Portable Backup'),
-                    subtitle: const Text('Preview the backup before replacing local craft data.'),
+                    subtitle: const Text(
+                        'Preview the backup before replacing local craft data.'),
                     onTap: _importBackup,
                   ),
                 ],
@@ -206,29 +232,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 16),
             Card(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
               elevation: 5,
               child: Column(
                 children: [
                   ListTile(
                     leading: const Icon(Icons.auto_awesome_outlined),
                     title: const Text('Load Starter Sample Data'),
-                    subtitle: const Text('Add crochet and knitting stock, a project, a shopping list, and market sales.'),
+                    subtitle: const Text(
+                        'Add crochet and knitting stock, a project, a shopping list, and market sales.'),
                     onTap: _loadStarterData,
                   ),
                   const Divider(height: 1),
                   ListTile(
-                    leading: Icon(Icons.delete_forever_outlined, color: color.error),
-                    title: Text('Clear Craft Data', style: TextStyle(color: color.error)),
-                    subtitle: const Text('Remove inventory, sales, projects, shopping lists, and compliance records.'),
+                    leading:
+                        Icon(Icons.delete_forever_outlined, color: color.error),
+                    title: Text('Clear Craft Data',
+                        style: TextStyle(color: color.error)),
+                    subtitle: const Text(
+                        'Remove inventory, sales, projects, shopping lists, and compliance records.'),
                     onTap: _clearCraftData,
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 16),
-            Card( // Added Analytics Card
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            Card(
+              // Added Analytics Card
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
               elevation: 5,
               child: Column(
                 children: [
@@ -249,8 +282,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            Card( // Added Feedback Card
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            Card(
+              // Added Feedback Card
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
               elevation: 5,
               child: ListTile(
                 leading: const Icon(Icons.email_outlined),
@@ -261,17 +296,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 16),
             Card(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
               elevation: 5,
               child: SwitchListTile(
                 title: const Text('Restart Onboarding'),
-                subtitle: const Text('View the welcome tour again on next launch'),
+                subtitle:
+                    const Text('View the welcome tour again on next launch'),
                 value: _resetOnboarding,
                 onChanged: (value) async {
                   if (value) {
                     await _storage.delete(key: StorageKeys.onboardingComplete);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Onboarding will restart on next launch.')),
+                      const SnackBar(
+                          content:
+                              Text('Onboarding will restart on next launch.')),
                     );
                   }
                   setState(() => _resetOnboarding = value);
@@ -285,7 +324,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _sendFeedbackEmail() async {
-    const String recipientEmail = 'feedback@artisanarc.app'; // Replace with your actual feedback email
+    const String recipientEmail =
+        'feedback@artisanarc.app'; // Replace with your actual feedback email
     const String emailSubject = 'ArtisanArc App Feedback';
 
     final Uri mailtoUri = Uri(
@@ -306,7 +346,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         // For this example, we'll just show a snackbar if mailto fails.
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Could not open email app. Please send feedback manually to $recipientEmail')),
+            const SnackBar(
+                content: Text(
+                    'Could not open email app. Please send feedback manually to $recipientEmail')),
           );
         }
       }
@@ -321,14 +363,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _createSafetySnapshot() async {
     try {
-      final snapshot = await BackupService.createAutomaticSnapshot(reason: 'created from Settings');
+      final snapshot = await BackupService.createAutomaticSnapshot(
+          reason: 'created from Settings');
       if (!mounted) return;
       setState(() => _latestSnapshot = snapshot);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(snapshot == null ? 'There is no craft data to snapshot yet.' : 'Safety snapshot created.')),
+        SnackBar(
+            content: Text(snapshot == null
+                ? 'There is no craft data to snapshot yet.'
+                : 'Safety snapshot created.')),
       );
     } catch (error) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not create a safety snapshot: $error')));
+      if (mounted)
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Could not create a safety snapshot: $error')));
     }
   }
 
@@ -362,8 +410,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             'Backup created: ${preview.createdAt.toLocal()}\n\nIncludes: ${preview.includedBoxes.join(', ')}\n\nYour current data will first be protected in a new automatic safety snapshot. Restoring requires you to close and reopen ArtisanArc afterwards.',
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-            FilledButton.tonal(onPressed: () => Navigator.pop(context, true), child: const Text('Restore & Restart')),
+            TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancel')),
+            FilledButton.tonal(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Restore & Restart')),
           ],
         ),
       );
@@ -372,11 +424,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
       await BackupService.restorePortableBackup(preview);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Backup restored. Close and reopen ArtisanArc to load the restored data.')),
+          const SnackBar(
+              content: Text(
+                  'Backup restored. Close and reopen ArtisanArc to load the restored data.')),
         );
       }
     } catch (error) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not restore backup: $error')));
+      if (mounted)
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Could not restore backup: $error')));
     }
   }
 
@@ -394,8 +450,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               : 'This adds fictional crochet and knitting inventory, a project, a shopping list, and a makers-market sales example. You can clear it later in Settings.',
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(hasExistingData ? 'Replace & Load' : 'Load Data')),
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel')),
+          FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(hasExistingData ? 'Replace & Load' : 'Load Data')),
         ],
       ),
     );
@@ -405,11 +465,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
       await SampleDataService.loadStarterData(replaceExisting: hasExistingData);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Starter data loaded. Explore Inventory, Projects, Business Tools, and Shopping.')),
+          const SnackBar(
+              content: Text(
+                  'Starter data loaded. Explore Inventory, Projects, Business Tools, and Shopping.')),
         );
       }
     } catch (error) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not load starter data: $error')));
+      if (mounted)
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Could not load starter data: $error')));
     }
   }
 
@@ -418,9 +482,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Clear Craft Data'),
-        content: const Text('This permanently removes inventory, sales, projects, shopping lists, and compliance records from this device. Create a backup first if you may need them again.'),
+        content: const Text(
+            'This permanently removes inventory, sales, projects, shopping lists, and compliance records from this device. Create a backup first if you may need them again.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel')),
           FilledButton.tonal(
             onPressed: () => Navigator.pop(context, true),
             child: const Text('Clear Data'),
@@ -432,13 +499,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (confirmed != true) return;
     await SampleDataService.clearCraftData();
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Craft data cleared.')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Craft data cleared.')));
     }
   }
 
   Future<void> _showAnalytics() async {
     final analytics = await AnalyticsService.getUsageAnalytics();
-    
+
     if (mounted) {
       showDialog(
         context: context,
@@ -453,8 +521,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     children: analytics.entries.map((entry) {
                       final feature = entry.key;
                       final usage = entry.value as Map<String, dynamic>;
-                      final totalUsage = usage.values.fold<int>(0, (sum, count) => sum + (count as int));
-                      
+                      final totalUsage = usage.values
+                          .fold<int>(0, (sum, count) => sum + (count as int));
+
                       return ListTile(
                         title: Text(feature),
                         trailing: Text('$totalUsage uses'),
@@ -478,7 +547,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Clear Analytics'),
-        content: const Text('Are you sure you want to clear all usage analytics?'),
+        content:
+            const Text('Are you sure you want to clear all usage analytics?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),

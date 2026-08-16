@@ -16,7 +16,8 @@ class PermissionService {
     return status.isGranted;
   }
 
-  static Future<Map<Permission, PermissionStatus>> requestMultiplePermissions() async {
+  static Future<Map<Permission, PermissionStatus>>
+      requestMultiplePermissions() async {
     return await [
       Permission.camera,
       Permission.storage,

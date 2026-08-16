@@ -25,7 +25,8 @@ class SearchableSelectionField<T> extends FormField<T> {
           builder: (state) {
             final field = state as _SearchableSelectionFieldState<T>;
             final selectedValue = field.value;
-            final selectedLabel = selectedValue == null ? null : itemLabel(selectedValue);
+            final selectedLabel =
+                selectedValue == null ? null : itemLabel(selectedValue);
 
             return InkWell(
               onTap: enabled
@@ -95,12 +96,14 @@ class SearchableSelectionField<T> extends FormField<T> {
 
 class _SearchableSelectionFieldState<T> extends FormFieldState<T> {
   @override
-  SearchableSelectionField<T> get widget => super.widget as SearchableSelectionField<T>;
+  SearchableSelectionField<T> get widget =>
+      super.widget as SearchableSelectionField<T>;
 
   @override
   void didUpdateWidget(covariant SearchableSelectionField<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.initialValue != oldWidget.initialValue && value != widget.initialValue) {
+    if (widget.initialValue != oldWidget.initialValue &&
+        value != widget.initialValue) {
       didChange(widget.initialValue);
     }
   }
@@ -128,10 +131,12 @@ class _SearchableSelectionSheet<T> extends StatefulWidget {
   });
 
   @override
-  State<_SearchableSelectionSheet<T>> createState() => _SearchableSelectionSheetState<T>();
+  State<_SearchableSelectionSheet<T>> createState() =>
+      _SearchableSelectionSheetState<T>();
 }
 
-class _SearchableSelectionSheetState<T> extends State<_SearchableSelectionSheet<T>> {
+class _SearchableSelectionSheetState<T>
+    extends State<_SearchableSelectionSheet<T>> {
   final TextEditingController _searchController = TextEditingController();
   String _query = '';
 
@@ -154,8 +159,10 @@ class _SearchableSelectionSheetState<T> extends State<_SearchableSelectionSheet<
 
   @override
   Widget build(BuildContext context) {
-    final filteredOptions = widget.options.where((item) => _matches(item, _query.trim())).toList();
-    final canUseCustomValue = widget.customValueBuilder != null && _query.trim().isNotEmpty;
+    final filteredOptions =
+        widget.options.where((item) => _matches(item, _query.trim())).toList();
+    final canUseCustomValue =
+        widget.customValueBuilder != null && _query.trim().isNotEmpty;
 
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
@@ -191,7 +198,8 @@ class _SearchableSelectionSheetState<T> extends State<_SearchableSelectionSheet<
                 leading: const Icon(Icons.add_circle_outline),
                 title: Text('Use "${_query.trim()}"'),
                 subtitle: const Text('Add a custom value'),
-                onTap: () => Navigator.of(context).pop(widget.customValueBuilder!(_query.trim())),
+                onTap: () => Navigator.of(context)
+                    .pop(widget.customValueBuilder!(_query.trim())),
               ),
             const Divider(height: 1),
             Expanded(
@@ -205,7 +213,9 @@ class _SearchableSelectionSheetState<T> extends State<_SearchableSelectionSheet<
                         final subtitle = widget.itemSubtitle?.call(option);
                         return ListTile(
                           title: Text(widget.itemLabel(option)),
-                          subtitle: subtitle == null || subtitle.isEmpty ? null : Text(subtitle),
+                          subtitle: subtitle == null || subtitle.isEmpty
+                              ? null
+                              : Text(subtitle),
                           onTap: () => Navigator.of(context).pop(option),
                         );
                       },

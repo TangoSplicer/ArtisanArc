@@ -24,7 +24,8 @@ class ProjectServiceImpl implements ProjectService {
   Future<List<Project>> fetchProjects() => _repo.getAllProjects();
 
   @override
-  Future<void> updateProject(Project project) => _repo.saveProject(project); // Hive's put handles create/update
+  Future<void> updateProject(Project project) =>
+      _repo.saveProject(project); // Hive's put handles create/update
 
   @override
   Future<void> deleteProject(String id) => _repo.deleteProject(id);

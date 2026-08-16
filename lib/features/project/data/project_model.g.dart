@@ -36,6 +36,7 @@ class ProjectAdapter extends TypeAdapter<Project> {
       recipeName: fields[18] as String?,
       plannedOutputQuantity: fields[19] == null ? 1 : fields[19] as int,
       finishedItemCategory: fields[20] as String?,
+      collectionId: fields[21] as String?,
       createdAt: fields[7] as DateTime,
       lastUpdatedAt: fields[8] as DateTime?,
     );
@@ -44,7 +45,7 @@ class ProjectAdapter extends TypeAdapter<Project> {
   @override
   void write(BinaryWriter writer, Project obj) {
     writer
-      ..writeByte(21)
+      ..writeByte(22)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -86,7 +87,9 @@ class ProjectAdapter extends TypeAdapter<Project> {
       ..writeByte(19)
       ..write(obj.plannedOutputQuantity)
       ..writeByte(20)
-      ..write(obj.finishedItemCategory);
+      ..write(obj.finishedItemCategory)
+      ..writeByte(21)
+      ..write(obj.collectionId);
   }
 
   @override

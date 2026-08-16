@@ -3,7 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
 void main() {
-  testWidgets('system back returns to Home after a feature route is pushed', (tester) async {
+  testWidgets('system back returns to Home after a feature route is pushed',
+      (tester) async {
     final router = GoRouter(
       initialLocation: '/home',
       routes: [
@@ -20,7 +21,8 @@ void main() {
         ),
         GoRoute(
           path: '/inventory',
-          builder: (context, state) => const Scaffold(body: Center(child: Text('Inventory screen'))),
+          builder: (context, state) =>
+              const Scaffold(body: Center(child: Text('Inventory screen'))),
         ),
       ],
     );

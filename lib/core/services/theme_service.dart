@@ -5,7 +5,8 @@ class ThemeService with ChangeNotifier {
   static const _themeKey = 'artisanarc_theme_mode';
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
-  ThemeMode _themeMode = ThemeMode.system; // Add a private field to hold the current theme
+  ThemeMode _themeMode =
+      ThemeMode.system; // Add a private field to hold the current theme
 
   ThemeMode get currentThemeMode => _themeMode; // Getter for the current theme
 
@@ -20,7 +21,8 @@ class ThemeService with ChangeNotifier {
     notifyListeners(); // Notify listeners about the change
   }
 
-  Future<void> loadThemeMode() async { // Renamed from getThemeMode to avoid confusion
+  Future<void> loadThemeMode() async {
+    // Renamed from getThemeMode to avoid confusion
     final value = await _storage.read(key: _themeKey);
     switch (value) {
       case 'dark':

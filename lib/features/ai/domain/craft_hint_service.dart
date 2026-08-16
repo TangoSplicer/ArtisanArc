@@ -1,4 +1,4 @@
- import '../data/ai_config_model.dart';
+import '../data/ai_config_model.dart';
 
 class CraftHintService {
   CraftAIProfile? getProfileFor(String craft) {

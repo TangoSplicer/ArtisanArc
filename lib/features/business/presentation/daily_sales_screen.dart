@@ -49,7 +49,9 @@ class _DailySalesScreenState extends State<DailySalesScreen> {
     final color = Theme.of(context).colorScheme;
     final sortedDates = _grouped.keys.toList()..sort((a, b) => b.compareTo(a));
     final filteredDates = _selectedDate != null
-        ? sortedDates.where((d) => d == DateFormat('yyyy-MM-dd').format(_selectedDate!)).toList()
+        ? sortedDates
+            .where((d) => d == DateFormat('yyyy-MM-dd').format(_selectedDate!))
+            .toList()
         : sortedDates;
 
     return Scaffold(
@@ -78,7 +80,8 @@ class _DailySalesScreenState extends State<DailySalesScreen> {
               itemBuilder: (context, index) {
                 final date = filteredDates[index];
                 final sales = _grouped[date]!;
-                final dailyTotal = sales.fold<double>(0, (sum, s) => sum + (s.sale.total ?? 0.0));
+                final dailyTotal = sales.fold<double>(
+                    0, (sum, s) => sum + (s.sale.total ?? 0.0));
 
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -90,21 +93,28 @@ class _DailySalesScreenState extends State<DailySalesScreen> {
                     const SizedBox(height: 8),
                     ...sales.map((s) => Card(
                           margin: const EdgeInsets.only(bottom: 8),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14)),
                           elevation: 2,
                           child: ListTile(
                             title: Text(s.itemName ?? 'Unknown Item'),
                             subtitle: Text([
                               '${s.sale.quantity} × £${s.sale.pricePerUnit.toStringAsFixed(2)}',
-                              if (s.sale.eventName != null && s.sale.eventName!.isNotEmpty) s.sale.eventName!,
-                              if (s.sale.eventLocation != null && s.sale.eventLocation!.isNotEmpty) s.sale.eventLocation!,
+                              if (s.sale.eventName != null &&
+                                  s.sale.eventName!.isNotEmpty)
+                                s.sale.eventName!,
+                              if (s.sale.eventLocation != null &&
+                                  s.sale.eventLocation!.isNotEmpty)
+                                s.sale.eventLocation!,
                             ].join(' · ')),
-                            trailing: Text('£${s.sale.total.toStringAsFixed(2)}'),
+                            trailing:
+                                Text('£${s.sale.total.toStringAsFixed(2)}'),
                           ),
                         )),
                     Padding(
                       padding: const EdgeInsets.only(top: 8, bottom: 20),
-                      child: Text('Daily Total: £${dailyTotal.toStringAsFixed(2)}',
+                      child: Text(
+                          'Daily Total: £${dailyTotal.toStringAsFixed(2)}',
                           style: const TextStyle(fontWeight: FontWeight.bold)),
                     ),
                   ],

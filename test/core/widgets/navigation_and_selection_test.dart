@@ -5,7 +5,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
 void main() {
-  testWidgets('searchable selector filters options and returns the chosen value', (tester) async {
+  testWidgets(
+      'searchable selector filters options and returns the chosen value',
+      (tester) async {
     String? selectedMaterial;
 
     await tester.pumpWidget(
@@ -40,13 +42,15 @@ void main() {
     expect(find.text('Search material'), findsNothing);
   });
 
-  testWidgets('top-level feature screen exposes Home when no back stack exists', (tester) async {
+  testWidgets('top-level feature screen exposes Home when no back stack exists',
+      (tester) async {
     final router = GoRouter(
       initialLocation: '/inventory',
       routes: [
         GoRoute(
           path: '/home',
-          builder: (context, state) => const Scaffold(body: Center(child: Text('Home hub'))),
+          builder: (context, state) =>
+              const Scaffold(body: Center(child: Text('Home hub'))),
         ),
         GoRoute(
           path: '/inventory',

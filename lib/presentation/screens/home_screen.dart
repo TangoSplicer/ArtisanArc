@@ -99,6 +99,16 @@ class HomeScreen extends StatelessWidget {
             ),
             _buildNavCard(
               context,
+              title: 'Maker Collections & Capacity',
+              subtitle:
+                  'Plan seasonal ranges, track recipe targets, and verify weekly making capacity',
+              icon: Icons.auto_awesome_outlined,
+              route: '/collections',
+              color: Colors.teal.shade700,
+              onTap: () => _trackNavigation('maker_collections'),
+            ),
+            _buildNavCard(
+              context,
               title: 'Maker Operations',
               subtitle:
                   'See local stock, orders, projects, stall context and seasonal work in one place',

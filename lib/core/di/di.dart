@@ -39,6 +39,10 @@ import '../../features/project/domain/project_time_service.dart';
 import '../../features/recipes/data/make_recipe_repository.dart';
 import '../../features/recipes/domain/make_recipe_service.dart';
 
+// Collections and capacity planning
+import '../../features/collections/data/maker_collection_repository.dart';
+import '../../features/collections/domain/collection_planning_service.dart';
+
 // Commissions
 import '../../features/commissions/data/commission_repository.dart';
 import '../../features/commissions/domain/commission_service.dart';
@@ -153,6 +157,20 @@ Future<void> configureDependencies() async {
     () => MakeRecipeService(
       getIt<MakeRecipeRepository>(),
       getIt<ProjectService>(),
+    ),
+  );
+
+  // Local crochet collections and capacity planning
+  getIt.registerLazySingleton<MakerCollectionRepository>(
+      () => MakerCollectionRepositoryImpl());
+  getIt.registerLazySingleton<CollectionPlanningService>(
+    () => CollectionPlanningService(
+      getIt<MakerCollectionRepository>(),
+      getIt<MakeRecipeRepository>(),
+      getIt<MakeRecipeService>(),
+      getIt<ProjectService>(),
+      getIt<ProductionRunRepository>(),
+      getIt<InventoryService>(),
     ),
   );
 
