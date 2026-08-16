@@ -14,6 +14,9 @@ import '../../features/commissions/data/commission_model.dart';
 import '../../features/recipes/data/make_recipe_model.dart';
 import '../../features/collections/data/maker_collection_model.dart';
 import '../../features/wholesale/data/wholesale_model.dart';
+import '../../features/patterns/data/pattern_model.dart';
+import '../../features/stitches/data/stitch_model.dart';
+import '../../features/equipment/data/equipment_model.dart';
 
 void registerHiveAdapters() {
   _registerAdapterIfNotRegistered(InventoryItemAdapter());
@@ -38,6 +41,10 @@ void registerHiveAdapters() {
   _registerAdapterIfNotRegistered(WholesalePartnerAdapter());
   _registerAdapterIfNotRegistered(WholesaleBatchAdapter());
   _registerAdapterIfNotRegistered(WholesaleBatchItemAdapter());
+  _registerAdapterIfNotRegistered(StoredPatternAdapter());
+  _registerAdapterIfNotRegistered(RowCounterAdapter());
+  _registerAdapterIfNotRegistered(StitchReferenceAdapter());
+  _registerAdapterIfNotRegistered(EquipmentItemAdapter());
 }
 
 void _registerAdapterIfNotRegistered<T>(TypeAdapter<T> adapter) {

@@ -42,6 +42,8 @@ import 'package:artisanarc/features/collections/presentation/maker_collection_ed
 import 'package:artisanarc/features/wholesale/presentation/wholesale_ledger_screen.dart';
 import 'package:artisanarc/features/wholesale/presentation/wholesale_partner_editor_screen.dart';
 import 'package:artisanarc/features/wholesale/presentation/wholesale_batch_editor_screen.dart';
+import 'package:artisanarc/features/stitches/presentation/stitch_library_screen.dart';
+import 'package:artisanarc/features/equipment/presentation/equipment_ledger_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -266,6 +268,16 @@ class AppRouter {
         path: '/wholesale/new-batch',
         name: 'addWholesaleBatch',
         builder: (context, state) => const WholesaleBatchEditorScreen(),
+      ),
+      GoRoute(
+        path: '/stitches',
+        name: 'stitchLibrary',
+        builder: (context, state) => const StitchLibraryScreen(),
+      ),
+      GoRoute(
+        path: '/equipment',
+        name: 'equipmentLedger',
+        builder: (context, state) => const EquipmentLedgerScreen(),
       ),
       GoRoute(
         path: '/collections',

@@ -54,6 +54,11 @@ import '../../features/operations/domain/maker_operations_service.dart';
 import '../../features/wholesale/data/wholesale_repository.dart';
 import '../../features/wholesale/domain/wholesale_service.dart';
 
+// Patterns, Stitches, Equipment
+import '../../features/patterns/data/pattern_repository.dart';
+import '../../features/stitches/data/stitch_repository.dart';
+import '../../features/equipment/data/equipment_repository.dart';
+
 // AI
 import '../../features/ai/domain/craft_hint_service.dart';
 
@@ -197,6 +202,11 @@ Future<void> configureDependencies() async {
   // Local-only wholesale and consignment ledger
   getIt.registerLazySingleton<WholesaleRepository>(() => WholesaleRepository());
   getIt.registerLazySingleton<WholesaleService>(() => WholesaleService());
+
+  // Patterns & Stitches & Equipment
+  getIt.registerLazySingleton<PatternRepository>(() => PatternRepository());
+  getIt.registerLazySingleton<StitchRepository>(() => StitchRepository());
+  getIt.registerLazySingleton<EquipmentRepository>(() => EquipmentRepository());
 
   // Register Project Use Cases
   getIt.registerLazySingleton<CreateProject>(

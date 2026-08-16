@@ -368,3 +368,16 @@ After **1.4**, use the app for a few real makes. If creating a finished item fro
 | Batch Delivery & Stock Deduction | Sending a batch of finished crochet creations to a partner records agreed unit prices, sent dates, and payment due dates, automatically deducting inventory stock. |
 | Consignment Settlement & Returns | Settling batches records actual sold quantities and returned pieces, restoring returned inventory back to finished stock. |
 | Data safety & Portability | Wholesale partners and batches (Hive TypeIds 18, 19, 20) are fully integrated with automatic safety snapshots, portable backup/restore, starter data loading, and Settings clear-all. |
+
+---
+
+# 3.0 — Complete Fibre Arts Studio Expansion (v2.7 — v3.0)
+
+## Delivery record — v3.0.0+22
+
+| Delivered capability | Implementation outcome |
+|---|---|
+| v2.7 — Digital Pattern Box & Row Counters | Offline pattern vault models, searchable local stitch library, and interactive haptic row counters linked to projects. |
+| v2.8 — Professional Presentation | Local Brand Kit and portfolio structure for offline client and market showcase. |
+| v2.9 — Smart Studio Intelligence | Local-first profitability insights and material forecasting based on historical making and sales data. |
+| v3.0 — Fibre Arts Studio Expansion | Studio Equipment Ledger for looms, winders, and machinery (Hive TypeId 24) plus multi-craft taxonomy support. |

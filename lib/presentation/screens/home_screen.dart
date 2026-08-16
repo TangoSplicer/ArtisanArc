@@ -129,6 +129,26 @@ class HomeScreen extends StatelessWidget {
             ),
             _buildNavCard(
               context,
+              title: 'Crochet Stitch Library',
+              subtitle:
+                  'Offline reference guide for standard crochet stitches, abbreviations, and tips',
+              icon: Icons.menu_book,
+              route: '/stitches',
+              color: Colors.pink.shade700,
+              onTap: () => _trackNavigation('stitch_library'),
+            ),
+            _buildNavCard(
+              context,
+              title: 'Studio Equipment Ledger',
+              subtitle:
+                  'Track looms, ball winders, blocking mats, machinery and maintenance notes',
+              icon: Icons.handyman_outlined,
+              route: '/equipment',
+              color: Colors.blueGrey.shade700,
+              onTap: () => _trackNavigation('equipment_ledger'),
+            ),
+            _buildNavCard(
+              context,
               title: 'Commissions & Orders',
               subtitle:
                   'Keep private customer orders, deposits, due dates and linked projects together',
