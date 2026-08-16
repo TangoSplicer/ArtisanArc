@@ -33,12 +33,26 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
   final _priceController = TextEditingController();
   final _storageLocationController = TextEditingController();
   final _reorderPointController = TextEditingController();
+  final _yarnBrandController = TextEditingController();
+  final _yarnRangeController = TextEditingController();
+  final _yarnColourController = TextEditingController();
+  final _dyeLotController = TextEditingController();
+  final _yarnWeightGramsController = TextEditingController();
+  final _yarnLengthMetresController = TextEditingController();
+  final _gaugeNoteController = TextEditingController();
   String? _measurementUnit;
+  String? _yarnWeight;
+  String? _yarnFibre;
+  String? _recommendedHookSize;
   List<String> _selectedImagePaths = []; // To store paths of copied images
   final ImagePicker _picker = ImagePicker();
 
   final InventoryService _inventoryService = GetIt.I<InventoryService>();
   final Uuid _uuid = Uuid();
+
+  bool get _isYarnCategory =>
+      !_isFinishedItem &&
+      _categoryController.text.toLowerCase().startsWith('yarn');
 
   @override
   void dispose() {
@@ -48,6 +62,13 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
     _priceController.dispose();
     _storageLocationController.dispose();
     _reorderPointController.dispose();
+    _yarnBrandController.dispose();
+    _yarnRangeController.dispose();
+    _yarnColourController.dispose();
+    _dyeLotController.dispose();
+    _yarnWeightGramsController.dispose();
+    _yarnLengthMetresController.dispose();
+    _gaugeNoteController.dispose();
     super.dispose();
   }
 
@@ -73,6 +94,24 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
         measuredReorderPoint: _isFinishedItem
             ? null
             : double.tryParse(_reorderPointController.text),
+        yarnBrand:
+            _isYarnCategory ? _optional(_yarnBrandController.text) : null,
+        yarnRange:
+            _isYarnCategory ? _optional(_yarnRangeController.text) : null,
+        yarnColour:
+            _isYarnCategory ? _optional(_yarnColourController.text) : null,
+        dyeLot: _isYarnCategory ? _optional(_dyeLotController.text) : null,
+        yarnWeight: _isYarnCategory ? _yarnWeight : null,
+        yarnFibre: _isYarnCategory ? _yarnFibre : null,
+        yarnWeightGrams: _isYarnCategory
+            ? double.tryParse(_yarnWeightGramsController.text)
+            : null,
+        yarnLengthMetres: _isYarnCategory
+            ? double.tryParse(_yarnLengthMetresController.text)
+            : null,
+        recommendedHookSize: _isYarnCategory ? _recommendedHookSize : null,
+        gaugeNote:
+            _isYarnCategory ? _optional(_gaugeNoteController.text) : null,
       );
 
       try {
@@ -217,6 +256,10 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
                   ],
                 ),
               ],
+              if (_isYarnCategory) ...[
+                const SizedBox(height: 24),
+                _buildYarnDetailsSection(),
+              ],
               const SizedBox(height: 16),
               SearchableSelectionField<String>(
                 options: SelectionOptions.storageLocations,
@@ -248,6 +291,128 @@ class _AddInventoryItemScreenState extends State<AddInventoryItemScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  String? _optional(String value) {
+    final clean = value.trim();
+    return clean.isEmpty ? null : clean;
+  }
+
+  Widget _buildYarnDetailsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Yarn & fibre details',
+            style: Theme.of(context).textTheme.titleLarge),
+        const SizedBox(height: 4),
+        const Text(
+          'Optional details help you match dye lots, choose a compatible hook, and plan a reliable replacement.',
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: _yarnBrandController,
+          decoration: const InputDecoration(
+            labelText: 'Brand (optional)',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: _yarnRangeController,
+          decoration: const InputDecoration(
+            labelText: 'Range / line (optional)',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: _yarnColourController,
+          decoration: const InputDecoration(
+            labelText: 'Colour / shade (optional)',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: _dyeLotController,
+          decoration: const InputDecoration(
+            labelText: 'Dye lot (optional)',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        const SizedBox(height: 12),
+        SearchableSelectionField<String>(
+          options: SelectionOptions.yarnWeights,
+          value: _yarnWeight,
+          labelText: 'Yarn weight (optional)',
+          hintText: 'Search yarn weight',
+          itemLabel: (value) => value,
+          searchTerms: (value) => [value],
+          onChanged: (value) => setState(() => _yarnWeight = value),
+          allowClear: true,
+        ),
+        const SizedBox(height: 12),
+        SearchableSelectionField<String>(
+          options: SelectionOptions.yarnFibres,
+          value: _yarnFibre,
+          labelText: 'Main fibre (optional)',
+          hintText: 'Search fibre',
+          itemLabel: (value) => value,
+          searchTerms: (value) => [value],
+          onChanged: (value) => setState(() => _yarnFibre = value),
+          allowClear: true,
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _yarnWeightGramsController,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(
+                  labelText: 'Skein weight (g, optional)',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: TextField(
+                controller: _yarnLengthMetresController,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(
+                  labelText: 'Skein length (m, optional)',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        SearchableSelectionField<String>(
+          options: SelectionOptions.crochetHookSizes,
+          value: _recommendedHookSize,
+          labelText: 'Recommended hook size (optional)',
+          hintText: 'Search hook size',
+          itemLabel: (value) => value,
+          searchTerms: (value) => [value],
+          onChanged: (value) => setState(() => _recommendedHookSize = value),
+          allowClear: true,
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: _gaugeNoteController,
+          minLines: 2,
+          maxLines: 3,
+          decoration: const InputDecoration(
+            labelText: 'Gauge or substitution note (optional)',
+            border: OutlineInputBorder(),
+          ),
+        ),
+      ],
     );
   }
 

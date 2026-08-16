@@ -35,7 +35,8 @@ The current build already provides searchable craft-focused selection controls, 
 | **2.0 — Price with clarity, fulfil locally** | Project cost previews and customer commissions | Makers can price work transparently and track private orders without a server | **Delivered in v2.0.0+15; signed APK verified** |
 | **2.1 — Label, scan and bring data safely** | QR labels, scan-to-sell and CSV workflow | Physical labels and reusable CSV files accelerate routine stock and sale work offline | **Delivered in v2.1.0+16; signed APK verified** |
 | **2.2 — Run the maker week** | Operations dashboard and seasonal workflows | A maker can prioritise local stock, orders, projects, sales and event work in one view | **Delivered in v2.2.0+17; signed APK verified** |
-| **2.3 — Make it worth making** | Crochet Make Recipes and actual-time pricing | Reusable crochet product plans turn recorded time and materials into a trustworthy price floor | **Delivered in v2.3.0+18; release verification pending** |
+| **2.3 — Make it worth making** | Crochet Make Recipes and actual-time pricing | Reusable crochet product plans turn recorded time and materials into a trustworthy price floor | **Delivered in v2.3.0+18; signed APK verified** |
+| **2.4 — Know your yarn** | Yarn and fibre intelligence | Crochet makers can identify, match, replenish and export yarn details without a separate stash app | **Delivered in v2.4.0+19; release verification pending** |
 | **Later, only if needed** | Optional expansion | Controlled scope without weakening the Personal Edition | **Deliberate** |
 
 ---
@@ -281,6 +282,21 @@ Once the core workflow is solid, improve the app’s speed, clarity and accessib
 | Truthful per-item pricing | Cost & Price now shows actual-time labour cost, an explainable current price floor per planned item, and an actual-time target price when a rate and margin are set. |
 | Historical production evidence | Production runs capture the project’s recorded making minutes at completion alongside their immutable material-cost snapshot. |
 | Data safety and regression coverage | Make Recipes are registered with Hive, safety snapshots, portable backups, starter-data replacement and Settings clear-all. Automated regression tests cover recipe conversion, timer persistence, actual-time price floors and production snapshots. |
+
+---
+
+# 2.4 — Know your yarn
+
+## Delivery record — v2.4.0+19
+
+| Delivered capability | Implementation outcome |
+|---|---|
+| Crochet yarn and fibre cards | Material Stock records can optionally save brand, range, colour, dye lot, yarn weight, main fibre, skein grams/metres, recommended hook and gauge or substitution notes. Existing records remain fully compatible. |
+| Relevant material forms | Yarn details appear only when a yarn category is chosen, avoiding irrelevant fields for hooks, eyes, stuffing, packaging and other materials. Weight, fibre and hook size use curated searchable selections. |
+| Fast material recognition | The Materials Stock list and detail screen show concise yarn context, including brand, shade, yarn weight, fibre, dye lot and recommended hook where recorded. |
+| Safe CSV portability | Inventory CSV export and preview-before-write import now round-trip optional yarn and fibre columns. Numeric skein metrics are validated, while the add-only duplicate-protection policy remains unchanged. |
+| Crochet-first starter data | Optional starter records demonstrate current crochet finished-product categories and realistic yarn information, so new makers can see the intended workflow immediately. |
+| Regression coverage | Automated CSV tests verify the yarn-and-fibre metadata export/import round trip alongside measured-stock safeguards. |
 
 ---
 

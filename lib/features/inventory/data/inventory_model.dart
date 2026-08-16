@@ -55,6 +55,38 @@ class InventoryItem extends HiveObject {
   @HiveField(13)
   final double? measuredReorderPoint;
 
+  /// Optional crochet yarn and fibre details. They are deliberately additive so
+  /// existing material, tool and finished-item records remain compatible.
+  @HiveField(14)
+  final String? yarnBrand;
+
+  @HiveField(15)
+  final String? yarnRange;
+
+  @HiveField(16)
+  final String? yarnColour;
+
+  @HiveField(17)
+  final String? dyeLot;
+
+  @HiveField(18)
+  final String? yarnWeight;
+
+  @HiveField(19)
+  final String? yarnFibre;
+
+  @HiveField(20)
+  final double? yarnWeightGrams;
+
+  @HiveField(21)
+  final double? yarnLengthMetres;
+
+  @HiveField(22)
+  final String? recommendedHookSize;
+
+  @HiveField(23)
+  final String? gaugeNote;
+
   InventoryItem({
     required this.id,
     required this.name,
@@ -70,6 +102,16 @@ class InventoryItem extends HiveObject {
     this.measuredQuantity,
     this.measurementUnit,
     this.measuredReorderPoint,
+    this.yarnBrand,
+    this.yarnRange,
+    this.yarnColour,
+    this.dyeLot,
+    this.yarnWeight,
+    this.yarnFibre,
+    this.yarnWeightGrams,
+    this.yarnLengthMetres,
+    this.recommendedHookSize,
+    this.gaugeNote,
   });
 
   bool get isFinishedItem =>
@@ -80,6 +122,20 @@ class InventoryItem extends HiveObject {
 
   bool get usesMeasuredQuantity =>
       isMaterialStock && measuredQuantity != null && measurementUnit != null;
+
+  bool get isYarnOrFibre =>
+      isMaterialStock && category.toLowerCase().startsWith('yarn');
+
+  String get yarnDetailSummary {
+    final details = <String>[
+      if (yarnBrand?.trim().isNotEmpty == true) yarnBrand!.trim(),
+      if (yarnRange?.trim().isNotEmpty == true) yarnRange!.trim(),
+      if (yarnColour?.trim().isNotEmpty == true) yarnColour!.trim(),
+      if (yarnWeight?.trim().isNotEmpty == true) yarnWeight!.trim(),
+      if (yarnFibre?.trim().isNotEmpty == true) yarnFibre!.trim(),
+    ];
+    return details.join(' · ');
+  }
 
   double get availableStockQuantity =>
       usesMeasuredQuantity ? measuredQuantity! : quantity.toDouble();
@@ -118,6 +174,26 @@ class InventoryItem extends HiveObject {
     bool clearMeasuredQuantity = false,
     bool clearMeasurementUnit = false,
     bool clearMeasuredReorderPoint = false,
+    String? yarnBrand,
+    String? yarnRange,
+    String? yarnColour,
+    String? dyeLot,
+    String? yarnWeight,
+    String? yarnFibre,
+    double? yarnWeightGrams,
+    double? yarnLengthMetres,
+    String? recommendedHookSize,
+    String? gaugeNote,
+    bool clearYarnBrand = false,
+    bool clearYarnRange = false,
+    bool clearYarnColour = false,
+    bool clearDyeLot = false,
+    bool clearYarnWeight = false,
+    bool clearYarnFibre = false,
+    bool clearYarnWeightGrams = false,
+    bool clearYarnLengthMetres = false,
+    bool clearRecommendedHookSize = false,
+    bool clearGaugeNote = false,
   }) {
     return InventoryItem(
       id: id ?? this.id,
@@ -140,6 +216,21 @@ class InventoryItem extends HiveObject {
       measuredReorderPoint: clearMeasuredReorderPoint
           ? null
           : measuredReorderPoint ?? this.measuredReorderPoint,
+      yarnBrand: clearYarnBrand ? null : yarnBrand ?? this.yarnBrand,
+      yarnRange: clearYarnRange ? null : yarnRange ?? this.yarnRange,
+      yarnColour: clearYarnColour ? null : yarnColour ?? this.yarnColour,
+      dyeLot: clearDyeLot ? null : dyeLot ?? this.dyeLot,
+      yarnWeight: clearYarnWeight ? null : yarnWeight ?? this.yarnWeight,
+      yarnFibre: clearYarnFibre ? null : yarnFibre ?? this.yarnFibre,
+      yarnWeightGrams:
+          clearYarnWeightGrams ? null : yarnWeightGrams ?? this.yarnWeightGrams,
+      yarnLengthMetres: clearYarnLengthMetres
+          ? null
+          : yarnLengthMetres ?? this.yarnLengthMetres,
+      recommendedHookSize: clearRecommendedHookSize
+          ? null
+          : recommendedHookSize ?? this.recommendedHookSize,
+      gaugeNote: clearGaugeNote ? null : gaugeNote ?? this.gaugeNote,
     );
   }
 }

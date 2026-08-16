@@ -31,13 +31,23 @@ class InventoryItemAdapter extends TypeAdapter<InventoryItem> {
       measuredQuantity: fields[11] as double?,
       measurementUnit: fields[12] as String?,
       measuredReorderPoint: fields[13] as double?,
+      yarnBrand: fields[14] as String?,
+      yarnRange: fields[15] as String?,
+      yarnColour: fields[16] as String?,
+      dyeLot: fields[17] as String?,
+      yarnWeight: fields[18] as String?,
+      yarnFibre: fields[19] as String?,
+      yarnWeightGrams: fields[20] as double?,
+      yarnLengthMetres: fields[21] as double?,
+      recommendedHookSize: fields[22] as String?,
+      gaugeNote: fields[23] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, InventoryItem obj) {
     writer
-      ..writeByte(14)
+      ..writeByte(24)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -65,7 +75,27 @@ class InventoryItemAdapter extends TypeAdapter<InventoryItem> {
       ..writeByte(12)
       ..write(obj.measurementUnit)
       ..writeByte(13)
-      ..write(obj.measuredReorderPoint);
+      ..write(obj.measuredReorderPoint)
+      ..writeByte(14)
+      ..write(obj.yarnBrand)
+      ..writeByte(15)
+      ..write(obj.yarnRange)
+      ..writeByte(16)
+      ..write(obj.yarnColour)
+      ..writeByte(17)
+      ..write(obj.dyeLot)
+      ..writeByte(18)
+      ..write(obj.yarnWeight)
+      ..writeByte(19)
+      ..write(obj.yarnFibre)
+      ..writeByte(20)
+      ..write(obj.yarnWeightGrams)
+      ..writeByte(21)
+      ..write(obj.yarnLengthMetres)
+      ..writeByte(22)
+      ..write(obj.recommendedHookSize)
+      ..writeByte(23)
+      ..write(obj.gaugeNote);
   }
 
   @override

@@ -149,7 +149,7 @@ class _InventoryCsvImportScreenState extends State<InventoryCsvImportScreen> {
           Text('CSV columns', style: theme.textTheme.titleLarge),
           const SizedBox(height: 8),
           const Text(
-            'Required: Name, Type, Quantity. Optional: Category, Price, Location, Unit, Reorder Point. Use Type values Created Item/Finished or Material Stock/Material. A material with a Unit is imported as measured stock.',
+            'Required: Name, Type, Quantity. Optional: Category, Price, Location, Unit, Reorder Point, Yarn Brand, Yarn Range, Yarn Colour, Dye Lot, Yarn Weight, Yarn Fibre, Skein Weight (g), Skein Length (m), Recommended Hook and Gauge Note. Use Type values Created Item/Finished or Material Stock/Material. A material with a Unit is imported as measured stock.',
           ),
           const SizedBox(height: 16),
           OutlinedButton.icon(

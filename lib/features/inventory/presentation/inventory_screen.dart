@@ -186,7 +186,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                       subtitle: Text(
                         _isFinishedView
                             ? 'Tally: ${item.quantity} made / available · ${item.category}\nSale price: ${item.price != null ? '£${item.price!.toStringAsFixed(2)}' : 'Not set'} · Location: ${item.storageLocation ?? 'Not set'}'
-                            : 'Available: ${item.formattedStockQuantity} · ${item.category}\nLocation: ${item.storageLocation ?? 'Not set'}${item.price == null ? '' : ' · Latest unit cost: £${item.price!.toStringAsFixed(2)}'}',
+                            : _materialSubtitle(item),
                       ),
                       trailing: IconButton(
                         icon: const Icon(Icons.qr_code_2),
@@ -203,6 +203,23 @@ class _InventoryScreenState extends State<InventoryScreen> {
               ),
       ),
     );
+  }
+
+  String _materialSubtitle(InventoryItem item) {
+    final availability =
+        'Available: ${item.formattedStockQuantity} · ${item.category}';
+    if (item.isYarnOrFibre) {
+      final details = <String>[
+        if (item.yarnDetailSummary.isNotEmpty) item.yarnDetailSummary,
+        if (item.dyeLot?.isNotEmpty == true) 'Dye lot ${item.dyeLot}',
+        if (item.recommendedHookSize?.isNotEmpty == true)
+          'Hook ${item.recommendedHookSize}',
+        if (item.price != null)
+          'Latest unit cost: £${item.price!.toStringAsFixed(2)}',
+      ];
+      return '$availability\n${details.isEmpty ? 'Add yarn details for matching and replacement.' : details.join(' · ')}';
+    }
+    return '$availability\nLocation: ${item.storageLocation ?? 'Not set'}${item.price == null ? '' : ' · Latest unit cost: £${item.price!.toStringAsFixed(2)}'}';
   }
 
   void _showScannedItem(InventoryItem item) {

@@ -83,6 +83,16 @@ Broken Item,Created Item,Finished Makes,not-a-number,10.00,Display Shelf,,
         measurementUnit: 'gram',
         measuredReorderPoint: 40,
         price: 0.02,
+        yarnBrand: 'Willow Yarns',
+        yarnRange: 'Soft Cotton',
+        yarnColour: 'Sage',
+        dyeLot: 'S24-118',
+        yarnWeight: 'Light / DK',
+        yarnFibre: 'Cotton',
+        yarnWeightGrams: 50,
+        yarnLengthMetres: 125,
+        recommendedHookSize: '4.00 mm',
+        gaugeNote: '22 stitches per 10 cm',
         itemType: 'material',
         lastUpdated: DateTime(2026, 8, 15),
       ),
@@ -94,5 +104,15 @@ Broken Item,Created Item,Finished Makes,not-a-number,10.00,Display Shelf,,
     expect(preview.items.single.measuredQuantity, 125.5);
     expect(preview.items.single.measurementUnit, 'gram');
     expect(preview.items.single.measuredReorderPoint, 40);
+    expect(preview.items.single.yarnBrand, 'Willow Yarns');
+    expect(preview.items.single.yarnRange, 'Soft Cotton');
+    expect(preview.items.single.yarnColour, 'Sage');
+    expect(preview.items.single.dyeLot, 'S24-118');
+    expect(preview.items.single.yarnWeight, 'Light / DK');
+    expect(preview.items.single.yarnFibre, 'Cotton');
+    expect(preview.items.single.yarnWeightGrams, 50);
+    expect(preview.items.single.yarnLengthMetres, 125);
+    expect(preview.items.single.recommendedHookSize, '4.00 mm');
+    expect(preview.items.single.gaugeNote, '22 stitches per 10 cm');
   });
 }

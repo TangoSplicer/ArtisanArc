@@ -74,6 +74,30 @@ class InventoryCsvImportService {
     final unitColumn = _findColumn(headers, const ['unit', 'measurement unit']);
     final reorderColumn =
         _findColumn(headers, const ['reorder point', 'reorder', 'minimum']);
+    final yarnBrandColumn = _findColumn(headers, const ['yarn brand', 'brand']);
+    final yarnRangeColumn = _findColumn(headers, const ['yarn range', 'range']);
+    final yarnColourColumn = _findColumn(
+        headers, const ['yarn colour', 'yarn color', 'colour', 'color']);
+    final dyeLotColumn = _findColumn(headers, const ['dye lot', 'dyelot']);
+    final yarnWeightColumn = _findColumn(headers, const ['yarn weight']);
+    final yarnFibreColumn = _findColumn(
+        headers, const ['yarn fibre', 'yarn fiber', 'fibre', 'fiber']);
+    final skeinWeightColumn = _findColumn(headers, const [
+      'skein weight (g)',
+      'skein weight g',
+      'skein weight',
+      'weight grams',
+    ]);
+    final skeinLengthColumn = _findColumn(headers, const [
+      'skein length (m)',
+      'skein length m',
+      'skein length',
+      'length metres',
+      'length meters',
+    ]);
+    final hookColumn = _findColumn(
+        headers, const ['recommended hook', 'hook size', 'crochet hook']);
+    final gaugeColumn = _findColumn(headers, const ['gauge note', 'gauge']);
 
     final existing = await _inventoryRepository.getAllItems();
     final knownKeys = <String>{
@@ -98,6 +122,23 @@ class InventoryCsvImportService {
       final priceText = priceColumn == null ? '' : rowValue(priceColumn);
       final location = locationColumn == null ? '' : rowValue(locationColumn);
       final reorderText = reorderColumn == null ? '' : rowValue(reorderColumn);
+      final yarnBrand =
+          yarnBrandColumn == null ? '' : rowValue(yarnBrandColumn);
+      final yarnRange =
+          yarnRangeColumn == null ? '' : rowValue(yarnRangeColumn);
+      final yarnColour =
+          yarnColourColumn == null ? '' : rowValue(yarnColourColumn);
+      final dyeLot = dyeLotColumn == null ? '' : rowValue(dyeLotColumn);
+      final yarnWeight =
+          yarnWeightColumn == null ? '' : rowValue(yarnWeightColumn);
+      final yarnFibre =
+          yarnFibreColumn == null ? '' : rowValue(yarnFibreColumn);
+      final skeinWeightText =
+          skeinWeightColumn == null ? '' : rowValue(skeinWeightColumn);
+      final skeinLengthText =
+          skeinLengthColumn == null ? '' : rowValue(skeinLengthColumn);
+      final recommendedHook = hookColumn == null ? '' : rowValue(hookColumn);
+      final gaugeNote = gaugeColumn == null ? '' : rowValue(gaugeColumn);
 
       if (name.isEmpty) {
         issues.add(InventoryImportIssue(
@@ -154,6 +195,27 @@ class InventoryCsvImportService {
         continue;
       }
 
+      final skeinWeight =
+          skeinWeightText.isEmpty ? null : double.tryParse(skeinWeightText);
+      final skeinLength =
+          skeinLengthText.isEmpty ? null : double.tryParse(skeinLengthText);
+      if ((skeinWeightText.isNotEmpty &&
+              (skeinWeight == null ||
+                  !skeinWeight.isFinite ||
+                  skeinWeight < 0)) ||
+          (skeinLengthText.isNotEmpty &&
+              (skeinLength == null ||
+                  !skeinLength.isFinite ||
+                  skeinLength < 0))) {
+        issues.add(InventoryImportIssue(
+          rowNumber: rowNumber,
+          kind: InventoryImportIssueKind.invalid,
+          message:
+              'Skein weight and length must be blank or numbers of zero or more.',
+        ));
+        continue;
+      }
+
       final key = _uniqueKey(name, itemType);
       if (knownKeys.contains(key) || !previewKeys.add(key)) {
         issues.add(InventoryImportIssue(
@@ -181,6 +243,16 @@ class InventoryCsvImportService {
         measuredQuantity: measuredMaterial ? quantity : null,
         measurementUnit: measuredMaterial ? unit : null,
         measuredReorderPoint: measuredMaterial ? reorder : null,
+        yarnBrand: yarnBrand.isEmpty ? null : yarnBrand,
+        yarnRange: yarnRange.isEmpty ? null : yarnRange,
+        yarnColour: yarnColour.isEmpty ? null : yarnColour,
+        dyeLot: dyeLot.isEmpty ? null : dyeLot,
+        yarnWeight: yarnWeight.isEmpty ? null : yarnWeight,
+        yarnFibre: yarnFibre.isEmpty ? null : yarnFibre,
+        yarnWeightGrams: skeinWeight,
+        yarnLengthMetres: skeinLength,
+        recommendedHookSize: recommendedHook.isEmpty ? null : recommendedHook,
+        gaugeNote: gaugeNote.isEmpty ? null : gaugeNote,
       ));
     }
 
