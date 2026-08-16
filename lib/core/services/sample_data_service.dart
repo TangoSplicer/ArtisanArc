@@ -6,6 +6,7 @@ import '../../features/project/data/project_model.dart';
 import '../../features/project/domain/entities/supply_need.dart';
 import '../../features/shopping/data/shopping_list_model.dart';
 import '../../features/commissions/data/commission_model.dart';
+import '../../features/recipes/data/make_recipe_model.dart';
 
 /// Provides optional, clearly fictional starter content for first-time users.
 /// It is only created when the user asks for it and can be removed in Settings.
@@ -19,6 +20,7 @@ class SampleDataService {
   static const _projectsBox = 'projectsBox';
   static const _productionRunsBox = 'productionRunsBox';
   static const _commissionsBox = 'commissionsBox';
+  static const _makeRecipesBox = 'makeRecipesBox';
   static const _shoppingListsBox = 'shoppingListsBox';
   static const _complianceBox = 'complianceBox';
 
@@ -32,6 +34,7 @@ class SampleDataService {
     final projects = await Hive.openBox<Project>(_projectsBox);
     final productionRuns = await Hive.openBox(_productionRunsBox);
     final commissions = await Hive.openBox<Commission>(_commissionsBox);
+    final recipes = await Hive.openBox<MakeRecipe>(_makeRecipesBox);
     final shopping = await Hive.openBox<ShoppingList>(_shoppingListsBox);
     return inventory.isNotEmpty ||
         stockAdjustments.isNotEmpty ||
@@ -42,6 +45,7 @@ class SampleDataService {
         projects.isNotEmpty ||
         productionRuns.isNotEmpty ||
         commissions.isNotEmpty ||
+        recipes.isNotEmpty ||
         shopping.isNotEmpty;
   }
 
@@ -60,6 +64,7 @@ class SampleDataService {
     final projects = await Hive.openBox<Project>(_projectsBox);
     final productionRuns = await Hive.openBox(_productionRunsBox);
     final commissions = await Hive.openBox<Commission>(_commissionsBox);
+    final recipes = await Hive.openBox<MakeRecipe>(_makeRecipesBox);
     final shopping = await Hive.openBox<ShoppingList>(_shoppingListsBox);
 
     if (replaceExisting) {
@@ -73,6 +78,7 @@ class SampleDataService {
         projects.clear(),
         productionRuns.clear(),
         commissions.clear(),
+        recipes.clear(),
         shopping.clear()
       ]);
     }
@@ -192,6 +198,10 @@ class SampleDataService {
       estimatedLabourMinutes: 210,
       labourRatePerHour: 15.00,
       targetMarginPercent: 50,
+      actualLabourMinutes: 45,
+      recipeId: 'sample-recipe-granny-tote',
+      recipeName: 'Granny Square Market Tote',
+      plannedOutputQuantity: 1,
       supplyNeeds: [
         SupplyNeed(
           id: 'sample-supply-cotton',
@@ -217,6 +227,34 @@ class SampleDataService {
       lastUpdatedAt: now,
     );
 
+    final sampleRecipe = MakeRecipe(
+      id: 'sample-recipe-granny-tote',
+      name: 'Granny Square Market Tote',
+      productCategory: 'Crochet Bags & Storage',
+      craftFocus: 'Granny Square Crochet',
+      patternReference: 'Personal granny-square tote notes',
+      patternSource: 'Starter data — maker-owned reference',
+      hookSize: '4.00 mm',
+      gaugeNote: 'Keep granny squares consistent; block before joining.',
+      defaultOutputQuantity: 1,
+      estimatedMakeMinutes: 210,
+      targetMarginPercent: 50,
+      supplyNeeds:
+          sampleProject.supplyNeeds.map((need) => need.copyWith()).toList(),
+      variants: [
+        RecipeVariant(
+          id: 'sample-recipe-granny-tote-mini',
+          name: 'Mini market bag',
+          detail: 'Smaller handle length and eight granny squares.',
+          outputQuantity: 1,
+          estimatedMakeMinutes: 150,
+          supplyNeeds:
+              sampleProject.supplyNeeds.map((need) => need.copyWith()).toList(),
+        ),
+      ],
+      createdAt: now.subtract(const Duration(days: 4)),
+      updatedAt: now,
+    );
     final eventName = 'Spring Makers Market';
     final eventLocation = 'Table 12 · Town Hall';
     final sampleSales = <SaleRecord>[
@@ -304,6 +342,7 @@ class SampleDataService {
       inventory.putAll({for (final item in inventoryItems) item.id: item}),
       sales.putAll({for (final sale in sampleSales) sale.id: sale}),
       projects.put(sampleProject.id, sampleProject),
+      recipes.put(sampleRecipe.id, sampleRecipe),
       commissions.putAll({for (final item in sampleCommissions) item.id: item}),
       shopping.put(sampleShoppingList.id, sampleShoppingList),
     ]);
@@ -319,6 +358,7 @@ class SampleDataService {
     final projects = await Hive.openBox<Project>(_projectsBox);
     final productionRuns = await Hive.openBox(_productionRunsBox);
     final commissions = await Hive.openBox<Commission>(_commissionsBox);
+    final recipes = await Hive.openBox<MakeRecipe>(_makeRecipesBox);
     final shopping = await Hive.openBox<ShoppingList>(_shoppingListsBox);
     final compliance = await Hive.openBox(_complianceBox);
     await Future.wait([
@@ -331,6 +371,7 @@ class SampleDataService {
       projects.clear(),
       productionRuns.clear(),
       commissions.clear(),
+      recipes.clear(),
       shopping.clear(),
       compliance.clear(),
     ]);

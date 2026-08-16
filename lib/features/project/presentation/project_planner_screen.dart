@@ -44,6 +44,7 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
   List<Milestone> _milestones = [];
   List<SupplyNeed> _supplyNeeds = []; // Added SupplyNeeds list
   List<InventoryItem> _materialItems = [];
+  String? _finishedItemCategory;
 
   bool _isLoading = false;
   bool get _isEditMode => widget.projectId != null;
@@ -89,6 +90,7 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
             ''; // Assuming craftType is a simple string for now
         _startDate = project.startDate ?? DateTime.now();
         _endDate = project.endDate;
+        _finishedItemCategory = project.finishedItemCategory;
         // Milestones need to be mutable for completion status, so create new instances
         _milestones = project.milestones
             .map((m) => Milestone(
@@ -238,6 +240,21 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
       supplyNeeds: _supplyNeeds, // Added supplyNeeds to save
       finishedItemIds: _isEditMode ? _editingProject!.finishedItemIds : [],
       productionNotes: _isEditMode ? _editingProject!.productionNotes : [],
+      estimatedLabourMinutes:
+          _isEditMode ? _editingProject!.estimatedLabourMinutes : null,
+      labourRatePerHour:
+          _isEditMode ? _editingProject!.labourRatePerHour : null,
+      targetMarginPercent:
+          _isEditMode ? _editingProject!.targetMarginPercent : null,
+      actualLabourMinutes:
+          _isEditMode ? _editingProject!.actualLabourMinutes : 0,
+      activeTimerStartedAt:
+          _isEditMode ? _editingProject!.activeTimerStartedAt : null,
+      recipeId: _isEditMode ? _editingProject!.recipeId : null,
+      recipeName: _isEditMode ? _editingProject!.recipeName : null,
+      plannedOutputQuantity:
+          _isEditMode ? _editingProject!.plannedOutputQuantity : 1,
+      finishedItemCategory: _finishedItemCategory,
       createdAt: _isEditMode ? _editingProject!.createdAt : DateTime.now(),
       lastUpdatedAt: DateTime.now(),
     );
@@ -359,6 +376,18 @@ class _ProjectPlannerScreenState extends State<ProjectPlannerScreen> {
                       onChanged: (craft) =>
                           setState(() => _craftController.text = craft ?? ''),
                       customValueBuilder: (query) => query,
+                      allowClear: true,
+                    ),
+                    const SizedBox(height: 12),
+                    SearchableSelectionField<String>(
+                      options: SelectionOptions.finishedItemCategories,
+                      value: _finishedItemCategory,
+                      labelText: 'Finished product category (optional)',
+                      hintText: 'Search crochet product categories',
+                      itemLabel: (category) => category,
+                      searchTerms: (category) => [category],
+                      onChanged: (category) =>
+                          setState(() => _finishedItemCategory = category),
                       allowClear: true,
                     ),
                     const SizedBox(height: 16),

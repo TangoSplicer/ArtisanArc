@@ -31,6 +31,11 @@ class ProductionRun extends HiveObject {
   @HiveField(7)
   final String? notes;
 
+  /// Total project making minutes recorded when this run was completed. It is a
+  /// historical snapshot and is never recalculated from later timer edits.
+  @HiveField(8, defaultValue: 0)
+  final int labourMinutesAtCompletion;
+
   ProductionRun({
     required this.id,
     required this.projectId,
@@ -40,6 +45,7 @@ class ProductionRun extends HiveObject {
     required this.materialCost,
     required this.completedAt,
     this.notes,
+    this.labourMinutesAtCompletion = 0,
   });
 
   double get materialCostPerItem =>

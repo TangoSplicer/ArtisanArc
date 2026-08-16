@@ -63,6 +63,31 @@ class Project extends HiveObject {
   @HiveField(14)
   double? targetMarginPercent;
 
+  /// Minutes actually worked by the maker. This is local production evidence,
+  /// kept separately from the planning estimate used in the original quote.
+  @HiveField(15, defaultValue: 0)
+  int actualLabourMinutes;
+
+  /// When non-null, the project timer is running. Persisting the start time
+  /// keeps a timer trustworthy across navigation and an app restart.
+  @HiveField(16)
+  DateTime? activeTimerStartedAt;
+
+  /// Optional link back to a reusable, reference-only Make Recipe.
+  @HiveField(17)
+  String? recipeId;
+
+  @HiveField(18)
+  String? recipeName;
+
+  /// The planned number of saleable pieces from this project or recipe.
+  @HiveField(19, defaultValue: 1)
+  int plannedOutputQuantity;
+
+  /// Optional crochet-first finished-product category supplied by a Make Recipe.
+  @HiveField(20)
+  String? finishedItemCategory;
+
   Project({
     required this.id,
     required this.name,
@@ -77,6 +102,12 @@ class Project extends HiveObject {
     this.estimatedLabourMinutes,
     this.labourRatePerHour,
     this.targetMarginPercent,
+    this.actualLabourMinutes = 0,
+    this.activeTimerStartedAt,
+    this.recipeId,
+    this.recipeName,
+    this.plannedOutputQuantity = 1,
+    this.finishedItemCategory,
     required this.createdAt,
     this.lastUpdatedAt,
   })  : milestones = milestones ?? [],
@@ -101,6 +132,16 @@ class Project extends HiveObject {
     bool clearLabourRatePerHour = false,
     double? targetMarginPercent,
     bool clearTargetMarginPercent = false,
+    int? actualLabourMinutes,
+    DateTime? activeTimerStartedAt,
+    bool clearActiveTimerStartedAt = false,
+    String? recipeId,
+    bool clearRecipeId = false,
+    String? recipeName,
+    bool clearRecipeName = false,
+    int? plannedOutputQuantity,
+    String? finishedItemCategory,
+    bool clearFinishedItemCategory = false,
     DateTime? createdAt,
     DateTime? lastUpdatedAt,
   }) {
@@ -130,6 +171,17 @@ class Project extends HiveObject {
       targetMarginPercent: clearTargetMarginPercent
           ? null
           : targetMarginPercent ?? this.targetMarginPercent,
+      actualLabourMinutes: actualLabourMinutes ?? this.actualLabourMinutes,
+      activeTimerStartedAt: clearActiveTimerStartedAt
+          ? null
+          : activeTimerStartedAt ?? this.activeTimerStartedAt,
+      recipeId: clearRecipeId ? null : recipeId ?? this.recipeId,
+      recipeName: clearRecipeName ? null : recipeName ?? this.recipeName,
+      plannedOutputQuantity:
+          plannedOutputQuantity ?? this.plannedOutputQuantity,
+      finishedItemCategory: clearFinishedItemCategory
+          ? null
+          : finishedItemCategory ?? this.finishedItemCategory,
       createdAt: createdAt ?? this.createdAt,
       lastUpdatedAt: lastUpdatedAt ?? this.lastUpdatedAt,
     );

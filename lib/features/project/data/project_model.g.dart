@@ -30,6 +30,12 @@ class ProjectAdapter extends TypeAdapter<Project> {
       estimatedLabourMinutes: fields[12] as int?,
       labourRatePerHour: fields[13] as double?,
       targetMarginPercent: fields[14] as double?,
+      actualLabourMinutes: fields[15] == null ? 0 : fields[15] as int,
+      activeTimerStartedAt: fields[16] as DateTime?,
+      recipeId: fields[17] as String?,
+      recipeName: fields[18] as String?,
+      plannedOutputQuantity: fields[19] == null ? 1 : fields[19] as int,
+      finishedItemCategory: fields[20] as String?,
       createdAt: fields[7] as DateTime,
       lastUpdatedAt: fields[8] as DateTime?,
     );
@@ -38,7 +44,7 @@ class ProjectAdapter extends TypeAdapter<Project> {
   @override
   void write(BinaryWriter writer, Project obj) {
     writer
-      ..writeByte(15)
+      ..writeByte(21)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -68,7 +74,19 @@ class ProjectAdapter extends TypeAdapter<Project> {
       ..writeByte(13)
       ..write(obj.labourRatePerHour)
       ..writeByte(14)
-      ..write(obj.targetMarginPercent);
+      ..write(obj.targetMarginPercent)
+      ..writeByte(15)
+      ..write(obj.actualLabourMinutes)
+      ..writeByte(16)
+      ..write(obj.activeTimerStartedAt)
+      ..writeByte(17)
+      ..write(obj.recipeId)
+      ..writeByte(18)
+      ..write(obj.recipeName)
+      ..writeByte(19)
+      ..write(obj.plannedOutputQuantity)
+      ..writeByte(20)
+      ..write(obj.finishedItemCategory);
   }
 
   @override

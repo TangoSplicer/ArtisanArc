@@ -295,6 +295,35 @@ class _ProjectCostingCardState extends State<ProjectCostingCard> {
                 style: TextStyle(color: theme.colorScheme.error),
               ),
             ],
+            const Divider(height: 28),
+            Text('Recorded making time', style: theme.textTheme.titleMedium),
+            const SizedBox(height: 4),
+            if (!preview.hasRecordedTime)
+              const Text(
+                'Start the project timer to see the actual time cost and a truthful per-item price floor.',
+              )
+            else ...[
+              _textRow(
+                'Actual time',
+                _formatMinutes(preview.recordedActualLabourMinutes),
+              ),
+              _moneyRow('Actual time cost', preview.actualLabourCost),
+              _moneyRow(
+                'Current price floor per item',
+                preview.actualPriceFloorPerItem,
+                emphasized: true,
+              ),
+              if (preview.actualSuggestedSalePricePerItem != null)
+                _moneyRow(
+                  'Actual-time target price per item',
+                  preview.actualSuggestedSalePricePerItem!,
+                  emphasized: true,
+                )
+              else
+                const Text(
+                  'Set an hourly rate and target margin to calculate an actual-time target price.',
+                ),
+            ],
             const SizedBox(height: 12),
             ExpansionTile(
               tilePadding: EdgeInsets.zero,
@@ -348,6 +377,16 @@ class _ProjectCostingCardState extends State<ProjectCostingCard> {
     );
   }
 
+  Widget _textRow(String label, String value) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 3),
+        child: Row(
+          children: [
+            Expanded(child: Text(label)),
+            Text(value, style: const TextStyle(fontWeight: FontWeight.w500)),
+          ],
+        ),
+      );
+
   Widget _moneyRow(String label, double value, {bool emphasized = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 3),
@@ -365,6 +404,14 @@ class _ProjectCostingCardState extends State<ProjectCostingCard> {
   }
 
   String _money(double value) => '£${value.toStringAsFixed(2)}';
+
+  String _formatMinutes(int minutes) {
+    final hours = minutes ~/ 60;
+    final remainder = minutes % 60;
+    if (hours == 0) return '$remainder min';
+    if (remainder == 0) return '$hours h';
+    return '$hours h $remainder min';
+  }
 
   String _formatQuantity(double value) => value == value.roundToDouble()
       ? value.toStringAsFixed(0)

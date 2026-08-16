@@ -77,12 +77,16 @@ InventoryItem material({
   );
 }
 
-Project projectWithSupplies({required List<SupplyNeed> supplyNeeds}) {
+Project projectWithSupplies({
+  required List<SupplyNeed> supplyNeeds,
+  int actualLabourMinutes = 0,
+}) {
   return Project(
     id: 'project-tote',
     name: 'Crochet Market Tote',
     craftType: 'Crochet',
     supplyNeeds: supplyNeeds,
+    actualLabourMinutes: actualLabourMinutes,
     createdAt: DateTime(2026, 8, 15),
   );
 }
@@ -97,6 +101,7 @@ void main() {
         material(id: 'hook', name: '4 mm hook', quantity: 1),
       ]);
       final project = projectWithSupplies(
+        actualLabourMinutes: 65,
         supplyNeeds: [
           SupplyNeed(
             id: 'cotton-need',
@@ -134,6 +139,8 @@ void main() {
       expect(result.finishedItem.category, 'Finished Crochet Makes');
       expect(result.finishedItem.price, 18.0);
       expect(result.productionRun.materialCost, 8.0);
+      expect(result.productionRun.labourMinutesAtCompletion, 65);
+      expect(result.updatedProject.actualLabourMinutes, 65);
       expect(
           (await productionRuns.getRuns()).single.id, result.productionRun.id);
       expect(result.updatedProject.finishedItemIds, [result.finishedItem.id]);

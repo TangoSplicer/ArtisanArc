@@ -33,6 +33,9 @@ import 'package:artisanarc/features/commissions/presentation/commissions_screen.
 import 'package:artisanarc/features/commissions/presentation/commission_detail_screen.dart';
 import 'package:artisanarc/features/commissions/presentation/commission_editor_screen.dart';
 import 'package:artisanarc/features/operations/presentation/maker_operations_dashboard_screen.dart';
+import 'package:artisanarc/features/recipes/presentation/make_recipe_list_screen.dart';
+import 'package:artisanarc/features/recipes/presentation/make_recipe_detail_screen.dart';
+import 'package:artisanarc/features/recipes/presentation/make_recipe_editor_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -189,6 +192,40 @@ class AppRouter {
                 return const ErrorScreen(error: 'Project ID is missing');
               }
               return ProjectDetailScreen(projectId: projectId);
+            },
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/make-recipes',
+        name: 'makeRecipes',
+        builder: (context, state) => const MakeRecipeListScreen(),
+        routes: [
+          GoRoute(
+            path: 'add',
+            name: 'addMakeRecipe',
+            builder: (context, state) => const MakeRecipeEditorScreen(),
+          ),
+          GoRoute(
+            path: 'detail/:id',
+            name: 'makeRecipeDetail',
+            builder: (context, state) {
+              final recipeId = state.pathParameters['id'];
+              if (recipeId == null) {
+                return const ErrorScreen(error: 'Recipe ID is missing');
+              }
+              return MakeRecipeDetailScreen(recipeId: recipeId);
+            },
+          ),
+          GoRoute(
+            path: 'edit/:id',
+            name: 'editMakeRecipe',
+            builder: (context, state) {
+              final recipeId = state.pathParameters['id'];
+              if (recipeId == null) {
+                return const ErrorScreen(error: 'Recipe ID is missing');
+              }
+              return MakeRecipeEditorScreen(recipeId: recipeId);
             },
           ),
         ],

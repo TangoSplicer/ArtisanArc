@@ -89,6 +89,16 @@ class HomeScreen extends StatelessWidget {
             ),
             _buildNavCard(
               context,
+              title: 'Crochet Make Recipes',
+              subtitle:
+                  'Reuse pattern references, hooks, gauge, materials, variants and making-time plans',
+              icon: Icons.menu_book_outlined,
+              route: '/make-recipes',
+              color: Colors.purple,
+              onTap: () => _trackNavigation('make_recipes'),
+            ),
+            _buildNavCard(
+              context,
               title: 'Maker Operations',
               subtitle:
                   'See local stock, orders, projects, stall context and seasonal work in one place',

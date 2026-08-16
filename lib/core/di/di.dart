@@ -33,6 +33,11 @@ import '../../features/project/data/production_run_repository.dart';
 import '../../features/project/domain/project_service.dart';
 import '../../features/project/domain/make_to_sell_service.dart';
 import '../../features/project/domain/project_costing_service.dart';
+import '../../features/project/domain/project_time_service.dart';
+
+// Make Recipes
+import '../../features/recipes/data/make_recipe_repository.dart';
+import '../../features/recipes/domain/make_recipe_service.dart';
 
 // Commissions
 import '../../features/commissions/data/commission_repository.dart';
@@ -136,6 +141,18 @@ Future<void> configureDependencies() async {
     () => ProjectCostingService(
       getIt<ProcurementService>(),
       getIt<ProductionRunRepository>(),
+    ),
+  );
+  getIt.registerLazySingleton<ProjectTimeService>(
+      () => ProjectTimeService(getIt<ProjectService>()));
+
+  // Local Make Recipes
+  getIt.registerLazySingleton<MakeRecipeRepository>(
+      () => MakeRecipeRepositoryImpl());
+  getIt.registerLazySingleton<MakeRecipeService>(
+    () => MakeRecipeService(
+      getIt<MakeRecipeRepository>(),
+      getIt<ProjectService>(),
     ),
   );
 

@@ -7,6 +7,7 @@ import '../domain/usecases/update_project.dart';
 import '../data/project_model.dart';
 import '../domain/entities/supply_need.dart';
 import '../domain/make_to_sell_service.dart';
+import '../domain/project_time_service.dart';
 import 'project_costing_card.dart';
 import '../../../core/utils/date_helpers.dart';
 
@@ -23,6 +24,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   final GetProjectById _getProjectUseCase = GetIt.I<GetProjectById>();
   final UpdateProject _updateProjectUseCase = GetIt.I<UpdateProject>();
   final MakeToSellService _makeToSellService = GetIt.I<MakeToSellService>();
+  final ProjectTimeService _projectTimeService = GetIt.I<ProjectTimeService>();
 
   Project? _project;
   Map<String, MaterialStockStatus> _stockStatusBySupplyId = const {};
@@ -112,6 +114,33 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error updating supply need: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _toggleProjectTimer() async {
+    final project = _project;
+    if (project == null) return;
+    try {
+      final updated = project.activeTimerStartedAt == null
+          ? await _projectTimeService.start(project)
+          : await _projectTimeService.pause(project);
+      if (!mounted) return;
+      setState(() => _project = updated);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            updated.activeTimerStartedAt == null
+                ? 'Making timer paused. Actual time is saved locally.'
+                : 'Making timer started for ${updated.name}.',
+          ),
+        ),
+      );
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not update making timer: $error')),
         );
       }
     }
@@ -340,6 +369,17 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
               },
             ),
           IconButton(
+            icon: Icon(
+              _project!.activeTimerStartedAt == null
+                  ? Icons.timer_outlined
+                  : Icons.pause_circle_outline,
+            ),
+            tooltip: _project!.activeTimerStartedAt == null
+                ? 'Start making timer'
+                : 'Pause making timer',
+            onPressed: _toggleProjectTimer,
+          ),
+          IconButton(
             icon: const Icon(Icons.inventory_2_outlined),
             tooltip: 'Complete Make',
             onPressed: _openCompleteMakeDialog,
@@ -362,6 +402,8 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
             _buildProjectOverview(theme),
             const SizedBox(height: 16),
             _buildProgressCard(theme),
+            const SizedBox(height: 16),
+            _buildMakingTimeCard(theme),
             const SizedBox(height: 16),
             ProjectCostingCard(
               project: _project!,
@@ -404,6 +446,14 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                 label: Text(_project!.craftType!),
                 backgroundColor: theme.colorScheme.primaryContainer,
               ),
+              const SizedBox(height: 16),
+            ],
+            if (_project!.recipeName != null &&
+                _project!.recipeName!.isNotEmpty) ...[
+              Text('Make Recipe', style: theme.textTheme.titleMedium),
+              const SizedBox(height: 4),
+              Text(
+                  '${_project!.recipeName} · planned output ${_project!.plannedOutputQuantity}'),
               const SizedBox(height: 16),
             ],
             Row(
@@ -463,6 +513,45 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
             Text(
               '${_project!.milestones.where((m) => m.isCompleted).length} of ${_project!.milestones.length} milestones completed',
               style: theme.textTheme.bodyMedium,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMakingTimeCard(ThemeData theme) {
+    final project = _project!;
+    final isRunning = project.activeTimerStartedAt != null;
+    final hours = project.actualLabourMinutes ~/ 60;
+    final minutes = project.actualLabourMinutes % 60;
+    final recorded = hours == 0
+        ? '$minutes min'
+        : '$hours h${minutes == 0 ? '' : ' $minutes min'}';
+    return Card(
+      elevation: 4,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text('Making Time', style: theme.textTheme.titleLarge),
+                ),
+                FilledButton.icon(
+                  onPressed: _toggleProjectTimer,
+                  icon: Icon(isRunning ? Icons.pause : Icons.play_arrow),
+                  label: Text(isRunning ? 'Pause' : 'Start'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text('Recorded: $recorded${isRunning ? ' · timer running' : ''}'),
+            const SizedBox(height: 4),
+            const Text(
+              'Actual time stays separate from the original estimate and feeds the Cost & Price price floor.',
             ),
           ],
         ),

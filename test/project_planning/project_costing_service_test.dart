@@ -112,6 +112,8 @@ void main() {
       estimatedLabourMinutes: 60,
       labourRatePerHour: 20,
       targetMarginPercent: 50,
+      actualLabourMinutes: 90,
+      plannedOutputQuantity: 2,
       supplyNeeds: [
         SupplyNeed(
           id: 'explicit',
@@ -141,5 +143,10 @@ void main() {
     expect(preview.suggestedSalePrice, 84);
     expect(preview.recordedProductionMaterialCost, 24);
     expect(preview.recordedMaterialCostPerItem, 8);
+    expect(preview.recordedActualLabourMinutes, 90);
+    expect(preview.actualLabourCost, 30);
+    expect(preview.actualDirectCost, 52);
+    expect(preview.actualPriceFloorPerItem, 26);
+    expect(preview.actualSuggestedSalePricePerItem, 52);
   });
 }

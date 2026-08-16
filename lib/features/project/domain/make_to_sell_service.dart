@@ -176,6 +176,13 @@ class MakeToSellService {
     }
 
     final now = DateTime.now();
+    final activeTimerStart = project.activeTimerStartedAt;
+    final activeTimerMinutes =
+        activeTimerStart != null && now.isAfter(activeTimerStart)
+            ? now.difference(activeTimerStart).inMinutes
+            : 0;
+    final labourMinutesAtCompletion =
+        project.actualLabourMinutes + activeTimerMinutes;
     final updatedMaterials = <InventoryItem>[];
     var materialCost = 0.0;
     for (final status in stockPreview.materials
@@ -205,9 +212,11 @@ class MakeToSellService {
     final finishedItem = InventoryItem(
       id: _uuid.v4(),
       name: outputName,
-      category: craft == null || craft.isEmpty
-          ? 'Finished Makes'
-          : 'Finished $craft Makes',
+      category: project.finishedItemCategory?.trim().isNotEmpty == true
+          ? project.finishedItemCategory!.trim()
+          : craft == null || craft.isEmpty
+              ? 'Finished Makes'
+              : 'Finished $craft Makes',
       quantity: outputQuantity,
       price: salePrice,
       storageLocation: 'Finished items',
@@ -225,6 +234,8 @@ class MakeToSellService {
     final updatedProject = project.copyWith(
       finishedItemIds: [...project.finishedItemIds, finishedItem.id],
       productionNotes: [...project.productionNotes, noteParts.join(' ')],
+      actualLabourMinutes: labourMinutesAtCompletion,
+      clearActiveTimerStartedAt: activeTimerStart != null,
       lastUpdatedAt: now,
     );
     await _projectRepository.saveProject(updatedProject);
@@ -238,6 +249,7 @@ class MakeToSellService {
       materialCost: materialCost,
       completedAt: now,
       notes: cleanNotes,
+      labourMinutesAtCompletion: labourMinutesAtCompletion,
     );
     await _productionRunRepository.saveRun(productionRun);
 

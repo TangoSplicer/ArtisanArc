@@ -35,6 +35,7 @@ The current build already provides searchable craft-focused selection controls, 
 | **2.0 — Price with clarity, fulfil locally** | Project cost previews and customer commissions | Makers can price work transparently and track private orders without a server | **Delivered in v2.0.0+15; signed APK verified** |
 | **2.1 — Label, scan and bring data safely** | QR labels, scan-to-sell and CSV workflow | Physical labels and reusable CSV files accelerate routine stock and sale work offline | **Delivered in v2.1.0+16; signed APK verified** |
 | **2.2 — Run the maker week** | Operations dashboard and seasonal workflows | A maker can prioritise local stock, orders, projects, sales and event work in one view | **Delivered in v2.2.0+17; signed APK verified** |
+| **2.3 — Make it worth making** | Crochet Make Recipes and actual-time pricing | Reusable crochet product plans turn recorded time and materials into a trustworthy price floor | **Delivered in v2.3.0+18; release verification pending** |
 | **Later, only if needed** | Optional expansion | Controlled scope without weakening the Personal Edition | **Deliberate** |
 
 ---
@@ -264,6 +265,22 @@ Once the core workflow is solid, improve the app’s speed, clarity and accessib
 | One-tap maker actions | The dashboard provides direct routes to add a commission, open or resume a stall session, run a stocktake and print labels. |
 | Seasonal workflow views | Five focused local planning views—All-year rhythm, Spring markets, Summer fairs, Autumn launch and Winter gifting—offer concise production, ordering, labelling and event-day checklists without accounts, notifications, external calendars or remote data. |
 | Regression coverage | Automated aggregation tests verify active low-stock detection, project and commission deadline queues, seven-day sales totals and active-stall visibility using in-memory local data. |
+
+---
+
+# 2.3 — Make it worth making
+
+## Delivery record — v2.3.0+18
+
+| Delivered capability | Implementation outcome |
+|---|---|
+| Crochet-first searchable selections | Project, inventory and recipe choices now lead with amigurumi, wearables, accessories, bags, homeware, hooks, yarn, finishing and related fibre crafts. Duplicate labels are removed while knitting and closely related techniques remain available. |
+| Reusable Make Recipes | A local Make Recipe library stores maker-authored product plans, pattern references, optional source credit, hook size, gauge note, default output, material requirements and simple variants. It intentionally stores references rather than copied commercial pattern instructions. |
+| Recipe-to-project workflow | A selected recipe or variant creates an editable tracked project with copied supplies, craft focus, expected time, target margin, planned output and crochet-first finished-product category. |
+| Actual making-time evidence | Projects provide a persistent local start/pause timer. Recorded time remains separate from the original labour estimate, survives navigation and is saved when a make is completed. |
+| Truthful per-item pricing | Cost & Price now shows actual-time labour cost, an explainable current price floor per planned item, and an actual-time target price when a rate and margin are set. |
+| Historical production evidence | Production runs capture the project’s recorded making minutes at completion alongside their immutable material-cost snapshot. |
+| Data safety and regression coverage | Make Recipes are registered with Hive, safety snapshots, portable backups, starter-data replacement and Settings clear-all. Automated regression tests cover recipe conversion, timer persistence, actual-time price floors and production snapshots. |
 
 ---
 

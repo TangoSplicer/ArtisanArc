@@ -52,6 +52,11 @@ class ProjectCostingPreview {
     required this.recordedProductionMaterialCost,
     required this.recordedOutputQuantity,
     required this.recordedRunCount,
+    required this.recordedActualLabourMinutes,
+    required this.actualLabourCost,
+    required this.actualDirectCost,
+    required this.actualPriceFloorPerItem,
+    required this.actualSuggestedSalePricePerItem,
   });
 
   final Project project;
@@ -63,6 +68,13 @@ class ProjectCostingPreview {
   final double recordedProductionMaterialCost;
   final int recordedOutputQuantity;
   final int recordedRunCount;
+  final int recordedActualLabourMinutes;
+  final double actualLabourCost;
+  final double actualDirectCost;
+  final double actualPriceFloorPerItem;
+  final double? actualSuggestedSalePricePerItem;
+
+  bool get hasRecordedTime => recordedActualLabourMinutes > 0;
 
   int get missingCostCount =>
       supplyLines.where((line) => line.unitCost == null).length;
@@ -104,6 +116,16 @@ class ProjectCostingService {
       directCost,
       project.targetMarginPercent,
     );
+    final recordedMinutes = _recordedMinutesIncludingActiveTimer(project);
+    final actualLabourCost =
+        _labourCost(recordedMinutes, project.labourRatePerHour);
+    final actualDirectCost = materialCost + actualLabourCost;
+    final plannedOutput =
+        project.plannedOutputQuantity < 1 ? 1 : project.plannedOutputQuantity;
+    final actualSuggestedPrice = _suggestedSalePrice(
+      actualDirectCost,
+      project.targetMarginPercent,
+    );
 
     return ProjectCostingPreview(
       project: project,
@@ -121,6 +143,13 @@ class ProjectCostingService {
         (total, run) => total + run.outputQuantity,
       ),
       recordedRunCount: productionRuns.length,
+      recordedActualLabourMinutes: recordedMinutes,
+      actualLabourCost: actualLabourCost,
+      actualDirectCost: actualDirectCost,
+      actualPriceFloorPerItem: actualDirectCost / plannedOutput,
+      actualSuggestedSalePricePerItem: actualSuggestedPrice == null
+          ? null
+          : actualSuggestedPrice / plannedOutput,
     );
   }
 
@@ -176,11 +205,23 @@ class ProjectCostingService {
     );
   }
 
-  double _estimateLabourCost(Project project) {
-    final minutes = project.estimatedLabourMinutes;
-    final rate = project.labourRatePerHour;
-    if (minutes == null || rate == null || minutes <= 0 || rate < 0) return 0;
+  double _estimateLabourCost(Project project) => _labourCost(
+        project.estimatedLabourMinutes ?? 0,
+        project.labourRatePerHour,
+      );
+
+  double _labourCost(int minutes, double? rate) {
+    if (rate == null || minutes <= 0 || rate < 0) return 0;
     return (minutes / 60) * rate;
+  }
+
+  int _recordedMinutesIncludingActiveTimer(Project project) {
+    final activeStart = project.activeTimerStartedAt;
+    if (activeStart == null) return project.actualLabourMinutes;
+    final runningMinutes = DateTime.now().isAfter(activeStart)
+        ? DateTime.now().difference(activeStart).inMinutes
+        : 0;
+    return project.actualLabourMinutes + runningMinutes;
   }
 
   double? _suggestedSalePrice(double directCost, double? targetMarginPercent) {
