@@ -7,6 +7,7 @@ import '../../features/project/domain/entities/supply_need.dart';
 import '../../features/shopping/data/shopping_list_model.dart';
 import '../../features/commissions/data/commission_model.dart';
 import '../../features/recipes/data/make_recipe_model.dart';
+import '../../features/collections/data/maker_collection_model.dart';
 
 /// Provides optional, clearly fictional starter content for first-time users.
 /// It is only created when the user asks for it and can be removed in Settings.
@@ -24,6 +25,8 @@ class SampleDataService {
   static const _makerCollectionsBox = 'makerCollectionsBox';
   static const _shoppingListsBox = 'shoppingListsBox';
   static const _complianceBox = 'complianceBox';
+  static const _wholesalePartnersBox = 'wholesalePartnersBox';
+  static const _wholesaleBatchesBox = 'wholesaleBatchesBox';
 
   static Future<bool> hasCraftData() async {
     final inventory = await Hive.openBox<InventoryItem>(_inventoryBox);
@@ -38,6 +41,8 @@ class SampleDataService {
     final recipes = await Hive.openBox<MakeRecipe>(_makeRecipesBox);
     final collections = await Hive.openBox(_makerCollectionsBox);
     final shopping = await Hive.openBox<ShoppingList>(_shoppingListsBox);
+    final wholesalePartners = await Hive.openBox(_wholesalePartnersBox);
+    final wholesaleBatches = await Hive.openBox(_wholesaleBatchesBox);
     return inventory.isNotEmpty ||
         stockAdjustments.isNotEmpty ||
         suppliers.isNotEmpty ||
@@ -49,7 +54,9 @@ class SampleDataService {
         commissions.isNotEmpty ||
         recipes.isNotEmpty ||
         collections.isNotEmpty ||
-        shopping.isNotEmpty;
+        shopping.isNotEmpty ||
+        wholesalePartners.isNotEmpty ||
+        wholesaleBatches.isNotEmpty;
   }
 
   static Future<void> loadStarterData({bool replaceExisting = false}) async {
@@ -70,6 +77,8 @@ class SampleDataService {
     final recipes = await Hive.openBox<MakeRecipe>(_makeRecipesBox);
     final collections = await Hive.openBox(_makerCollectionsBox);
     final shopping = await Hive.openBox<ShoppingList>(_shoppingListsBox);
+    final wholesalePartners = await Hive.openBox(_wholesalePartnersBox);
+    final wholesaleBatches = await Hive.openBox(_wholesaleBatchesBox);
 
     if (replaceExisting) {
       await Future.wait([
@@ -84,7 +93,9 @@ class SampleDataService {
         commissions.clear(),
         recipes.clear(),
         collections.clear(),
-        shopping.clear()
+        shopping.clear(),
+        wholesalePartners.clear(),
+        wholesaleBatches.clear(),
       ]);
     }
 
@@ -404,6 +415,8 @@ class SampleDataService {
     final collections = await Hive.openBox(_makerCollectionsBox);
     final shopping = await Hive.openBox<ShoppingList>(_shoppingListsBox);
     final compliance = await Hive.openBox(_complianceBox);
+    final wholesalePartners = await Hive.openBox(_wholesalePartnersBox);
+    final wholesaleBatches = await Hive.openBox(_wholesaleBatchesBox);
     await Future.wait([
       inventory.clear(),
       stockAdjustments.clear(),
@@ -418,6 +431,8 @@ class SampleDataService {
       collections.clear(),
       shopping.clear(),
       compliance.clear(),
+      wholesalePartners.clear(),
+      wholesaleBatches.clear(),
     ]);
   }
 }

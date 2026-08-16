@@ -39,14 +39,14 @@ class ShoppingListAdapter extends TypeAdapter<ShoppingList> {
   }
 
   @override
+  int get hashCode => typeId.hashCode;
+
+  @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is ShoppingListAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
-
-  @override
-  int get hashCode => typeId.hashCode;
 }
 
 class ShoppingListItemAdapter extends TypeAdapter<ShoppingListItem> {
@@ -85,12 +85,12 @@ class ShoppingListItemAdapter extends TypeAdapter<ShoppingListItem> {
   }
 
   @override
+  int get hashCode => typeId.hashCode;
+
+  @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is ShoppingListItemAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
-
-  @override
-  int get hashCode => typeId.hashCode;
 }

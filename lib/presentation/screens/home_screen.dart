@@ -119,6 +119,16 @@ class HomeScreen extends StatelessWidget {
             ),
             _buildNavCard(
               context,
+              title: 'Wholesale & Consignment',
+              subtitle:
+                  'Track shops, galleries, batches sent, sell-through, returns and settlement',
+              icon: Icons.store_mall_directory_outlined,
+              route: '/wholesale',
+              color: Colors.brown.shade700,
+              onTap: () => _trackNavigation('wholesale_ledger'),
+            ),
+            _buildNavCard(
+              context,
               title: 'Commissions & Orders',
               subtitle:
                   'Keep private customer orders, deposits, due dates and linked projects together',

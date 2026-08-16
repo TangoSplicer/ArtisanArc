@@ -39,6 +39,9 @@ import 'package:artisanarc/features/recipes/presentation/make_recipe_editor_scre
 import 'package:artisanarc/features/collections/presentation/maker_collections_screen.dart';
 import 'package:artisanarc/features/collections/presentation/maker_collection_detail_screen.dart';
 import 'package:artisanarc/features/collections/presentation/maker_collection_editor_screen.dart';
+import 'package:artisanarc/features/wholesale/presentation/wholesale_ledger_screen.dart';
+import 'package:artisanarc/features/wholesale/presentation/wholesale_partner_editor_screen.dart';
+import 'package:artisanarc/features/wholesale/presentation/wholesale_batch_editor_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -237,6 +240,32 @@ class AppRouter {
         path: '/operations',
         name: 'makerOperations',
         builder: (context, state) => const MakerOperationsDashboardScreen(),
+      ),
+      GoRoute(
+        path: '/wholesale',
+        name: 'wholesaleLedger',
+        builder: (context, state) => const WholesaleLedgerScreen(),
+      ),
+      GoRoute(
+        path: '/wholesale/new-partner',
+        name: 'addWholesalePartner',
+        builder: (context, state) => const WholesalePartnerEditorScreen(),
+      ),
+      GoRoute(
+        path: '/wholesale/edit-partner/:id',
+        name: 'editWholesalePartner',
+        builder: (context, state) {
+          final partnerId = state.pathParameters['id'];
+          if (partnerId == null) {
+            return const ErrorScreen(error: 'Partner ID is missing');
+          }
+          return WholesalePartnerEditorScreen(partnerId: partnerId);
+        },
+      ),
+      GoRoute(
+        path: '/wholesale/new-batch',
+        name: 'addWholesaleBatch',
+        builder: (context, state) => const WholesaleBatchEditorScreen(),
       ),
       GoRoute(
         path: '/collections',

@@ -355,3 +355,16 @@ After **1.4**, use the app for a few real makes. If creating a finished item fro
 | Actionable material readiness & project startup | Collections show readiness per recipe target (shortages highlighted) and allow immediate project creation for batched production runs. |
 | Persistent local storage and safety | Maker collections are stored in local Hive data (TypeIds 16, 17) and fully integrated with automatic snapshots, portable backup/restore validation, sample data loading, and Settings clear-all. |
 | Regression coverage | Automated test suites verify capacity snapshots, target tracking, and material readiness calculations. |
+
+---
+
+# 2.6 — Sell where you stand (Market Day & Wholesale)
+
+## Delivery record — v2.6.0+21
+
+| Delivered capability | Implementation outcome |
+|---|---|
+| Wholesale & Consignment Ledger | Local management of wholesale and consignment partners (shops, galleries, stallholders) with configurable commission shares and contact notes. |
+| Batch Delivery & Stock Deduction | Sending a batch of finished crochet creations to a partner records agreed unit prices, sent dates, and payment due dates, automatically deducting inventory stock. |
+| Consignment Settlement & Returns | Settling batches records actual sold quantities and returned pieces, restoring returned inventory back to finished stock. |
+| Data safety & Portability | Wholesale partners and batches (Hive TypeIds 18, 19, 20) are fully integrated with automatic safety snapshots, portable backup/restore, starter data loading, and Settings clear-all. |

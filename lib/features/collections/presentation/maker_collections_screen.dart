@@ -68,9 +68,7 @@ class _MakerCollectionsScreenState extends State<MakerCollectionsScreen> {
                             size: 64, color: theme.colorScheme.primary),
                         const SizedBox(height: 16),
                         Text('No production collections yet',
-                            style: theme.styleTextIfPossible?.titleLarge ??
-                                const TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.bold)),
+                            style: theme.textTheme.titleLarge),
                         const SizedBox(height: 8),
                         const Text(
                           'Plan a seasonal range, market stall, or gifting collection to track recipe targets, making capacity, and next-make queues.',

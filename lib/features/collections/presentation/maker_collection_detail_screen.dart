@@ -6,6 +6,10 @@ import '../../../core/widgets/personal_app_bar.dart';
 import '../data/maker_collection_model.dart';
 import '../domain/collection_planning_service.dart';
 
+String _formatQuantity(double amount) => amount == amount.roundToDouble()
+    ? amount.toInt().toString()
+    : amount.toStringAsFixed(2).replaceFirst(RegExp(r'0+$'), '');
+
 class MakerCollectionDetailScreen extends StatefulWidget {
   const MakerCollectionDetailScreen({super.key, required this.collectionId});
 
@@ -305,7 +309,7 @@ class _MakerCollectionDetailScreenState
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
-                                    '${readiness.supplyNeed.itemName} (${CollectionMaterialReadiness._format(readiness.requiredQuantity)} ${readiness.supplyNeed.unit}): ${readiness.issue}',
+                                    '${readiness.supplyNeed.itemName} (${_formatQuantity(readiness.requiredQuantity)} ${readiness.supplyNeed.unit}): ${readiness.issue}',
                                     style: TextStyle(
                                       color: readiness.isReady
                                           ? theme.colorScheme.onSurface

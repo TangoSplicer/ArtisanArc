@@ -13,6 +13,7 @@ import '../../features/shopping/data/shopping_list_model.dart';
 import '../../features/commissions/data/commission_model.dart';
 import '../../features/recipes/data/make_recipe_model.dart';
 import '../../features/collections/data/maker_collection_model.dart';
+import '../../features/wholesale/data/wholesale_model.dart';
 
 void registerHiveAdapters() {
   _registerAdapterIfNotRegistered(InventoryItemAdapter());
@@ -34,6 +35,9 @@ void registerHiveAdapters() {
   _registerAdapterIfNotRegistered(RecipeVariantAdapter());
   _registerAdapterIfNotRegistered(MakerCollectionAdapter());
   _registerAdapterIfNotRegistered(CollectionRecipeTargetAdapter());
+  _registerAdapterIfNotRegistered(WholesalePartnerAdapter());
+  _registerAdapterIfNotRegistered(WholesaleBatchAdapter());
+  _registerAdapterIfNotRegistered(WholesaleBatchItemAdapter());
 }
 
 void _registerAdapterIfNotRegistered<T>(TypeAdapter<T> adapter) {

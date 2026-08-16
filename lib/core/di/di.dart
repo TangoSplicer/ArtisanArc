@@ -50,6 +50,10 @@ import '../../features/commissions/domain/commission_service.dart';
 // Maker operations
 import '../../features/operations/domain/maker_operations_service.dart';
 
+// Wholesale and consignment
+import '../../features/wholesale/data/wholesale_repository.dart';
+import '../../features/wholesale/domain/wholesale_service.dart';
+
 // AI
 import '../../features/ai/domain/craft_hint_service.dart';
 
@@ -189,6 +193,10 @@ Future<void> configureDependencies() async {
       getIt<StallSessionService>(),
     ),
   );
+
+  // Local-only wholesale and consignment ledger
+  getIt.registerLazySingleton<WholesaleRepository>(() => WholesaleRepository());
+  getIt.registerLazySingleton<WholesaleService>(() => WholesaleService());
 
   // Register Project Use Cases
   getIt.registerLazySingleton<CreateProject>(
