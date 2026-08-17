@@ -149,6 +149,16 @@ class HomeScreen extends StatelessWidget {
             ),
             _buildNavCard(
               context,
+              title: 'UK Tax & Expenses',
+              subtitle:
+                  'Estimate Self Assessment tax, track allowable expenses, and monitor VAT thresholds',
+              icon: Icons.calculate_outlined,
+              route: '/tax',
+              color: Colors.teal.shade800,
+              onTap: () => _trackNavigation('tax_dashboard'),
+            ),
+            _buildNavCard(
+              context,
               title: 'Commissions & Orders',
               subtitle:
                   'Keep private customer orders, deposits, due dates and linked projects together',

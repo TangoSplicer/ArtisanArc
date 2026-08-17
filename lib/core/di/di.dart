@@ -58,6 +58,7 @@ import '../../features/wholesale/domain/wholesale_service.dart';
 import '../../features/patterns/data/pattern_repository.dart';
 import '../../features/stitches/data/stitch_repository.dart';
 import '../../features/equipment/data/equipment_repository.dart';
+import '../../features/tax/domain/tax_service.dart';
 
 // AI
 import '../../features/ai/domain/craft_hint_service.dart';
@@ -207,6 +208,7 @@ Future<void> configureDependencies() async {
   getIt.registerLazySingleton<PatternRepository>(() => PatternRepository());
   getIt.registerLazySingleton<StitchRepository>(() => StitchRepository());
   getIt.registerLazySingleton<EquipmentRepository>(() => EquipmentRepository());
+  getIt.registerLazySingleton<TaxService>(() => TaxService());
 
   // Register Project Use Cases
   getIt.registerLazySingleton<CreateProject>(

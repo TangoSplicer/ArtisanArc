@@ -44,6 +44,7 @@ import 'package:artisanarc/features/wholesale/presentation/wholesale_partner_edi
 import 'package:artisanarc/features/wholesale/presentation/wholesale_batch_editor_screen.dart';
 import 'package:artisanarc/features/stitches/presentation/stitch_library_screen.dart';
 import 'package:artisanarc/features/equipment/presentation/equipment_ledger_screen.dart';
+import 'package:artisanarc/features/tax/presentation/tax_dashboard_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -278,6 +279,11 @@ class AppRouter {
         path: '/equipment',
         name: 'equipmentLedger',
         builder: (context, state) => const EquipmentLedgerScreen(),
+      ),
+      GoRoute(
+        path: '/tax',
+        name: 'taxDashboard',
+        builder: (context, state) => const TaxDashboardScreen(),
       ),
       GoRoute(
         path: '/collections',

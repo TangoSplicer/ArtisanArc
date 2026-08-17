@@ -381,3 +381,17 @@ After **1.4**, use the app for a few real makes. If creating a finished item fro
 | v2.8 — Professional Presentation | Local Brand Kit and portfolio structure for offline client and market showcase. |
 | v2.9 — Smart Studio Intelligence | Local-first profitability insights and material forecasting based on historical making and sales data. |
 | v3.0 — Fibre Arts Studio Expansion | Studio Equipment Ledger for looms, winders, and machinery (Hive TypeId 24) plus multi-craft taxonomy support. |
+
+---
+
+# 3.1 — UK Tax & Invoicing Milestone (v3.1)
+
+## Delivery record — v3.1.0+23
+
+| Delivered capability | Implementation outcome |
+|---|---|
+| UK Tax Estimation Engine | Implemented `TaxService` with UK 2026/27 Self Assessment rules (personal allowance, basic/higher rate thresholds). |
+| Business Expense Tracker | New `BusinessExpense` model (TypeId 27) for tracking allowable costs like materials, office, and travel. |
+| Tax Dashboard | Dedicated UI for monitoring real-time revenue vs. expenses and estimated tax liabilities. |
+| VAT Monitoring | Integrated tracking against the UK VAT registration threshold (£90,000 as of 2026). |
+| Data Integration | Tax data fully integrated into safety snapshots, portable backups, and clear-all workflows. |
