@@ -31,17 +31,24 @@ class _SplashScreenState extends State<SplashScreen>
 
   Future<void> _checkOnboardingStatus() async {
     await Future.delayed(
-        const Duration(seconds: 3)); // Show splash for 3 seconds
+        const Duration(seconds: 2)); // Quick splash duration
 
     if (mounted) {
-      const storage = FlutterSecureStorage();
-      final seenOnboarding =
-          await storage.read(key: StorageKeys.onboardingComplete) == 'true';
+      bool seenOnboarding = false;
+      try {
+        const storage = FlutterSecureStorage();
+        seenOnboarding =
+            await storage.read(key: StorageKeys.onboardingComplete) == 'true';
+      } catch (e) {
+        debugPrint('Splash storage check error: $e');
+      }
 
-      if (seenOnboarding) {
-        context.go('/home');
-      } else {
-        context.go('/onboarding');
+      if (mounted) {
+        if (seenOnboarding) {
+          context.go('/home');
+        } else {
+          context.go('/onboarding');
+        }
       }
     }
   }

@@ -50,14 +50,7 @@ class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: '/splash',
     errorBuilder: (context, state) => ErrorScreen(error: state.error?.message),
-    redirect: (context, state) async {
-      const storage = FlutterSecureStorage();
-      final seenOnboarding =
-          await storage.read(key: StorageKeys.onboardingComplete) == 'true';
-
-      if (state.matchedLocation == '/splash') {
-        return seenOnboarding ? '/home' : '/onboarding';
-      }
+    redirect: (context, state) {
       return null;
     },
     routes: [

@@ -22,14 +22,7 @@ void main() async {
   await Hive.initFlutter();
   registerHiveAdapters();
 
-  // Keep a short rotating local safety history without requiring an account or network.
-  try {
-    await BackupService.createStartupSnapshotIfDue();
-  } catch (error) {
-    debugPrint('Automatic backup snapshot skipped: $error');
-  }
-
-  // Configure dependencies
+  // Configure dependencies first
   await configureDependencies();
 
   // Initialize notifications
@@ -37,9 +30,24 @@ void main() async {
 
   final themeService = getIt.get<ThemeService>();
   await themeService.loadThemeMode();
-  final storage = getIt.get<FlutterSecureStorage>();
-  final seenOnboarding =
-      await storage.read(key: StorageKeys.onboardingComplete) == 'true';
+
+  // Run backup snapshot in background asynchronously so it never blocks startup
+  Future.microtask(() async {
+    try {
+      await BackupService.createStartupSnapshotIfDue();
+    } catch (error) {
+      debugPrint('Automatic backup snapshot skipped: $error');
+    }
+  });
+
+  bool seenOnboarding = false;
+  try {
+    final storage = getIt.get<FlutterSecureStorage>();
+    seenOnboarding =
+        await storage.read(key: StorageKeys.onboardingComplete) == 'true';
+  } catch (e) {
+    debugPrint('Secure storage read error: $e');
+  }
 
   runApp(ArtisanArcApp(
     themeService: themeService,
