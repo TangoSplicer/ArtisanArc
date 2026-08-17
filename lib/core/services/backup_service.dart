@@ -69,6 +69,7 @@ class BackupService {
     'wholesaleBatchesBox',
     'businessExpensesBox',
     'taxYearConfigsBox',
+    'brandKitBox',
   ];
   static const _manifestName = 'artisanarc-backup-manifest.json';
   static const _formatVersion = 2;

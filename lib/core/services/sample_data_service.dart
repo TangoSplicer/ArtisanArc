@@ -16,6 +16,7 @@ import '../../features/compliance/data/compliance_model.dart';
 import '../../features/project/data/production_run_model.dart';
 import '../../features/wholesale/data/wholesale_model.dart';
 import '../../features/tax/data/tax_models.dart';
+import '../../features/tax/data/brand_kit_model.dart';
 
 /// Provides optional, clearly fictional starter content for first-time users.
 /// It is only created when the user asks for it and can be removed in Settings.
@@ -37,6 +38,7 @@ class SampleDataService {
   static const _wholesaleBatchesBox = 'wholesaleBatchesBox';
   static const _businessExpensesBox = 'businessExpensesBox';
   static const _taxYearConfigsBox = 'taxYearConfigsBox';
+  static const _brandKitBox = 'brandKitBox';
 
   static Future<bool> hasCraftData() async {
     final inventory = await Hive.openBox<InventoryItem>(_inventoryBox);
@@ -60,8 +62,10 @@ class SampleDataService {
     final wholesaleBatches =
         await Hive.openBox<WholesaleBatch>(_wholesaleBatchesBox);
     final expenses = await Hive.openBox<BusinessExpense>(_businessExpensesBox);
+    final brandKit = await Hive.openBox<BrandKit>(_brandKitBox);
     return inventory.isNotEmpty ||
         expenses.isNotEmpty ||
+        brandKit.isNotEmpty ||
         stockAdjustments.isNotEmpty ||
         suppliers.isNotEmpty ||
         purchases.isNotEmpty ||
@@ -104,6 +108,7 @@ class SampleDataService {
     final wholesaleBatches =
         await Hive.openBox<WholesaleBatch>(_wholesaleBatchesBox);
     final expenses = await Hive.openBox<BusinessExpense>(_businessExpensesBox);
+    final brandKit = await Hive.openBox<BrandKit>(_brandKitBox);
 
     if (replaceExisting) {
       await Future.wait([
@@ -122,6 +127,7 @@ class SampleDataService {
         wholesalePartners.clear(),
         wholesaleBatches.clear(),
         expenses.clear(),
+        brandKit.clear(),
       ]);
     }
 
@@ -450,9 +456,11 @@ class SampleDataService {
     final wholesaleBatches =
         await Hive.openBox<WholesaleBatch>(_wholesaleBatchesBox);
     final expenses = await Hive.openBox<BusinessExpense>(_businessExpensesBox);
+    final brandKit = await Hive.openBox<BrandKit>(_brandKitBox);
     await Future.wait([
       inventory.clear(),
       expenses.clear(),
+      brandKit.clear(),
       stockAdjustments.clear(),
       suppliers.clear(),
       purchases.clear(),

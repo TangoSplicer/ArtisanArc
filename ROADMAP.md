@@ -395,3 +395,15 @@ After **1.4**, use the app for a few real makes. If creating a finished item fro
 | Tax Dashboard | Dedicated UI for monitoring real-time revenue vs. expenses and estimated tax liabilities. |
 | VAT Monitoring | Integrated tracking against the UK VAT registration threshold (£90,000 as of 2026). |
 | Data Integration | Tax data fully integrated into safety snapshots, portable backups, and clear-all workflows. |
+
+---
+
+# 3.2 — Professional Invoicing & Brand Kit (v3.2)
+
+## Delivery record — v3.2.0+24
+
+| Delivered capability | Implementation outcome |
+|---|---|
+| Brand Kit Management | Persistent `BrandKit` model (TypeId 29) for solo maker business details, addresses, and contact info. |
+| Professional PDF Invoicing | `InvoiceService` generates clean, professional PDF invoices for sales and commissions, ready for sharing or printing. |
+| Data Integration | Brand kit and invoice boxes fully integrated into safety snapshots, portable backup/restore, and clear-all workflows. |

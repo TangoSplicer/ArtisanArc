@@ -1,6 +1,6 @@
 name: artisanarc
 description: A self-contained, offline-first craft organisation app for personal use.
-version: 3.1.0+23
+version: 3.2.0+24
 
 environment:
   sdk: '>=3.1.0 <4.0.0'

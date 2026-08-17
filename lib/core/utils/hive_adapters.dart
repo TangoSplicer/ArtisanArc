@@ -18,6 +18,7 @@ import '../../features/patterns/data/pattern_model.dart';
 import '../../features/stitches/data/stitch_model.dart';
 import '../../features/equipment/data/equipment_model.dart';
 import '../../features/tax/data/tax_models.dart';
+import '../../features/tax/data/brand_kit_model.dart';
 
 void registerHiveAdapters() {
   _registerAdapterIfNotRegistered(InventoryItemAdapter());
@@ -48,6 +49,7 @@ void registerHiveAdapters() {
   _registerAdapterIfNotRegistered(EquipmentItemAdapter());
   _registerAdapterIfNotRegistered(BusinessExpenseAdapter());
   _registerAdapterIfNotRegistered(TaxYearConfigAdapter());
+  _registerAdapterIfNotRegistered(BrandKitAdapter());
 }
 
 void _registerAdapterIfNotRegistered<T>(TypeAdapter<T> adapter) {
