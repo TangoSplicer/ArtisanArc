@@ -18,57 +18,23 @@ import 'presentation/onboarding/onboarding_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Hive
+  // Initialize Hive immediately and register adapters
   await Hive.initFlutter();
   registerHiveAdapters();
 
-  // Configure dependencies first
-  await configureDependencies();
-
-  // Initialize notifications
-  await NotificationService.initialize();
-
-  final themeService = getIt.get<ThemeService>();
-  await themeService.loadThemeMode();
-
-  // Run backup snapshot in background asynchronously so it never blocks startup
-  Future.microtask(() async {
-    try {
-      await BackupService.createStartupSnapshotIfDue();
-    } catch (error) {
-      debugPrint('Automatic backup snapshot skipped: $error');
-    }
-  });
-
-  bool seenOnboarding = false;
-  try {
-    final storage = getIt.get<FlutterSecureStorage>();
-    seenOnboarding =
-        await storage.read(key: StorageKeys.onboardingComplete) == 'true';
-  } catch (e) {
-    debugPrint('Secure storage read error: $e');
-  }
-
-  runApp(ArtisanArcApp(
-    themeService: themeService,
-    seenOnboarding: seenOnboarding,
-  ));
+  // Launch app immediately to dismiss native splash screen instantly
+  runApp(const ArtisanArcRootApp());
 }
 
-class ArtisanArcApp extends StatelessWidget {
-  final ThemeService themeService;
-  final bool seenOnboarding;
-
-  const ArtisanArcApp({
-    super.key,
-    required this.themeService,
-    required this.seenOnboarding,
-  });
+class ArtisanArcRootApp extends StatelessWidget {
+  const ArtisanArcRootApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
-      value: themeService,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeService()),
+      ],
       child: Consumer<ThemeService>(
         builder: (context, themeService, child) {
           return MaterialApp.router(
@@ -78,16 +44,15 @@ class ArtisanArcApp extends StatelessWidget {
             darkTheme: AppTheme.darkTheme,
             themeMode: themeService.currentThemeMode,
             routerConfig: AppRouter.router,
-            supportedLocales: const [
-              Locale('en', 'GB'),
-              Locale('en', 'US'),
-            ],
             localizationsDelegates: const [
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
             ],
-            locale: const Locale('en', 'GB'),
+            supportedLocales: const [
+              Locale('en', 'GB'),
+              Locale('en', 'US'),
+            ],
           );
         },
       ),
